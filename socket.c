@@ -1,10 +1,13 @@
-#include <netdb.h> //addrinfo
 #include <stdio.h> // null e stderr
 #include <string.h> // memset
 #include <unistd.h> // cloes
 #include <stdlib.h> // exit
+#include <arpa/inet.h> // inet_ntop
+#include "childProcess.h" // handleChildProcessTermination
+#include "socket.h" //addrinfo
 
-#define PORT "3492"  // A porta usada para outros usuários se conectarem. 
+#define PORT "3492"  // A porta usada para outros usuários se conectarem.
+#define BACKLOG 10   // Quantidade máxima de conexões pendentes  
 
 /**
  * Retorna uma referencia de memoria. Libere após usar!!!
@@ -122,4 +125,71 @@ void handleConnectionOnANewProcess(int parentSocketFileDescriptor, int connected
     close(connectedSocketFileDescriptor);
     exit(0);                                // Termina execução do processo filho
   }
+}
+
+// Abstrai o tipo do endereço do socket. De modo que funcione com IPs tanto de versão 4 como 6
+void *get_in_addr(struct sockaddr *sa) {
+    if (sa->sa_family == AF_INET) {
+        return &(((struct sockaddr_in*)sa)->sin_addr);
+    }
+
+    return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+void listenForConnections(int socketFileDescriptor, void (*onError)()) {
+    struct sockaddr_storage originConnectionAddress; // Informações do endereço da conexão de origem
+    socklen_t sin_size = sizeof originConnectionAddress;
+    int connectedSocketFileDescriptor;
+    char originIpAddress[INET6_ADDRSTRLEN];
+
+    handleChildProcessTermination();
+
+    if (listen(socketFileDescriptor, BACKLOG) == -1) {
+        perror("listen");
+        onError();
+    }
+
+    printf("\n\n✅ server: waiting for connections on port: %s ...\n", PORT);
+
+    // Loop principal para lidar com as solicitações de conexão 
+    while(1) {
+        // Aceita uma conexão pendente 
+        connectedSocketFileDescriptor = accept(
+            socketFileDescriptor,
+            (struct sockaddr *)
+            &originConnectionAddress,
+            &sin_size
+        );
+
+        if (connectedSocketFileDescriptor == -1) { // Se falha na conexão tenta a próxima 
+            perror("accept");
+            continue;
+        }
+
+        // Imprime o IP de origem da conexão 
+        inet_ntop(
+            originConnectionAddress.ss_family,
+            get_in_addr((struct sockaddr *)&originConnectionAddress),
+            originIpAddress,
+            sizeof originIpAddress);
+
+        printf("server: got connection from %s\n", originIpAddress);
+
+        // printando dados enviados pelo cliente 
+        int numbytes;
+        char buf[1000];
+        if ((numbytes = recv(connectedSocketFileDescriptor, buf, 1000 - 1, 0)) == -1) {
+            perror("recv");
+            onError();
+        }
+
+        buf[numbytes] = '\0';
+
+        printf("server: received data:\n\n '%s'",buf);
+
+        // Cria um novo processo para responder a solicitação 
+        handleConnectionOnANewProcess(socketFileDescriptor, connectedSocketFileDescriptor);
+
+        close(connectedSocketFileDescriptor);  // parent doesn't need this
+    }
 }

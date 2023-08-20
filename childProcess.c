@@ -3,6 +3,7 @@
 #include <stdio.h> // null
 #include <sys/wait.h> // WNOHANG
 #include <stdlib.h> // exit
+#include "childProcess.h"
 
 /**
  * Lida da o sinal que o sistema envia quando os processos filhos param ou terminal
