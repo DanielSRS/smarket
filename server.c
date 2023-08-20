@@ -143,59 +143,49 @@ int createAndBindSocket(const struct addrinfo *serverAddressInfo, void (*onError
   return socketFileDescriptor;
 }
 
-int main(void)
-{
-    // File descriptor do socket. sockfd escuta por conexões. new_fd quando uma nova conexão é estabelecida. 
-    int new_fd;
-    struct addrinfo *servinfo;
-    struct sockaddr_storage their_addr; // Informações do endereço de quem solicitou a conexão
-    socklen_t sin_size;
-    struct sigaction sa;
-    char s[INET6_ADDRSTRLEN];
-
-    servinfo = getAddressInfo(onGetAddressInfoError);
-
-    int socketFileDescriptor = createAndBindSocket(servinfo, onGetAddressInfoError);
-  
-    freeaddrinfo(servinfo); // Libera a memória. Essa estrutura não vai ser mais usada. 
+void listenForConnections(int socketFileDescriptor, void (*onError)()) {
+    struct sockaddr_storage originConnectionAddress; // Informações do endereço da conexão de origem
+    socklen_t sin_size = sizeof originConnectionAddress;
+    int connectedSocketFileDescriptor;
+    char originIpAddress[INET6_ADDRSTRLEN];
 
     if (listen(socketFileDescriptor, BACKLOG) == -1) {
         perror("listen");
-        exit(1);
-    }
-
-    sa.sa_handler = sigchld_handler; // reap all dead processes
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(1);
+        onError();
     }
 
     printf("\n\n✅ server: waiting for connections on port: %s ...\n", PORT);
 
     // Loop principal para lidar com as solicitações de conexão 
-    while(1) { 
-        sin_size = sizeof their_addr;
+    while(1) {
         // Aceita uma conexão pendente 
-        new_fd = accept(socketFileDescriptor, (struct sockaddr *)&their_addr, &sin_size);
-        if (new_fd == -1) { // Se falha na conexão tenta a próxima 
+        connectedSocketFileDescriptor = accept(
+            socketFileDescriptor,
+            (struct sockaddr *)
+            &originConnectionAddress,
+            &sin_size
+        );
+
+        if (connectedSocketFileDescriptor == -1) { // Se falha na conexão tenta a próxima 
             perror("accept");
             continue;
         }
 
         // Imprime o IP de origem da conexão 
-        inet_ntop(their_addr.ss_family,
-            get_in_addr((struct sockaddr *)&their_addr),
-            s, sizeof s);
-        printf("server: got connection from %s\n", s);
+        inet_ntop(
+            originConnectionAddress.ss_family,
+            get_in_addr((struct sockaddr *)&originConnectionAddress),
+            originIpAddress,
+            sizeof originIpAddress);
+
+        printf("server: got connection from %s\n", originIpAddress);
 
         // printando dados enviados pelo cliente 
         int numbytes;
         char buf[1000];
-        if ((numbytes = recv(new_fd, buf, 1000 - 1, 0)) == -1) {
+        if ((numbytes = recv(connectedSocketFileDescriptor, buf, 1000 - 1, 0)) == -1) {
             perror("recv");
-            exit(1);
+            onError();
         }
 
         buf[numbytes] = '\0';
@@ -211,13 +201,34 @@ int main(void)
             char *response = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nConnection: Keep-Alive\r\nContent-Type: text/plain\r\nContent-Length: 18\r\n\r\nHello, world!\r\n";
             
             // Envia a resposta 
-            if (send(new_fd, response, strlen(response), 0) == -1)
+            if (send(connectedSocketFileDescriptor, response, strlen(response), 0) == -1)
                 perror("send");
-            close(new_fd);
-            exit(0);
+            close(connectedSocketFileDescriptor);
+            exit(0);                                // Termina execução do processo filho
         }
-        close(new_fd);  // parent doesn't need this
+        close(connectedSocketFileDescriptor);  // parent doesn't need this
     }
+}
+
+int main(void) {
+    struct addrinfo *servinfo;
+    struct sigaction sa;
+
+    servinfo = getAddressInfo(onGetAddressInfoError);
+
+    int socketFileDescriptor = createAndBindSocket(servinfo, onGetAddressInfoError);
+  
+    freeaddrinfo(servinfo); // Libera a memória. Essa estrutura não vai ser mais usada. 
+
+    sa.sa_handler = sigchld_handler; // reap all dead processes
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
+
+    listenForConnections(socketFileDescriptor, onGetAddressInfoError);
 
     return 0;
 }
