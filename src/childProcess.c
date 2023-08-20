@@ -1,6 +1,6 @@
-#include <signal.h>
+#include <signal.h> // sigaction, sigemptyset, sigaction
 #include <errno.h> // errno
-#include <stdio.h> // null
+#include <stdio.h> // null, perror
 #include <sys/wait.h> // WNOHANG
 #include <stdlib.h> // exit
 #include "childProcess.h"
