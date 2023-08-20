@@ -15,11 +15,15 @@
 
 #define BACKLOG 10   // Quantidade máxima de conexões pendentes 
 
+/**
+ * Lida da o sinal que o sistema envia quando os processos filhos param ou terminal
+*/
 void sigchld_handler(int s)
 {
     // waitpid() might overwrite errno, so we save and restore it:
     int saved_errno = errno;
 
+    /** Aguarda até que o processo filho morra */
     while(waitpid(-1, NULL, WNOHANG) > 0);
 
     errno = saved_errno;
@@ -36,28 +40,52 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+void onGetAddressInfoError() {
+    exit(1);
+};
+
+/**
+ * Retorna uma referencia de memoria. Libere após usar!!!
+*/
+struct addrinfo* getAddressInfo(void (*onError)()) {
+    struct addrinfo configurationHints;                         // Parametros de confuguração para a função getaddrinfo
+    struct addrinfo *addressInfo;                               // Resposta de chamada de getaddrinfo
+    int configurationMemorySize = sizeof configurationHints;    // Tamanha da estrutura que gurda a configuração
+    int THERE_WAS_NO_ERROR = 0;                                 // getaddrinfo executou sem nenhum erro.
+
+    memset(&configurationHints, 0, configurationMemorySize);    // zerado a memória 
+
+    /* Definindo os  parametros de configuração */
+    configurationHints.ai_family = AF_UNSPEC;       // Escolha automática entre ipv4 e ipv6
+    configurationHints.ai_socktype = SOCK_STREAM;   // Usa TCP como tipo da conexão
+    configurationHints.ai_flags = AI_PASSIVE;       // Usar meu ip
+
+    // Automaticamente preenche as informações da struct de endereço 
+    int errorCode = getaddrinfo(NULL, PORT, &configurationHints, &addressInfo);
+
+    /* Verifica se houve erro*/
+    if (errorCode != THERE_WAS_NO_ERROR) {
+        // const char *getaddrinfoErrorMessage = gai_strerror(errorCode);
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(errorCode));
+        onError();
+        return NULL;
+    }
+
+    return addressInfo;
+}
+
 int main(void)
 {
     // File descriptor do socket. sockfd escuta por conexões. new_fd quando uma nova conexão é estabelecida. 
     int sockfd, new_fd;
-    struct addrinfo hints, *servinfo, *p;
+    struct addrinfo *servinfo, *p;
     struct sockaddr_storage their_addr; // Informações do endereço de quem solicitou a conexão
     socklen_t sin_size;
     struct sigaction sa;
     int yes=1;
     char s[INET6_ADDRSTRLEN];
-    int rv;
 
-    memset(&hints, 0, sizeof hints); // zerado a memória 
-    hints.ai_family = AF_UNSPEC; // Escolha automática entre ipv4 e ipv6
-    hints.ai_socktype = SOCK_STREAM; // TCP 
-    hints.ai_flags = AI_PASSIVE; // Usar meu ip
-
-    // Automaticamente preenche as informações da struct de endereço 
-    if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        return 1;
-    }
+    servinfo = getAddressInfo(onGetAddressInfoError);
 
     // Itera sobre todos os resultados e faz o bind no primeiro que for possível 
     for(p = servinfo; p != NULL; p = p->ai_next) {
@@ -105,7 +133,7 @@ int main(void)
         exit(1);
     }
 
-    printf("✅ server: waiting for connections on port: %s ...\n", PORT);
+    printf("\n\n✅ server: waiting for connections on port: %s ...\n", PORT);
 
     // Loop principal para lidar com as solicitações de conexão 
     while(1) { 
