@@ -6,3 +6,13 @@ Ubuntu:
 ``` bash
 sudo apt install build-essential
 ```
+
+Compilando servidor:
+``` bash
+make server
+```
+
+Executando servidor:
+``` bash
+make serve
+```
