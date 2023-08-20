@@ -143,11 +143,43 @@ int createAndBindSocket(const struct addrinfo *serverAddressInfo, void (*onError
   return socketFileDescriptor;
 }
 
+/**
+ * Lida com os sinais recebidos pelo sistema operacional quando um processo filho encerra
+*/
+void handleChildProcessTermination() {
+    struct sigaction signalAction;
+
+    signalAction.sa_handler = sigchld_handler; // reap all dead processes
+    sigemptyset(&signalAction.sa_mask);
+    signalAction.sa_flags = SA_RESTART;
+    if (sigaction(SIGCHLD, &signalAction, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
+}
+
+void handleConnectionOnANewProcess(int parentSocketFileDescriptor, int connectedSocketFileDescriptor) {
+    if (!fork()) { // Este é o processo filho 
+        close(parentSocketFileDescriptor); // O processo filho não precisa dessa conexão
+
+        // Resposta no formato definido pelo protocolo http 
+        char *response = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nConnection: Keep-Alive\r\nContent-Type: text/plain\r\nContent-Length: 18\r\n\r\nHello, world!\r\n";
+        
+        // Envia a resposta 
+        if (send(connectedSocketFileDescriptor, response, strlen(response), 0) == -1)
+            perror("send");
+        close(connectedSocketFileDescriptor);
+        exit(0);                                // Termina execução do processo filho
+    }
+}
+
 void listenForConnections(int socketFileDescriptor, void (*onError)()) {
     struct sockaddr_storage originConnectionAddress; // Informações do endereço da conexão de origem
     socklen_t sin_size = sizeof originConnectionAddress;
     int connectedSocketFileDescriptor;
     char originIpAddress[INET6_ADDRSTRLEN];
+
+    handleChildProcessTermination();
 
     if (listen(socketFileDescriptor, BACKLOG) == -1) {
         perror("listen");
@@ -193,40 +225,20 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
         printf("server: received data:\n\n '%s'",buf);
 
         // Cria um novo processo para responder a solicitação 
+        handleConnectionOnANewProcess(socketFileDescriptor, connectedSocketFileDescriptor);
 
-        if (!fork()) { // Este é o processo filho 
-            close(socketFileDescriptor); // O processo filho não precisa dessa conexão
-
-            // Resposta no formato definido pelo protocolo http 
-            char *response = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nConnection: Keep-Alive\r\nContent-Type: text/plain\r\nContent-Length: 18\r\n\r\nHello, world!\r\n";
-            
-            // Envia a resposta 
-            if (send(connectedSocketFileDescriptor, response, strlen(response), 0) == -1)
-                perror("send");
-            close(connectedSocketFileDescriptor);
-            exit(0);                                // Termina execução do processo filho
-        }
         close(connectedSocketFileDescriptor);  // parent doesn't need this
     }
 }
 
 int main(void) {
     struct addrinfo *servinfo;
-    struct sigaction sa;
 
     servinfo = getAddressInfo(onGetAddressInfoError);
 
     int socketFileDescriptor = createAndBindSocket(servinfo, onGetAddressInfoError);
   
     freeaddrinfo(servinfo); // Libera a memória. Essa estrutura não vai ser mais usada. 
-
-    sa.sa_handler = sigchld_handler; // reap all dead processes
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        perror("sigaction");
-        exit(1);
-    }
 
     listenForConnections(socketFileDescriptor, onGetAddressInfoError);
 
