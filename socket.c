@@ -2,6 +2,7 @@
 #include <stdio.h> // null e stderr
 #include <string.h> // memset
 #include <unistd.h> // cloes
+#include <stdlib.h> // exit
 
 #define PORT "3492"  // A porta usada para outros usuários se conectarem. 
 
@@ -102,4 +103,23 @@ int createAndBindSocket(const struct addrinfo *serverAddressInfo, void (*onError
   }
 
   return socketFileDescriptor;
+}
+
+void handleConnectionOnANewProcess(int parentSocketFileDescriptor, int connectedSocketFileDescriptor) {
+  if (!fork()) { // Este é o processo filho 
+    close(parentSocketFileDescriptor); // O processo filho não precisa dessa conexão
+
+    // Resposta no formato definido pelo protocolo http 
+    char *response = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\
+    Connection: Keep-Alive\r\n\
+    Content-Type: application/json\r\n\
+    Content-Length: 14\r\n\r\n\
+    {\"dan\": \"iel\"}";
+
+    // Envia a resposta 
+    if (send(connectedSocketFileDescriptor, response, strlen(response), 0) == -1)
+      perror("send");
+    close(connectedSocketFileDescriptor);
+    exit(0);                                // Termina execução do processo filho
+  }
 }
