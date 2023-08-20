@@ -163,8 +163,12 @@ void handleConnectionOnANewProcess(int parentSocketFileDescriptor, int connected
         close(parentSocketFileDescriptor); // O processo filho não precisa dessa conexão
 
         // Resposta no formato definido pelo protocolo http 
-        char *response = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nConnection: Keep-Alive\r\nContent-Type: text/plain\r\nContent-Length: 18\r\n\r\nHello, world!\r\n";
-        
+        char *response = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\
+        Connection: Keep-Alive\r\n\
+        Content-Type: application/json\r\n\
+        Content-Length: 14\r\n\r\n\
+        {\"dan\": \"iel\"}";
+
         // Envia a resposta 
         if (send(connectedSocketFileDescriptor, response, strlen(response), 0) == -1)
             perror("send");
