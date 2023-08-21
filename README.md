@@ -4,7 +4,7 @@ Configuração do ambiente de desenvolvimento:
 
 Ubuntu:
 ``` bash
-sudo apt install build-essential
+sudo apt install build-essential gdb cmake
 ```
 
 Compilando servidor:
