@@ -3,4 +3,5 @@ add_executable(Cstrings_Test cstrings_test.c)
 
 target_link_libraries(Cstrings_Test Cstrings)
 
-add_test(CstringsTest Cstrings_Test)
+add_test(_compareIfStringsAreEqual Cstrings_Test _compareIfStringsAreEqual)
+add_test(_compareIfStringsAreDiff Cstrings_Test _compareIfStringsAreDiff)
