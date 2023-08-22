@@ -4,6 +4,8 @@ project(SmartSupermarket VERSION 0.1.0 LANGUAGES C)
 include(CTest)
 enable_testing()
 
+add_subdirectory(util)
+
 add_library(socket socket.c)
 add_library(childProcess childProcess.c)
 
