@@ -2,6 +2,13 @@
 #include <stdio.h> // snprintf, fprintf
 #include <stdlib.h> // exit
 
+/**
+ * Encerra a execução do programa imadiatamente
+*/
+void exitOnError() {
+  exit(1);
+}
+
 TestResult assertEquals(int expected, int received) {
   TestResult result;
   if (expected == received) {
@@ -16,17 +23,16 @@ TestResult assertEquals(int expected, int received) {
   return result;
 }
 
-int it(char *testDesciption, TestResult(*test)()) {
+void it(char *testDesciption, TestResult(*test)()) {
   TestResult testResult;
   testResult = test();
 
   if (testResult.pass) {
     printf("\n✅ %s - pass", testDesciption);
-    return 0;
   } else {
     fprintf(stderr, "\n❌ %s - failed", testDesciption);
     fprintf(stderr, "\n\t\t%s", testResult.errorDescription);
-    return 1;
+    exitOnError();
   }
 }
 
@@ -48,13 +54,6 @@ TestArgs _parseTestArgs(int argc, char **argv, void(*onEror)()) {
   testArgs.testName = argv[1];
 
   return testArgs;
-}
-
-/**
- * Encerra a execução do programa imadiatamente
-*/
-void exitOnError() {
-  exit(1);
 }
 
 TestArgs parseTestArgs(int argc, char **argv) {

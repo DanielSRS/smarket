@@ -53,7 +53,7 @@ TestResult assertEquals(int expected, int received);
  *    ❌ - <descrição do teste - failed
  *        <descrição do erro>
 */
-int it(char *testDesciption, TestResult(*test)());
+void it(char *testDesciption, TestResult(*test)());
 
 /**
  * Valida os argumentos de chamada de um conjunto de testes
