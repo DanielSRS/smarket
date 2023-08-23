@@ -60,3 +60,8 @@ void exitOnError() {
 TestArgs parseTestArgs(int argc, char **argv) {
   _parseTestArgs(argc, argv, exitOnError);
 }
+
+void noTestFoundWithGiven(char *name) {
+  fprintf(stderr, "❌ - No test found with the name of: %s", name);
+  exitOnError();
+}

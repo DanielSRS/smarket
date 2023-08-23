@@ -31,7 +31,6 @@ int main(int argc, char **argv){
                 "Compara duas string e retorna false se forem diferentes",
                 _compareIfStringsAreDiff);
         DEFAULT
-            fprintf(stderr, "❌ - No test found with the name of: %s", args.testName);
-            return 1;
+            noTestFoundWithGiven(args.testName);
     } END;
 }

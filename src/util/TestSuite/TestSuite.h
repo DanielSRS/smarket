@@ -62,4 +62,9 @@ int it(char *testDesciption, TestResult(*test)());
  */
 TestArgs parseTestArgs(int argc, char **argv);
 
+/**
+ * Aborta caso não exista um teste com o nome especificado
+*/
+void noTestFoundWithGiven(char *name);
+
 #endif // TESTSUIT_H
