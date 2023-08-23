@@ -28,6 +28,15 @@ typedef struct TestResult
   char errorDescription[100];
 } TestResult;
 
+typedef struct TestArgs
+{
+  /** Nome do arquivo que contém os testes */
+  char *testFileName;
+  /** Nome do teste a ser executado */
+  char *testName;
+} TestArgs;
+
+
 TestResult assertEquals(int expected, int received);
 
 // assertNull
@@ -45,5 +54,12 @@ TestResult assertEquals(int expected, int received);
  *        <descrição do erro>
 */
 int it(char *testDesciption, TestResult(*test)());
+
+/**
+ * Valida os argumentos de chamada de um conjunto de testes
+ * 
+ * Aborta se os argumentos estiverem em um formato incorreto
+ */
+TestArgs parseTestArgs(int argc, char **argv);
 
 #endif // TESTSUIT_H
