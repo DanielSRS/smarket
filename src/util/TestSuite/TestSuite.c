@@ -64,3 +64,18 @@ void noTestFoundWithGiven(char *name) {
   fprintf(stderr, "❌ - No test found with the name of: %s", name);
   exitOnError();
 }
+
+TestResult expectToBeNotNull(void *received) {
+
+  TestResult result;
+  if (received != NULL) {
+    result.errorDescription[0] = '\0';
+    result.pass = True;
+    return result;
+  }
+
+  snprintf(result.errorDescription, 100, "Expected %p but received: %p\n", NULL, received);
+  result.pass = False;
+
+  return result;
+}

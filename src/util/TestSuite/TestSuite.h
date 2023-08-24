@@ -38,6 +38,8 @@ typedef struct TestArgs
 
 TestResult assertEquals(int expected, int received);
 
+TestResult expectToBeNotNull(void *received);
+
 // assertNull
 // assertTrue
 // assertFalse
