@@ -70,7 +70,7 @@ TestResult _pointerIsNullAfterDestroy() {
   char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
-  entry->destroy(entry);
+  entry->destroy(&entry);
 
   return expectToBeNull(entry);
 }

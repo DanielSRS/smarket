@@ -42,7 +42,7 @@ TestResult expectPointersToBeEquals(const void *expected, const void *received);
 
 TestResult expectToBeNotNull(const void *received);
 
-TestResult expectToBeNull(void *value);
+TestResult expectToBeNull(const void *value);
 // assertNull
 // assertTrue
 // assertFalse

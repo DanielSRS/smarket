@@ -80,7 +80,7 @@ TestResult expectToBeNotNull(const void *received) {
   return result;
 }
 
-TestResult expectToBeNull(void *value) {
+TestResult expectToBeNull(const void *value) {
 
   TestResult result;
   if (value == NULL) {

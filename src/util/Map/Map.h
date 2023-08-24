@@ -20,7 +20,7 @@ typedef struct MapEntry
   /**
    * Destroi o registro liberando memória
    */
-  const void(*destroy)(struct MapEntry* self);
+  const void(*destroy)(struct MapEntry** self);
 
   struct MapEntry *sibling;
 } MapEntry;

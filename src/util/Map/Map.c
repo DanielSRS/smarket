@@ -248,10 +248,11 @@ Map* newMap() {
 /**
  * Destroi o registro liberando memória
  */
-void destroyMapEntry(struct MapEntry* self) {
-  memset(self, 0, sizeof(MapEntry));
-  free(self);
-  self = NULL;
+void destroyMapEntry(struct MapEntry **self) {
+  if (!*self) return;
+  free(*self);
+  memset(*self, 0, sizeof(MapEntry));
+  *self = NULL;
 }
 
 MapEntry *newMapEntry(char *key, void *value, char *type) {
