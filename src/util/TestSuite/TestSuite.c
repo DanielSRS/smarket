@@ -65,7 +65,7 @@ void noTestFoundWithGiven(char *name) {
   exitOnError();
 }
 
-TestResult expectToBeNotNull(void *received) {
+TestResult expectToBeNotNull(const void *received) {
 
   TestResult result;
   if (received != NULL) {
@@ -90,6 +90,20 @@ TestResult expectToBeNull(void *value) {
   }
 
   snprintf(result.errorDescription, 100, "Expected %p but received: %p\n", NULL, value);
+  result.pass = False;
+
+  return result;
+}
+
+TestResult expectPointersToBeEquals(const void *expected, const void *received) {
+  TestResult result;
+  if (expected == received) {
+    result.errorDescription[0] = '\0';
+    result.pass = True;
+    return result;
+  }
+
+  snprintf(result.errorDescription, 100, "Expected %p but received: %p\n", expected, received);
   result.pass = False;
 
   return result;

@@ -38,7 +38,9 @@ typedef struct TestArgs
 
 TestResult assertEquals(int expected, int received);
 
-TestResult expectToBeNotNull(void *received);
+TestResult expectPointersToBeEquals(const void *expected, const void *received);
+
+TestResult expectToBeNotNull(const void *received);
 
 TestResult expectToBeNull(void *value);
 // assertNull
