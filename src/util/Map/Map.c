@@ -256,6 +256,7 @@ void destroyMapEntry(struct MapEntry* self) {
 
 MapEntry *newMapEntry(char *key, void *value, char *type) {
   MapEntry *newEntry = (MapEntry*) malloc(sizeof(MapEntry));
+  memset(newEntry, 0, sizeof(MapEntry));
 
   newEntry->key = key;
   newEntry->value = value;
