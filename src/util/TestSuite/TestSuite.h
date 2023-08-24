@@ -1,9 +1,8 @@
 #include "switchString.h"
+#include "../Boolean/Boolean.h" // boolean
 
 #ifndef TESTSUIT_H
 #define TESTSUIT_H
-
-typedef enum boolean { False, True } boolean; 
 
 /**
  * Resultado da execução de um teste (asserção)

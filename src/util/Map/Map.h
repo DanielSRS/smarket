@@ -1,10 +1,7 @@
+#include "../Boolean/Boolean.h"
+
 #ifndef MAP_H
 #define MAP_H
-
-typedef enum {
-  False,
-  True,
-} boolean;
 
 typedef struct MapEntry
 {
