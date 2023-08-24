@@ -1,5 +1,6 @@
-#include "../src/util/TestSuite/TestSuite.h"
+#include "../src/util/TestSuite/TestSuite.h" // strcpy
 #include "../src/util/Map/Map.h"
+#include <stdlib.h> // free
 
 TestResult _newMapEntryCreatesANonNullReference() {
   char *key = "idDaEntrada";
@@ -75,6 +76,23 @@ TestResult _pointerIsNullAfterDestroy() {
   return expectToBeNull(entry);
 }
 
+TestResult _toStringHasTheExpectedFormat() {
+  char *key = "idDaEntrada";
+  char *value = "Sou um valor qualquer";
+  char *type = "Custom type";
+  MapEntry *entry = newMapEntry(key, (void *) value, type);
+
+  char *stringRepresentation = entry->toString(entry);
+  int stringLen = strlen(stringRepresentation);
+  char received[stringLen];
+  strcpy(received, stringRepresentation);
+
+  /** toString aloca memória. É preciso liberar antes da asserção */
+  free(stringRepresentation);
+
+  return expectStringsToBeEquals("idDaEntrada: Custom type", received);
+}
+
 
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
@@ -103,6 +121,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_pointerIsNullAfterDestroy")
       it("Destruir o MapEntry define self (ponteiro para si mesmo) como null", _pointerIsNullAfterDestroy);
+      break;
+    CASE ("_toStringHasTheExpectedFormat")
+      it("toString retorna a representação do dado no formato esperado", _toStringHasTheExpectedFormat);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
