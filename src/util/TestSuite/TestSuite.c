@@ -23,6 +23,20 @@ TestResult assertEquals(int expected, int received) {
   return result;
 }
 
+TestResult expectStringsToBeEquals(const char *expected, const char *received) {
+  TestResult result;
+  if (strcmp(expected, received) == 0) {
+    result.errorDescription[0] = '\0';
+    result.pass = True;
+    return result;
+  }
+
+  snprintf(result.errorDescription, 100, "Expected \"%s\" but received: \"%s\"\n", expected, received);
+  result.pass = False;
+
+  return result;
+}
+
 void it(char *testDesciption, TestResult(*test)()) {
   TestResult testResult;
   testResult = test();
