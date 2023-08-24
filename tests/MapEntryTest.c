@@ -55,6 +55,15 @@ TestResult _destroyShouldBeNotNull() {
   return expectToBeNotNull(entry->destroy);
 }
 
+TestResult _toStringShouldBeNotNull() {
+  char *key = "idDaEntrada";
+  char *value = "Sou um valor qualquer";
+  char *type = "Custom type";
+  MapEntry *entry = newMapEntry(key, (void *) value, type);
+
+  return expectToBeNotNull(entry->toString);
+}
+
 
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
@@ -77,6 +86,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_destroyShouldBeNotNull")
       it("Atributo destroy tem valor válido (not null)", _destroyShouldBeNotNull);
+      break;
+    CASE ("_toStringShouldBeNotNull")
+      it("Atributo toString tem valor válido (not null)", _toStringShouldBeNotNull);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
