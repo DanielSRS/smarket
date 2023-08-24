@@ -209,11 +209,36 @@ int _lengthOfAMap(Map* self) {
   return self->length;
 }
 
-void _setElementOfAMap(Map* self, char* key, void* value) {
+/**
+ * Destroi o registro liberando memória
+ */
+void destroyMapEntry(struct MapEntry **self) {
+  if (!*self) return;
+  free(*self);
+  memset(*self, 0, sizeof(MapEntry));
+  *self = NULL;
+}
+
+MapEntry *newMapEntry(char *key, void *value, char *type) {
   MapEntry *newEntry = (MapEntry*) malloc(sizeof(MapEntry));
-  newEntry->key = duplicateString(key);
+  memset(newEntry, 0, sizeof(MapEntry));
+
+  newEntry->key = key;
+  newEntry->value = value;
+  newEntry->type = type;
   newEntry->sibling = NULL;
-  newEntry->type = duplicateString(ANY_OBJECT);
+
+  newEntry->destroy = destroyMapEntry;
+  newEntry->toString = _mapEntryToString;
+  return newEntry;
+}
+
+void _setElementOfAMap(Map* self, char* key, void* value) {
+  MapEntry *newEntry = newMapEntry(
+    duplicateString(key),
+    value,
+    duplicateString(ANY_OBJECT));
+  newEntry->sibling = NULL;
   newEntry->value = value;
 
   /** Se vazio */
@@ -243,28 +268,4 @@ Map* newMap() {
   map->_items = NULL;
 
   return map;
-}
-
-/**
- * Destroi o registro liberando memória
- */
-void destroyMapEntry(struct MapEntry **self) {
-  if (!*self) return;
-  free(*self);
-  memset(*self, 0, sizeof(MapEntry));
-  *self = NULL;
-}
-
-MapEntry *newMapEntry(char *key, void *value, char *type) {
-  MapEntry *newEntry = (MapEntry*) malloc(sizeof(MapEntry));
-  memset(newEntry, 0, sizeof(MapEntry));
-
-  newEntry->key = key;
-  newEntry->value = value;
-  newEntry->type = type;
-  newEntry->sibling = NULL;
-
-  newEntry->destroy = destroyMapEntry;
-  newEntry->toString = _mapEntryToString;
-  return newEntry;
 }
