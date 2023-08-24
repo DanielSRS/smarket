@@ -58,6 +58,32 @@ TestResult _lengthShouldBeZero() {
   return assertEquals(initialValueShouldBeZero, mapLength);
 }
 
+TestResult _lengthShouldChangeAfterInsertion() {
+  Map *map = newMap();
+  char *key = "chave";
+  char *value = "valor";
+  map->set(map, key, value);
+
+  int itemsCount = map->length;
+
+  return assertEquals(1, itemsCount);
+}
+
+TestResult _lengthShouldChangeAfterMultInsertion() {
+  Map *map = newMap();
+  map->set(map, "key1", "val1");
+  map->set(map, "key2", "val2");
+  map->set(map, "key3", "val3");
+  map->set(map, "key4", "val4");
+  map->set(map, "key5", "val5");
+  map->set(map, "key6", "val6");
+  map->set(map, "key7", "val7");
+
+  int itemsCount = map->length;
+
+  return assertEquals(7, itemsCount);
+}
+
 /*TestResult _pointerIsNullAfterDestroy() {
   char *key = "idDaEntrada";
   char *value = "Sou um valor qualquer";
@@ -119,6 +145,12 @@ int main(int argc, char **argv){
       break;
     CASE ("_lengthShouldBeZero")
       it("Atributo length tem valor 0 (zero) quando um Map é criado", _lengthShouldBeZero);
+      break;
+    CASE ("_lengthShouldChangeAfterInsertion")
+      it("A quantidade de items deve ser 1 após uma inserção", _lengthShouldBeZero);
+      break;
+    CASE ("_lengthShouldChangeAfterMultInsertion")
+      it("A quantidade de items deve ser 7 após sete inserções inserção", _lengthShouldChangeAfterMultInsertion);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
