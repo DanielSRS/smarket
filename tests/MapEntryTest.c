@@ -64,6 +64,17 @@ TestResult _toStringShouldBeNotNull() {
   return expectToBeNotNull(entry->toString);
 }
 
+TestResult _pointerIsNullAfterDestroy() {
+  char *key = "idDaEntrada";
+  char *value = "Sou um valor qualquer";
+  char *type = "Custom type";
+  MapEntry *entry = newMapEntry(key, (void *) value, type);
+
+  entry->destroy(entry);
+
+  return expectToBeNull(entry);
+}
+
 
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
@@ -89,6 +100,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_toStringShouldBeNotNull")
       it("Atributo toString tem valor válido (not null)", _toStringShouldBeNotNull);
+      break;
+    CASE ("_pointerIsNullAfterDestroy")
+      it("Destruir o MapEntry define self (ponteiro para si mesmo) como null", _pointerIsNullAfterDestroy);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
