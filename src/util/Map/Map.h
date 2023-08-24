@@ -69,5 +69,13 @@ typedef struct Map
 */
 Map* newMap();
 
+/**
+ * MapEntry não aloca memoria para seus atributos.
+ * 
+ * antes do Destroy deve liberar a memória das referencias
+ * manualmente
+*/
+MapEntry *newMapEntry(char *key, void *value, char *type);
+
 
 #endif // MAP_H

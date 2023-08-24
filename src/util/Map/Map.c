@@ -253,3 +253,16 @@ void destroyMapEntry(struct MapEntry* self) {
   free(self);
   self = NULL;
 }
+
+MapEntry *newMapEntry(char *key, void *value, char *type) {
+  MapEntry *newEntry = (MapEntry*) malloc(sizeof(MapEntry));
+
+  newEntry->key = key;
+  newEntry->value = value;
+  newEntry->type = type;
+  newEntry->sibling = NULL;
+
+  newEntry->destroy = destroyMapEntry;
+  newEntry->toString = _mapEntryToString;
+  return newEntry;
+}
