@@ -16,7 +16,7 @@ typedef struct MapEntry
   /**
    * Retorna uma string com a chave e o valor
    */
-  const char*(*toString)(struct MapEntry* self);
+  char*(*toString)(struct MapEntry* self);
   /**
    * Destroi o registro liberando memória
    */
