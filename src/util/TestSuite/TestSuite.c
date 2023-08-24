@@ -74,7 +74,22 @@ TestResult expectToBeNotNull(void *received) {
     return result;
   }
 
-  snprintf(result.errorDescription, 100, "Expected %p but received: %p\n", NULL, received);
+  snprintf(result.errorDescription, 100, "Expected pointer address but received: %p\n", received);
+  result.pass = False;
+
+  return result;
+}
+
+TestResult expectToBeNull(void *value) {
+
+  TestResult result;
+  if (value == NULL) {
+    result.errorDescription[0] = '\0';
+    result.pass = True;
+    return result;
+  }
+
+  snprintf(result.errorDescription, 100, "Expected %p but received: %p\n", NULL, value);
   result.pass = False;
 
   return result;

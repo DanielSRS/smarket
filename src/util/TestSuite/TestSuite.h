@@ -40,6 +40,7 @@ TestResult assertEquals(int expected, int received);
 
 TestResult expectToBeNotNull(void *received);
 
+TestResult expectToBeNull(void *value);
 // assertNull
 // assertTrue
 // assertFalse
