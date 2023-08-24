@@ -2,5 +2,7 @@
 add_executable(Cstrings_Test cstrings_test.c)
 
 target_link_libraries(Cstrings_Test Cstrings)
+target_link_libraries(Cstrings_Test TestSuite)
 
-add_test(CstringsTest Cstrings_Test)
+add_test(_compareIfStringsAreEqual Cstrings_Test _compareIfStringsAreEqual)
+add_test(_compareIfStringsAreDiff Cstrings_Test _compareIfStringsAreDiff)
