@@ -37,6 +37,15 @@ TestResult _valueShouldBeTheSameAsParam() {
   return expectPointersToBeEquals(value, entry->value);
 }
 
+TestResult _typeShouldBeTheSameAsParam() {
+  char *key = "idDaEntrada";
+  char *value = "Sou um valor qualquer";
+  char *type = "Custom type";
+  MapEntry *entry = newMapEntry(key, (void *) value, type);
+
+  return expectPointersToBeEquals(value, entry->value);
+}
+
 
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
@@ -53,6 +62,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_valueShouldBeTheSameAsParam")
       it("Atributo value tem o mesmo valor informado como parametro", _valueShouldBeTheSameAsParam);
+      break;
+    CASE ("_typeShouldBeTheSameAsParam")
+      it("Atributo type tem o mesmo valor informado como parametro", _typeShouldBeTheSameAsParam);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
