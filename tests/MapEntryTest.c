@@ -19,6 +19,15 @@ TestResult _newMapEntrySiblingAttrShouldBeNull() {
   return expectToBeNull(entry->sibling);
 }
 
+TestResult _keyShouldBeTheSameAsParam() {
+  char *key = "idDaEntrada";
+  char *value = "Sou um valor qualquer";
+  char *type = "Custom type";
+  MapEntry *entry = newMapEntry(key, (void *) value, type);
+
+  return expectPointersToBeEquals(key, entry->key);
+}
+
 
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
@@ -29,6 +38,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_newMapEntrySiblingAttrShouldBeNull")
       it("Atributo sibling de novo MapEntry deve ser NULL", _newMapEntrySiblingAttrShouldBeNull);
+      break;
+    CASE ("_keyShouldBeTheSameAsParam")
+      it("Atributo key tem o mesmo valor informado como parametro", _keyShouldBeTheSameAsParam);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
