@@ -84,6 +84,14 @@ TestResult _lengthShouldChangeAfterMultInsertion() {
   return assertEquals(7, itemsCount);
 }
 
+TestResult _hasReturnFalseIfThereNoItems() {
+  Map *map = newMap();
+
+  boolean hasTheKey = map->has(map, "anything");
+
+  return expectToBeFalse(hasTheKey);
+}
+
 /*TestResult _pointerIsNullAfterDestroy() {
   char *key = "idDaEntrada";
   char *value = "Sou um valor qualquer";
@@ -151,6 +159,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_lengthShouldChangeAfterMultInsertion")
       it("A quantidade de items deve ser 7 após sete inserções inserção", _lengthShouldChangeAfterMultInsertion);
+      break;
+    CASE ("_hasReturnFalseIfThereNoItems")
+      it("has retorna False se não houver items no Map", _hasReturnFalseIfThereNoItems);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
