@@ -119,7 +119,7 @@ TestResult _hasReturnTrueIfTheKeyIsInTheMap() {
 
   boolean hasTheKey = map->has(map, "key4");
 
-  return expectToBeFalse(hasTheKey);
+  return expectToBeTrue(hasTheKey);
 }
 
 TestResult _hasReturnTrueIfTheKeyIsInTheBegginingOfTheMap() {
@@ -134,7 +134,7 @@ TestResult _hasReturnTrueIfTheKeyIsInTheBegginingOfTheMap() {
 
   boolean hasTheKey = map->has(map, "key1");
 
-  return expectToBeFalse(hasTheKey);
+  return expectToBeTrue(hasTheKey);
 }
 
 TestResult _hasReturnTrueIfTheKeyIsInTheEndingOfTheMap() {
@@ -149,7 +149,7 @@ TestResult _hasReturnTrueIfTheKeyIsInTheEndingOfTheMap() {
 
   boolean hasTheKey = map->has(map, "key7");
 
-  return expectToBeFalse(hasTheKey);
+  return expectToBeTrue(hasTheKey);
 }
 
 /*TestResult _pointerIsNullAfterDestroy() {
