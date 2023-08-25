@@ -107,6 +107,51 @@ TestResult _hasReturnFalseIfThereNoMatchingItems() {
   return expectToBeFalse(hasTheKey);
 }
 
+TestResult _hasReturnTrueIfTheKeyIsInTheMap() {
+  Map *map = newMap();
+  map->set(map, "key1", "val1");
+  map->set(map, "key2", "val2");
+  map->set(map, "key3", "val3");
+  map->set(map, "key4", "val4");
+  map->set(map, "key5", "val5");
+  map->set(map, "key6", "val6");
+  map->set(map, "key7", "val7");
+
+  boolean hasTheKey = map->has(map, "key4");
+
+  return expectToBeFalse(hasTheKey);
+}
+
+TestResult _hasReturnTrueIfTheKeyIsInTheBegginingOfTheMap() {
+  Map *map = newMap();
+  map->set(map, "key1", "val1");
+  map->set(map, "key2", "val2");
+  map->set(map, "key3", "val3");
+  map->set(map, "key4", "val4");
+  map->set(map, "key5", "val5");
+  map->set(map, "key6", "val6");
+  map->set(map, "key7", "val7");
+
+  boolean hasTheKey = map->has(map, "key1");
+
+  return expectToBeFalse(hasTheKey);
+}
+
+TestResult _hasReturnTrueIfTheKeyIsInTheEndingOfTheMap() {
+  Map *map = newMap();
+  map->set(map, "key1", "val1");
+  map->set(map, "key2", "val2");
+  map->set(map, "key3", "val3");
+  map->set(map, "key4", "val4");
+  map->set(map, "key5", "val5");
+  map->set(map, "key6", "val6");
+  map->set(map, "key7", "val7");
+
+  boolean hasTheKey = map->has(map, "key7");
+
+  return expectToBeFalse(hasTheKey);
+}
+
 /*TestResult _pointerIsNullAfterDestroy() {
   char *key = "idDaEntrada";
   char *value = "Sou um valor qualquer";
@@ -180,6 +225,15 @@ int main(int argc, char **argv){
       break;
     CASE ("_hasReturnFalseIfThereNoMatchingItems")
       it("has retorna False se não houver item com a key procurada", _hasReturnFalseIfThereNoMatchingItems);
+      break;
+    CASE ("_hasReturnTrueIfTheKeyIsInTheMap")
+      it("has retorna True se algum houver item com a key procurada", _hasReturnTrueIfTheKeyIsInTheMap);
+      break;
+    CASE ("_hasReturnTrueIfTheKeyIsInTheBegginingOfTheMap")
+      it("has retorna True se o item com a key procurada estiver no início do Map", _hasReturnTrueIfTheKeyIsInTheBegginingOfTheMap);
+      break;
+    CASE ("_hasReturnTrueIfTheKeyIsInTheEndingOfTheMap")
+      it("has retorna True se o item com a key procurada estiver no fim do Map", _hasReturnTrueIfTheKeyIsInTheEndingOfTheMap);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
