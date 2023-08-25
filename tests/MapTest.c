@@ -152,6 +152,40 @@ TestResult _hasReturnTrueIfTheKeyIsInTheEndingOfTheMap() {
   return expectToBeTrue(hasTheKey);
 }
 
+TestResult _hasAllTheInsertedItems() {
+  Map *map = newMap();
+  map->set(map, "key1a", "val1");
+  map->set(map, "key2b", "val2");
+  map->set(map, "kedy3", "val3");
+  map->set(map, "key4g", "val4");
+  map->set(map, "keys5", "val5");
+  map->set(map, "kegy6", "val6");
+  map->set(map, "kegy7", "val7");
+  map->set(map, "ninal", "val8");
+
+  boolean hasTheKey1 = map->has(map, "key1a");
+  boolean hasTheKey2 = map->has(map, "key2b");
+  boolean hasTheKey3 = map->has(map, "kedy3");
+  boolean hasTheKey4 = map->has(map, "key4g");
+  boolean hasTheKey5 = map->has(map, "keys5");
+  boolean hasTheKey6 = map->has(map, "kegy6");
+  boolean hasTheKey7 = map->has(map, "kegy7");
+  boolean hasTheKey8 = map->has(map, "ninal");
+
+  boolean lenghtIsCorrect = map->length == 8;
+
+  boolean hasTheKeys = hasTheKey1
+                    && hasTheKey2
+                    && hasTheKey3
+                    && hasTheKey4
+                    && hasTheKey5
+                    && hasTheKey6
+                    && hasTheKey7
+                    && hasTheKey8;
+
+  return expectToBeTrue(hasTheKeys && lenghtIsCorrect);
+}
+
 /*TestResult _pointerIsNullAfterDestroy() {
   char *key = "idDaEntrada";
   char *value = "Sou um valor qualquer";
@@ -234,6 +268,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_hasReturnTrueIfTheKeyIsInTheEndingOfTheMap")
       it("has retorna True se o item com a key procurada estiver no fim do Map", _hasReturnTrueIfTheKeyIsInTheEndingOfTheMap);
+      break;
+    CASE ("_hasAllTheInsertedItems")
+      it("todas as chaves inseridas no Map estão presentes", _hasAllTheInsertedItems);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
