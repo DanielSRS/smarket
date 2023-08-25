@@ -92,6 +92,21 @@ TestResult _hasReturnFalseIfThereNoItems() {
   return expectToBeFalse(hasTheKey);
 }
 
+TestResult _hasReturnFalseIfThereNoMatchingItems() {
+  Map *map = newMap();
+  map->set(map, "key1", "val1");
+  map->set(map, "key2", "val2");
+  map->set(map, "key3", "val3");
+  map->set(map, "key4", "val4");
+  map->set(map, "key5", "val5");
+  map->set(map, "key6", "val6");
+  map->set(map, "key7", "val7");
+
+  boolean hasTheKey = map->has(map, "something");
+
+  return expectToBeFalse(hasTheKey);
+}
+
 /*TestResult _pointerIsNullAfterDestroy() {
   char *key = "idDaEntrada";
   char *value = "Sou um valor qualquer";
@@ -162,6 +177,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_hasReturnFalseIfThereNoItems")
       it("has retorna False se não houver items no Map", _hasReturnFalseIfThereNoItems);
+      break;
+    CASE ("_hasReturnFalseIfThereNoMatchingItems")
+      it("has retorna False se não houver item com a key procurada", _hasReturnFalseIfThereNoMatchingItems);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
