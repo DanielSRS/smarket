@@ -46,6 +46,8 @@ TestResult expectToBeNull(const void *value);
 
 TestResult expectToBeFalse(const boolean value);
 
+TestResult expectToBeTrue(const boolean value);
+
 TestResult expectStringsToBeEquals(const char *expected, const char *received);
 
 // assertNull

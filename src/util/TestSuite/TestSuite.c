@@ -124,6 +124,21 @@ TestResult expectToBeFalse(const boolean value) {
   return result;
 }
 
+TestResult expectToBeTrue(const boolean value) {
+
+  TestResult result;
+  if (value == True) {
+    result.errorDescription[0] = '\0';
+    result.pass = True;
+    return result;
+  }
+
+  snprintf(result.errorDescription, 100, "Expected \"True\" but received: False\n");
+  result.pass = False;
+
+  return result;
+}
+
 TestResult expectPointersToBeEquals(const void *expected, const void *received) {
   TestResult result;
   if (expected == received) {
