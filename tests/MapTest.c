@@ -186,6 +186,13 @@ TestResult _hasAllTheInsertedItems() {
   return expectToBeTrue(hasTheKeys && lenghtIsCorrect);
 }
 
+TestResult _getReturnNullIfThereNoItems() {
+  Map *map = newMap();
+
+  void* itemValue = map->get(map, "anything");
+
+  return expectToBeNull(itemValue);
+}
 /*TestResult _pointerIsNullAfterDestroy() {
   char *key = "idDaEntrada";
   char *value = "Sou um valor qualquer";
@@ -255,7 +262,7 @@ int main(int argc, char **argv){
       it("A quantidade de items deve ser 7 após sete inserções inserção", _lengthShouldChangeAfterMultInsertion);
       break;
     CASE ("_hasReturnFalseIfThereNoItems")
-      it("has retorna False se não houver items no Map", _hasReturnFalseIfThereNoItems);
+      it("has retorna False se não houver itens no Map", _hasReturnFalseIfThereNoItems);
       break;
     CASE ("_hasReturnFalseIfThereNoMatchingItems")
       it("has retorna False se não houver item com a key procurada", _hasReturnFalseIfThereNoMatchingItems);
@@ -271,6 +278,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_hasAllTheInsertedItems")
       it("todas as chaves inseridas no Map estão presentes", _hasAllTheInsertedItems);
+      break;
+    CASE ("_getReturnNullIfThereNoItems")
+      it("get retorna NULL se não houver itens no Map", _getReturnNullIfThereNoItems);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
