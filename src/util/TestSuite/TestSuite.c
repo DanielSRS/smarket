@@ -31,7 +31,7 @@ TestResult expectStringsToBeEquals(const char *expected, const char *received) {
     return result;
   }
 
-  snprintf(result.errorDescription, 100, "Expected \"%s\" but received: \"%s\"\n", expected, received);
+  snprintf(result.errorDescription, 1000, "Expected \"%s\" but received: \"%s\"\n", expected, received);
   result.pass = False;
 
   return result;

@@ -24,7 +24,7 @@ typedef struct TestResult
    * Deve ser definido quando pass é False. do contrário
    * o valor definido deve ser "" (string vazia)
   */
-  char errorDescription[100];
+  char errorDescription[1000];
 } TestResult;
 
 typedef struct TestArgs
