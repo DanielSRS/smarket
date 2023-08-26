@@ -274,6 +274,14 @@ TestResult _noRepeatedKeyAllowed() {
   return expectToBeTrue(valuesAreTheSameInserted && countIsCorrect);
 }
 
+TestResult _toStringOnEmptyMap() {
+  Map *map = newMap();
+
+  char *expectedFormat = "{ }";
+  char *mapStringRepresentation = map->toString(map);
+
+  return expectStringsToBeEquals(expectedFormat, mapStringRepresentation);
+}
 // same key should override value
 
 /*TestResult _pointerIsNullAfterDestroy() {
@@ -370,6 +378,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_noRepeatedKeyAllowed")
       it("inserções com mesma key sobrescrevem valores setados anteriormente", _noRepeatedKeyAllowed);
+      break;
+    CASE ("_toStringOnEmptyMap")
+      it("se a representação em string do map vazio está correta", _toStringOnEmptyMap);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
