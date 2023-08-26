@@ -42,7 +42,7 @@ TestResult _hasShouldBeNotNull() {
 TestResult _setShouldBeNotNull() {
   Map *map = newMap();
 
-  return expectToBeNotNull(map->set);
+  return expectToBeNotNull(map->setAny);
 }
 
 TestResult _toStringShouldBeNotNull() {
@@ -63,7 +63,7 @@ TestResult _lengthShouldChangeAfterInsertion() {
   Map *map = newMap();
   char *key = "chave";
   char *value = "valor";
-  map->set(map, key, value);
+  map->setAny(map, key, value);
 
   int itemsCount = map->length;
 
@@ -72,13 +72,13 @@ TestResult _lengthShouldChangeAfterInsertion() {
 
 TestResult _lengthShouldChangeAfterMultInsertion() {
   Map *map = newMap();
-  map->set(map, "key1", "val1");
-  map->set(map, "key2", "val2");
-  map->set(map, "key3", "val3");
-  map->set(map, "key4", "val4");
-  map->set(map, "key5", "val5");
-  map->set(map, "key6", "val6");
-  map->set(map, "key7", "val7");
+  map->setAny(map, "key1", "val1");
+  map->setAny(map, "key2", "val2");
+  map->setAny(map, "key3", "val3");
+  map->setAny(map, "key4", "val4");
+  map->setAny(map, "key5", "val5");
+  map->setAny(map, "key6", "val6");
+  map->setAny(map, "key7", "val7");
 
   int itemsCount = map->length;
 
@@ -95,13 +95,13 @@ TestResult _hasReturnFalseIfThereNoItems() {
 
 TestResult _hasReturnFalseIfThereNoMatchingItems() {
   Map *map = newMap();
-  map->set(map, "key1", "val1");
-  map->set(map, "key2", "val2");
-  map->set(map, "key3", "val3");
-  map->set(map, "key4", "val4");
-  map->set(map, "key5", "val5");
-  map->set(map, "key6", "val6");
-  map->set(map, "key7", "val7");
+  map->setAny(map, "key1", "val1");
+  map->setAny(map, "key2", "val2");
+  map->setAny(map, "key3", "val3");
+  map->setAny(map, "key4", "val4");
+  map->setAny(map, "key5", "val5");
+  map->setAny(map, "key6", "val6");
+  map->setAny(map, "key7", "val7");
 
   boolean hasTheKey = map->has(map, "something");
 
@@ -110,13 +110,13 @@ TestResult _hasReturnFalseIfThereNoMatchingItems() {
 
 TestResult _hasReturnTrueIfTheKeyIsInTheMap() {
   Map *map = newMap();
-  map->set(map, "key1", "val1");
-  map->set(map, "key2", "val2");
-  map->set(map, "key3", "val3");
-  map->set(map, "key4", "val4");
-  map->set(map, "key5", "val5");
-  map->set(map, "key6", "val6");
-  map->set(map, "key7", "val7");
+  map->setAny(map, "key1", "val1");
+  map->setAny(map, "key2", "val2");
+  map->setAny(map, "key3", "val3");
+  map->setAny(map, "key4", "val4");
+  map->setAny(map, "key5", "val5");
+  map->setAny(map, "key6", "val6");
+  map->setAny(map, "key7", "val7");
 
   boolean hasTheKey = map->has(map, "key4");
 
@@ -125,13 +125,13 @@ TestResult _hasReturnTrueIfTheKeyIsInTheMap() {
 
 TestResult _hasReturnTrueIfTheKeyIsInTheBegginingOfTheMap() {
   Map *map = newMap();
-  map->set(map, "key1", "val1");
-  map->set(map, "key2", "val2");
-  map->set(map, "key3", "val3");
-  map->set(map, "key4", "val4");
-  map->set(map, "key5", "val5");
-  map->set(map, "key6", "val6");
-  map->set(map, "key7", "val7");
+  map->setAny(map, "key1", "val1");
+  map->setAny(map, "key2", "val2");
+  map->setAny(map, "key3", "val3");
+  map->setAny(map, "key4", "val4");
+  map->setAny(map, "key5", "val5");
+  map->setAny(map, "key6", "val6");
+  map->setAny(map, "key7", "val7");
 
   boolean hasTheKey = map->has(map, "key1");
 
@@ -140,13 +140,13 @@ TestResult _hasReturnTrueIfTheKeyIsInTheBegginingOfTheMap() {
 
 TestResult _hasReturnTrueIfTheKeyIsInTheEndingOfTheMap() {
   Map *map = newMap();
-  map->set(map, "key1", "val1");
-  map->set(map, "key2", "val2");
-  map->set(map, "key3", "val3");
-  map->set(map, "key4", "val4");
-  map->set(map, "key5", "val5");
-  map->set(map, "key6", "val6");
-  map->set(map, "key7", "val7");
+  map->setAny(map, "key1", "val1");
+  map->setAny(map, "key2", "val2");
+  map->setAny(map, "key3", "val3");
+  map->setAny(map, "key4", "val4");
+  map->setAny(map, "key5", "val5");
+  map->setAny(map, "key6", "val6");
+  map->setAny(map, "key7", "val7");
 
   boolean hasTheKey = map->has(map, "key7");
 
@@ -155,14 +155,14 @@ TestResult _hasReturnTrueIfTheKeyIsInTheEndingOfTheMap() {
 
 TestResult _hasAllTheInsertedItems() {
   Map *map = newMap();
-  map->set(map, "key1a", "val1");
-  map->set(map, "key2b", "val2");
-  map->set(map, "kedy3", "val3");
-  map->set(map, "key4g", "val4");
-  map->set(map, "keys5", "val5");
-  map->set(map, "kegy6", "val6");
-  map->set(map, "kegy7", "val7");
-  map->set(map, "ninal", "val8");
+  map->setAny(map, "key1a", "val1");
+  map->setAny(map, "key2b", "val2");
+  map->setAny(map, "kedy3", "val3");
+  map->setAny(map, "key4g", "val4");
+  map->setAny(map, "keys5", "val5");
+  map->setAny(map, "kegy6", "val6");
+  map->setAny(map, "kegy7", "val7");
+  map->setAny(map, "ninal", "val8");
 
   boolean hasTheKey1 = map->has(map, "key1a");
   boolean hasTheKey2 = map->has(map, "key2b");
@@ -213,13 +213,13 @@ TestResult _allTheInsertedValuesAreCorrect() {
        *value6 = "value6",
        *value7 = "value7";
   
-  map->set(map, key1, value1);
-  map->set(map, key2, value2);
-  map->set(map, key3, value3);
-  map->set(map, key4, value4);
-  map->set(map, key5, value5);
-  map->set(map, key6, value6);
-  map->set(map, key7, value7);
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
 
   boolean countIsCorrect = map->length == 7;
 
@@ -253,13 +253,13 @@ TestResult _noRepeatedKeyAllowed() {
        *value6 = "value6",
        *value7 = "value7";
   
-  map->set(map, key1, value1);
-  map->set(map, key2, value2);
-  map->set(map, key3, value3);
-  map->set(map, key4, value4);
-  map->set(map, key5, value5);
-  map->set(map, key6, value6);
-  map->set(map, key7, value7);
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
 
   boolean countIsCorrect = map->length == 4;
 
@@ -304,13 +304,13 @@ TestResult _toStringOnNonEmptyMap() {
 
   char *type = "__Any__";
   
-  map->set(map, key1, value1);
-  map->set(map, key2, value2);
-  map->set(map, key3, value3);
-  map->set(map, key4, value4);
-  map->set(map, key5, value5);
-  map->set(map, key6, value6);
-  map->set(map, key7, value7);
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
 
   char expectedFormat[500];
   snprintf(
@@ -348,13 +348,13 @@ TestResult _lengthIsZeroAfterClear() {
        *value6 = "value6",
        *value7 = "value7";
   
-  map->set(map, key1, value1);
-  map->set(map, key2, value2);
-  map->set(map, key3, value3);
-  map->set(map, key4, value4);
-  map->set(map, key5, value5);
-  map->set(map, key6, value6);
-  map->set(map, key7, value7);
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
 
   int itemsCount = map->length == 7;                            // Antes de limpar
   map->clear(map);                                              // Removendo todas as entradas
@@ -381,13 +381,13 @@ TestResult _deleteTheFirstItemInserted() {
        *value6 = "value6",
        *value7 = "value7";
   
-  map->set(map, key1, value1);
-  map->set(map, key2, value2);
-  map->set(map, key3, value3);
-  map->set(map, key4, value4);
-  map->set(map, key5, value5);
-  map->set(map, key6, value6);
-  map->set(map, key7, value7);
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
 
   int itemsCount = map->length == 7;                            // Antes de limpar
   boolean isDeleted = map->del(map, key1);                      // Removendo entrada
@@ -415,13 +415,13 @@ TestResult _deleteTheLastItemInserted() {
        *value6 = "value6",
        *value7 = "value7";
   
-  map->set(map, key1, value1);
-  map->set(map, key2, value2);
-  map->set(map, key3, value3);
-  map->set(map, key4, value4);
-  map->set(map, key5, value5);
-  map->set(map, key6, value6);
-  map->set(map, key7, value7);
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
 
   int itemsCount = map->length == 7;                            // Antes de limpar
   boolean isDeleted = map->del(map, key7);                      // Removendo entrada
@@ -449,13 +449,13 @@ TestResult _deleteTheItemInsertedInTheMiddle() {
        *value6 = "value6",
        *value7 = "value7";
   
-  map->set(map, key1, value1);
-  map->set(map, key2, value2);
-  map->set(map, key3, value3);
-  map->set(map, key4, value4);
-  map->set(map, key5, value5);
-  map->set(map, key6, value6);
-  map->set(map, key7, value7);
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
 
   int itemsCount = map->length == 7;                            // Antes de limpar
   boolean isDeleted = map->del(map, key4);                      // Removendo entrada
@@ -483,13 +483,13 @@ TestResult _delReturnsFalseIfItemDoNotExist() {
        *value6 = "value6",
        *value7 = "value7";
   
-  map->set(map, key1, value1);
-  map->set(map, key2, value2);
-  map->set(map, key3, value3);
-  map->set(map, key4, value4);
-  map->set(map, key5, value5);
-  map->set(map, key6, value6);
-  map->set(map, key7, value7);
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
 
   int itemsCount = map->length == 7;                            // Antes de limpar
   boolean hasThekey = map->has(map, "key8");
@@ -555,7 +555,7 @@ int main(int argc, char **argv){
       it("Atributo has tem valor válido (not null)", _hasShouldBeNotNull);
       break;
     CASE ("_setShouldBeNotNull")
-      it("Atributo set tem valor válido (not null)", _setShouldBeNotNull);
+      it("Atributo setAny tem valor válido (not null)", _setShouldBeNotNull);
       break;
     CASE ("toStringShouldBeNotNull")
       it("Atributo toString tem valor válido (not null)", _toStringShouldBeNotNull);

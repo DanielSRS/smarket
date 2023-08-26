@@ -212,7 +212,7 @@ MapEntry *newMapEntry(char *key, void *value, char *type) {
   return newEntry;
 }
 
-void _setElementOfAMap(Map* self, char* key, void* value) {
+Map *_setElementOfAMap(Map* self, char* key, void* value) {
   MapEntry *newEntry = newMapEntry(
     duplicateString(key),
     value,
@@ -236,7 +236,7 @@ void _setElementOfAMap(Map* self, char* key, void* value) {
         free((void *) newEntry->type);
         newEntry->destroy(&newEntry); // Não foi usado, já que a entrada anterior foi reaproveitada
 
-        return; // retorna antes para que length não seja incrementado
+        return self; // retorna antes para que length não seja incrementado
         break;
       }
       /** Do contrário, adiciona uma nova entrada aos outros itens */
@@ -248,7 +248,7 @@ void _setElementOfAMap(Map* self, char* key, void* value) {
   }
 
   *((int *) &self->length) = self->length + 1;
-  // return self;
+  return self;
 }
 
 void _clearAllKeyValuePairsFromAMap(Map *self) {
@@ -291,7 +291,7 @@ Map* newMap() {
   map->del = _deleteElementInAMap;
   map->get = _getItemInAMap;
   map->has = _hasElementInAMap;
-  map->set = _setElementOfAMap;
+  map->setAny = _setElementOfAMap;
   map->toString = _mapToString;
   map->_items = NULL;
 
