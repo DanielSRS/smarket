@@ -35,14 +35,14 @@ boolean _hasElementInAMap(Map* self, char* key) {
 }
 
 boolean _deleteElementInAMap(Map* self, char* key) {
-  if (self->length == 0) return False;
+  if (self->length == 0 || self->_items == NULL ) return False;
   MapEntry *itemsInTheMap = (MapEntry *) self->_items;
 
   /**
    * Se deletando o primeiro da lista
   */
   if (isEquals(self->_items->key, key)) {
-    self->_items = self->_items->sibling; // define o proximo item como entrada da lista
+    self->_items = self->_items->sibling;             // define o proximo item como entrada da lista
     *((int *) &self->length) = self->length - 1;      // reduz a contagem de itens
 
     boolean isItemAnMap = isEquals(itemsInTheMap->type, MAP_OBJECT);
@@ -53,13 +53,10 @@ boolean _deleteElementInAMap(Map* self, char* key) {
      */
     if (isItemAnMap) {
       Map *nestedMap = (Map*) itemsInTheMap->value;
-      nestedMap->clear(nestedMap);
+      nestedMap->clear(nestedMap);                    // deve ser desroy não clear
     }
 
-    free((char*) itemsInTheMap->key);    // Libera a memória alocada para guardar a chave
-    free((char*) itemsInTheMap->type);   // Libera a memória alocada para guardar o tipo do dado
-    free((void*) itemsInTheMap->value);  // Libera a memória alocada para guardar o valor
-    free(itemsInTheMap); 
+    itemsInTheMap->destroy(&itemsInTheMap);
 
     return True;
   }
@@ -70,6 +67,7 @@ boolean _deleteElementInAMap(Map* self, char* key) {
    */
   for (MapEntry *previousItem = itemsInTheMap; previousItem != NULL;) {
     MapEntry *nextItem = previousItem->sibling;
+    if (nextItem ==NULL) break;
     boolean isThisTheOneToDelete = isEquals(nextItem->key, key);
 
     if (isThisTheOneToDelete) {
@@ -85,13 +83,10 @@ boolean _deleteElementInAMap(Map* self, char* key) {
        */
       if (isItemAnMap) {
         Map *nestedMap = (Map*) itemToDelete->value;
-        nestedMap->clear(nestedMap);
+        nestedMap->clear(nestedMap);        // deve ser destroy
       }
 
-      free((char*) itemToDelete->key);    // Libera a memória alocada para guardar a chave
-      free((char*) itemToDelete->type);   // Libera a memória alocada para guardar o tipo do dado
-      free((char*) itemToDelete->value);  // Libera a memória alocada para guardar o valor
-      free(itemToDelete); 
+      itemToDelete->destroy(&itemToDelete);
 
       return True;
     }
