@@ -245,6 +245,22 @@ void _setElementOfAMap(Map* self, char* key, void* value) {
   if (self->length == 0) self->_items = newEntry;
   else {
     for (MapEntry *item = (MapEntry *) self->_items; item != NULL; item = item->sibling) {
+      /** Se já existir uma entrada com a chave especificada, sobrescreve o valor */
+      if(isEquals(item->key, key)) {
+        item->value = value;
+
+        // apaga a chave e o valor escritos na memória
+        memset((void *) newEntry->key, 0, strlen(newEntry->key));
+        memset((void *) newEntry->type, 0, strlen(newEntry->type));
+        // libera pq não vai ser mais usado
+        free((void *) newEntry->key);
+        free((void *) newEntry->type);
+        newEntry->destroy(&newEntry); // Não foi usado, já que a entrada anterior foi reaproveitada
+
+        return; // retorna antes para que length não seja incrementado
+        break;
+      }
+      /** Do contrário, adiciona uma nova entrada aos outros itens */
       if (item->sibling == NULL) {
         item->sibling = newEntry;
         break;
