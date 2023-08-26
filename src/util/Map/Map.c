@@ -23,40 +23,6 @@ char *duplicateString(const char *stringToBeDuplicated) {
     return destinationString;                                             // Return the new string
 }
 
-
-void _clearAllKeyValuePairsFromAMap(Map *self) {
-  MapEntry *itemsInTheMap = (MapEntry *) self->_items;
-
-  /**
-   * Se itemsInTheMap for NULL, o map não tem itens logo
-   * não há nada para deletar
-   */
-  for (MapEntry *item = itemsInTheMap; item != NULL;) {
-    MapEntry *nextItem = item->sibling;
-    boolean isItemAnMap = isEquals(item->type, MAP_OBJECT);
-
-    /**
-     * Se o valor do item for um mapa aninhado, limpa todas
-     * as entradas antes de liberar a memória do mapa aninhado
-     */
-    if (isItemAnMap) {
-      Map *nestedMap = (Map*) item->value;
-      nestedMap->clear(nestedMap);
-    }
-
-    free((char*) item->key);    // Libera a memória alocada para guardar a chave
-    free((char*) item->type);   // Libera a memória alocada para guardar o tipo do dado
-    free((void*) item->value);  // Libera a memória alocada para guardar o valor
-    free(item);         // Libera a memória alocada para guardar entrada no Map
-
-    item = nextItem;    // Repete caso exista um proximo item
-  }
-
-  int *length = (int *) &(self->length);
-  *length = 0;
-  self->_items = NULL;
-}
-
 boolean _hasElementInAMap(Map* self, char* key) {
   if (self->length == 0) return False;
   MapEntry *itemsInTheMap = (MapEntry *) self->_items;
@@ -289,6 +255,39 @@ void _setElementOfAMap(Map* self, char* key, void* value) {
   *((int *) &self->length) = self->length + 1;
   // return self;
 }
+
+void _clearAllKeyValuePairsFromAMap(Map *self) {
+  MapEntry *itemsInTheMap = (MapEntry *) self->_items;
+
+  /**
+   * Se itemsInTheMap for NULL, o map não tem itens logo
+   * não há nada para deletar
+   */
+  for (MapEntry *item = itemsInTheMap; item != NULL;) {
+    MapEntry *nextItem = item->sibling;
+    boolean isItemAnMap = isEquals(item->type, MAP_OBJECT);
+
+    /**
+     * Se o valor do item for um mapa aninhado, limpa todas
+     * as entradas antes de liberar a memória do mapa aninhado
+     */
+    if (isItemAnMap) {
+      Map *nestedMap = (Map*) item->value;
+      nestedMap->clear(nestedMap); // deve ser destroy na verdade
+    }
+
+    item->destroy(&item);
+
+    if(item != NULL) exit(1);
+
+    item = nextItem;    // Repete caso exista um proximo item
+  }
+
+  int *length = (int *) &(self->length);
+  *length = 0;
+  self->_items = NULL;
+}
+
 
 Map* newMap() {
   Map *map = malloc(sizeof(Map));
