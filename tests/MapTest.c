@@ -363,6 +363,142 @@ TestResult _lengthIsZeroAfterClear() {
   return expectToBeTrue(itemsCount && itemsCountAfterClear);
 }
 
+TestResult _deleteTheFirstItemInserted() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->set(map, key1, value1);
+  map->set(map, key2, value2);
+  map->set(map, key3, value3);
+  map->set(map, key4, value4);
+  map->set(map, key5, value5);
+  map->set(map, key6, value6);
+  map->set(map, key7, value7);
+
+  int itemsCount = map->length == 7;                            // Antes de limpar
+  boolean isDeleted = map->del(map, key1);                      // Removendo entrada
+  int itemsCountAfterDel = map->length == 6;                  // Depis de removido
+  boolean hasDeletedkey = map->has(map, key1);
+
+  return expectToBeTrue(itemsCount && isDeleted && itemsCountAfterDel && !hasDeletedkey);
+}
+
+TestResult _deleteTheLastItemInserted() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->set(map, key1, value1);
+  map->set(map, key2, value2);
+  map->set(map, key3, value3);
+  map->set(map, key4, value4);
+  map->set(map, key5, value5);
+  map->set(map, key6, value6);
+  map->set(map, key7, value7);
+
+  int itemsCount = map->length == 7;                            // Antes de limpar
+  boolean isDeleted = map->del(map, key7);                      // Removendo entrada
+  int itemsCountAfterDel = map->length == 6;                  // Depis de removido
+  boolean hasDeletedkey = map->has(map, key7);
+
+  return expectToBeTrue(itemsCount && isDeleted && itemsCountAfterDel && !hasDeletedkey);
+}
+
+TestResult _deleteTheItemInsertedInTheMiddle() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->set(map, key1, value1);
+  map->set(map, key2, value2);
+  map->set(map, key3, value3);
+  map->set(map, key4, value4);
+  map->set(map, key5, value5);
+  map->set(map, key6, value6);
+  map->set(map, key7, value7);
+
+  int itemsCount = map->length == 7;                            // Antes de limpar
+  boolean isDeleted = map->del(map, key4);                      // Removendo entrada
+  int itemsCountAfterDel = map->length == 6;                  // Depis de removido
+  boolean hasDeletedkey = map->has(map, key4);
+
+  return expectToBeTrue(itemsCount && isDeleted && itemsCountAfterDel && !hasDeletedkey);
+}
+
+TestResult _delReturnsFalseIfItemDoNotExist() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->set(map, key1, value1);
+  map->set(map, key2, value2);
+  map->set(map, key3, value3);
+  map->set(map, key4, value4);
+  map->set(map, key5, value5);
+  map->set(map, key6, value6);
+  map->set(map, key7, value7);
+
+  int itemsCount = map->length == 7;                            // Antes de limpar
+  boolean hasThekey = map->has(map, "key8");
+  boolean isDeleted = map->del(map, "key8");                      // Removendo entrada
+  int itemsCountAfterDel = map->length == 7;                  // Depis de removido
+
+  return expectToBeTrue(itemsCount && !isDeleted && itemsCountAfterDel && !hasThekey);
+}
+
 // same key should override value
 
 /*TestResult _pointerIsNullAfterDestroy() {
@@ -421,7 +557,7 @@ int main(int argc, char **argv){
     CASE ("_setShouldBeNotNull")
       it("Atributo set tem valor válido (not null)", _setShouldBeNotNull);
       break;
-    CASE ("_toStringShouldBeNotNull")
+    CASE ("toStringShouldBeNotNull")
       it("Atributo toString tem valor válido (not null)", _toStringShouldBeNotNull);
       break;
     CASE ("_lengthShouldBeZero")
@@ -468,6 +604,18 @@ int main(int argc, char **argv){
       break;
     CASE ("_lengthIsZeroAfterClear")
       it("o tamanho é zero após limpar todas as entradas", _lengthIsZeroAfterClear);
+      break;
+    CASE ("_deleteTheFirstItemInserted")
+      it("deleta primeiro elemento inserido", _deleteTheFirstItemInserted);
+      break;
+    CASE ("_deleteTheLastItemInserted")
+      it("deleta ultimo elemento inserido", _deleteTheLastItemInserted);
+      break;
+    CASE ("_deleteTheItemInsertedInTheMiddle")
+      it("deleta elemento inserido no meio do Map", _deleteTheItemInsertedInTheMiddle);
+      break;
+    CASE ("_delReturnsFalseIfItemDoNotExist")
+      it("tentar deletar item que não está no map retorna False", _delReturnsFalseIfItemDoNotExist);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
