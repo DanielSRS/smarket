@@ -185,24 +185,42 @@ char* _mapToString(Map* self) {
   if (numberOfItems == 0) return "{ }";
   char *begginingOfTheString = "{\n";
   char *endingOfTheString = "}";
+  char *identation = "\t";
+  char *endOfLine = ",\n";
+  int identationLen = 1, endOfLineLen = 2;
+  int endOfStringLen = 1; // \0 ao final da strin
 
-  char *buffer = "";
+  char *buffer = duplicateString("");
   for (MapEntry *item = (MapEntry *) self->_items; item != NULL; item = item->sibling) {
-    char *identation = "\t";
-    char *endOfLine = ",\n";
+    /** Representação em string do valor da entrada*/
     const char *pairOfValues = item->toString(item);
-    int newBufferLenght = strlen(buffer) + strlen(identation) + strlen(endOfLine) + strlen(pairOfValues);
-    char newBuffer[newBufferLenght];
+    
+    /** O tamanho do buffer e da representação do valor e do novo buffer para gurdar ambos */
+    int bufferLength = buffer == NULL ? 0 : strlen(buffer);
+    int pairOfValuesLen = strlen(pairOfValues);
+    int newBufferLenght = bufferLength + identationLen + endOfLineLen + pairOfValuesLen + endOfStringLen;
+
+    /** Aloca espaço suficiente para guradar os tamanhos */
+    char *newBuffer = malloc(newBufferLenght);
+
+    /** Copia todos os dado para o novo buffer */
     snprintf(newBuffer, newBufferLenght, "%s%s%s%s", buffer, identation, pairOfValues, endOfLine);
+    
+    /** Libera o espaço aclocado anteriorrmente */
+    buffer == NULL ? 0 : free(buffer);
+
+    // atualiza a referencia do buffer
     buffer = (char*) newBuffer;
   }
 
-  int newBufferLenght = strlen(buffer) + strlen(begginingOfTheString) + strlen(endingOfTheString);
+  int newBufferLenght = strlen(buffer) + strlen(begginingOfTheString) + strlen(endingOfTheString) + endOfStringLen;
   char *newBuffer = malloc(newBufferLenght);
   snprintf(newBuffer, newBufferLenght, "%s%s%s", begginingOfTheString, buffer, endingOfTheString);
-  buffer = (char*) newBuffer;
 
-  return buffer;
+  /** Libera o espaço aclocado anteriorrmente */
+  buffer == NULL ? 0 : free(buffer);
+
+  return newBuffer;
 }
 
 int _lengthOfAMap(Map* self) {
