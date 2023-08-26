@@ -330,6 +330,39 @@ TestResult _toStringOnNonEmptyMap() {
   return expectStringsToBeEquals(expectedFormat, mapStringRepresentation);
 }
 
+TestResult _lengthIsZeroAfterClear() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->set(map, key1, value1);
+  map->set(map, key2, value2);
+  map->set(map, key3, value3);
+  map->set(map, key4, value4);
+  map->set(map, key5, value5);
+  map->set(map, key6, value6);
+  map->set(map, key7, value7);
+
+  int itemsCount = map->length == 7;                            // Antes de limpar
+  map->clear(map);                                              // Removendo todas as entradas
+  int itemsCountAfterClear = map->length == 0;                  // Depis de limpo
+
+  return expectToBeTrue(itemsCount && itemsCountAfterClear);
+}
+
 // same key should override value
 
 /*TestResult _pointerIsNullAfterDestroy() {
@@ -432,6 +465,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_toStringOnNonEmptyMap")
       it("se a representação em string do map está correta", _toStringOnNonEmptyMap);
+      break;
+    CASE ("_lengthIsZeroAfterClear")
+      it("o tamanho é zero após limpar todas as entradas", _lengthIsZeroAfterClear);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")

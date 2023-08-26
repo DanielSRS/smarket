@@ -42,3 +42,4 @@ add_test(_allTheInsertedValuesAreCorrect MapTest _allTheInsertedValuesAreCorrect
 add_test(_noRepeatedKeyAllowed MapTest _noRepeatedKeyAllowed)
 add_test(_toStringOnEmptyMap MapTest _toStringOnEmptyMap)
 add_test(_toStringOnNonEmptyMap MapTest _toStringOnNonEmptyMap)
+add_test(_lengthIsZeroAfterClear MapTest _lengthIsZeroAfterClear)
