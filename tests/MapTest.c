@@ -234,6 +234,46 @@ TestResult _allTheInsertedValuesAreCorrect() {
   return expectToBeTrue(valuesAreTheSameInserted && countIsCorrect);
 }
 
+TestResult _noRepeatedKeyAllowed() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key3",
+       *key5 = "key5",
+       *key6 = "key2",
+       *key7 = "key2";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->set(map, key1, value1);
+  map->set(map, key2, value2);
+  map->set(map, key3, value3);
+  map->set(map, key4, value4);
+  map->set(map, key5, value5);
+  map->set(map, key6, value6);
+  map->set(map, key7, value7);
+
+  boolean countIsCorrect = map->length == 4;
+
+  boolean valuesAreTheSameInserted = 
+      map->get(map, key1) == value1 &&
+      map->get(map, key2) == value7 &&
+      map->get(map, key3) == value4 &&
+      map->get(map, key4) == value4 &&
+      map->get(map, key5) == value5 &&
+      map->get(map, key6) == value7 &&
+      map->get(map, key7) == value7;
+
+  return expectToBeTrue(valuesAreTheSameInserted && countIsCorrect);
+}
+
 // same key should override value
 
 /*TestResult _pointerIsNullAfterDestroy() {
@@ -327,6 +367,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_allTheInsertedValuesAreCorrect")
       it("os valores recuperados do Map são os mesmos previamente inseridos", _allTheInsertedValuesAreCorrect);
+      break;
+    CASE ("_noRepeatedKeyAllowed")
+      it("inserções com mesma key sobrescrevem valores setados anteriormente", _noRepeatedKeyAllowed);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")

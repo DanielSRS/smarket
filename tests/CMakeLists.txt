@@ -39,3 +39,4 @@ add_test(_hasReturnTrueIfTheKeyIsInTheEndingOfTheMap MapTest _hasReturnTrueIfThe
 add_test(_hasAllTheInsertedItems MapTest _hasAllTheInsertedItems)
 add_test(_getReturnNullIfThereNoItems MapTest _getReturnNullIfThereNoItems)
 add_test(_allTheInsertedValuesAreCorrect MapTest _allTheInsertedValuesAreCorrect)
+add_test(_noRepeatedKeyAllowed MapTest _noRepeatedKeyAllowed)
