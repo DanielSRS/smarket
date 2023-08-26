@@ -1,6 +1,7 @@
 #include "../src/util/TestSuite/TestSuite.h" // strcpy
 #include "../src/util/Map/Map.h"
 #include <stdlib.h> // free
+#include <stdio.h> //snprintf
 
 TestResult _newMapCreatesANonNullReference() {
   Map *map = newMap();
@@ -282,6 +283,53 @@ TestResult _toStringOnEmptyMap() {
 
   return expectStringsToBeEquals(expectedFormat, mapStringRepresentation);
 }
+
+TestResult _toStringOnNonEmptyMap() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+
+  char *type = "__Any__";
+  
+  map->set(map, key1, value1);
+  map->set(map, key2, value2);
+  map->set(map, key3, value3);
+  map->set(map, key4, value4);
+  map->set(map, key5, value5);
+  map->set(map, key6, value6);
+  map->set(map, key7, value7);
+
+  char expectedFormat[500];
+  snprintf(
+    expectedFormat,
+    500,
+    "{\n\t%s: %s,\n\t%s: %s,\n\t%s: %s,\n\t%s: %s,\n\t%s: %s,\n\t%s: %s,\n\t%s: %s,\n}",
+    key1, type,
+    key2, type,
+    key3, type,
+    key4, type,
+    key5, type,
+    key6, type,
+    key7, type
+  );
+  char *mapStringRepresentation = map->toString(map);
+
+  return expectStringsToBeEquals(expectedFormat, mapStringRepresentation);
+}
+
 // same key should override value
 
 /*TestResult _pointerIsNullAfterDestroy() {
@@ -381,6 +429,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_toStringOnEmptyMap")
       it("se a representação em string do map vazio está correta", _toStringOnEmptyMap);
+      break;
+    CASE ("_toStringOnNonEmptyMap")
+      it("se a representação em string do map está correta", _toStringOnNonEmptyMap);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
