@@ -49,3 +49,4 @@ add_test(_deleteTheItemInsertedInTheMiddle MapTest _deleteTheItemInsertedInTheMi
 add_test(_delReturnsFalseIfItemDoNotExist MapTest _delReturnsFalseIfItemDoNotExist)
 add_test(_destroyTheMap MapTest _destroyTheMap)
 add_test(_nestedMapInsertion MapTest _nestedMapInsertion)
+add_test(_nestedMapToString MapTest _nestedMapToString)

@@ -107,6 +107,9 @@ void* _getItemInAMap(Map* self, char* key) {
   return NULL;
 }
 
+/**
+ * Libere a memoria apos o uso!!!!!!
+*/
 char* _mapEntryToString(MapEntry* self) {
   int keyLenght = strlen(self->key);
   int typeLenght = strlen(self->type);
@@ -125,10 +128,13 @@ char* _mapEntryToString(MapEntry* self) {
 
   /** Se o valor guardado for um map */
   if (isEquals(self->type, MAP_OBJECT)) {
-    int valueLenght = strlen("{ Map }");
+    char *mapStringfied = ((Map *) self->value)->toString((Map *) self->value);
+    int valueLenght = strlen(mapStringfied);
     int bufferSize = keyLenght + separatorLenght + valueLenght + 1;
     char *buffer = malloc(bufferSize);
-    snprintf(buffer, bufferSize, "%s%s%s", self->key, separator, "{ Map }");
+    snprintf(buffer, bufferSize, "%s%s%s", self->key, separator, mapStringfied);
+
+    mapStringfied == NULL ? 0 : free(mapStringfied); // map.toString() aloca memoria
 
     return buffer;
   }
@@ -141,6 +147,9 @@ char* _mapEntryToString(MapEntry* self) {
   return buffer;
 }
 
+/**
+ * Libere a memoria apos o uso!!!!!!
+*/
 char* _mapToString(Map* self) {
   int numberOfItems = self->length;
   if (numberOfItems == 0) return "{ }";
@@ -154,7 +163,7 @@ char* _mapToString(Map* self) {
   char *buffer = duplicateString("");
   for (MapEntry *item = (MapEntry *) self->_items; item != NULL; item = item->sibling) {
     /** Representação em string do valor da entrada*/
-    const char *pairOfValues = item->toString(item);
+    char *pairOfValues = item->toString(item);
     
     /** O tamanho do buffer e da representação do valor e do novo buffer para gurdar ambos */
     int bufferLength = buffer == NULL ? 0 : strlen(buffer);
@@ -169,6 +178,7 @@ char* _mapToString(Map* self) {
     
     /** Libera o espaço aclocado anteriorrmente */
     buffer == NULL ? 0 : free(buffer);
+    pairOfValues == NULL ? 0 : free(pairOfValues);
 
     // atualiza a referencia do buffer
     buffer = (char*) newBuffer;

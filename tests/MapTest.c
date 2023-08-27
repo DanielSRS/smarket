@@ -544,7 +544,6 @@ TestResult _destroyTheMap() {
   return expectToBeTrue(itemsCount && itsAllDestroyed);
 }
 
-
 TestResult _nestedMapInsertion() {
   Map *map = newMap();
   char *key1 = "key1",
@@ -594,7 +593,49 @@ TestResult _nestedMapInsertion() {
 
   return expectToBeTrue(isAllGood);
 }
-// same key should override value
+
+TestResult _nestedMapToString() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
+
+  char *nestedKey = "nested";
+  Map *nestedMap = map->nest(map, nestedKey);
+
+  /** Insere elementos no map aninhado */
+  nestedMap->setAny(nestedMap, "first key", value1);
+  nestedMap->setAny(nestedMap, "something", value2);
+  nestedMap->setAny(nestedMap, "likeThis", value3);
+  nestedMap->setAny(nestedMap, "CONST", value4);
+  nestedMap->setAny(nestedMap, "let", value5);
+  nestedMap->setAny(nestedMap, "var", value6);
+  nestedMap->setAny(nestedMap, "enciclopedia", value7);
+
+  char *stringfied = map->toString(map);
+
+  return expectStringsToBeEquals("expected", stringfied);
+}
 
 /*TestResult _pointerIsNullAfterDestroy() {
   char *key = "idDaEntrada";
@@ -717,6 +758,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_nestedMapInsertion")
       it("Adiciona um Map aninhado", _nestedMapInsertion);
+      break;
+    CASE ("_nestedMapToString")
+      it("Maps aninhados em forma de string ", _nestedMapToString);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
