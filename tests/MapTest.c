@@ -544,6 +544,56 @@ TestResult _destroyTheMap() {
   return expectToBeTrue(itemsCount && itsAllDestroyed);
 }
 
+
+TestResult _nestedMapInsertion() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
+
+  char *nestedKey = "nested";
+
+  boolean doNotHaveNestedKey = !map->has(map, nestedKey);   // A chave não existe antes da inserção
+  Map *nestedMap = map->nest(map, nestedKey);               // Adiciono um map aninhado com essa chave
+  boolean hasNestedKey = map->has(map, nestedKey);          // A chave agora existe
+  boolean newLength = map->length == 8;                     // O tamonho incrementa do mesmo jeito que outra inserção
+  boolean sameRef = nestedMap == map->get(map, nestedKey);  // o valor salvo é a mesma referencia retornada
+
+  /** Insere elementos no map aninhado */
+  nestedMap->setAny(nestedMap, key1, value1);
+  nestedMap->setAny(nestedMap, key2, value2);
+  nestedMap->setAny(nestedMap, key3, value3);
+  nestedMap->setAny(nestedMap, key4, value4);
+  nestedMap->setAny(nestedMap, key5, value5);
+  nestedMap->setAny(nestedMap, key6, value6);
+  nestedMap->setAny(nestedMap, key7, value7);
+
+  boolean nestedLengthIsCorrect = nestedMap->length == 7;
+
+  boolean isAllGood = doNotHaveNestedKey && hasNestedKey && newLength && sameRef && nestedLengthIsCorrect;
+
+  return expectToBeTrue(isAllGood);
+}
 // same key should override value
 
 /*TestResult _pointerIsNullAfterDestroy() {
@@ -664,6 +714,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_destroyTheMap")
       it("destrói o Map", _destroyTheMap);
+      break;
+    CASE ("_nestedMapInsertion")
+      it("Adiciona um Map aninhado", _nestedMapInsertion);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")

@@ -220,11 +220,11 @@ MapEntry *newMapEntry(char *key, void *value, char *type) {
   return newEntry;
 }
 
-Map *_setElementOfAMap(Map* self, char* key, void* value) {
+Map *_setElementOfAMap(Map* self, char* key, void* value, char *type) {
   MapEntry *newEntry = newMapEntry(
     duplicateString(key),
     value,
-    duplicateString(ANY_OBJECT));
+    duplicateString(type));
   newEntry->sibling = NULL;
   newEntry->value = value;
 
@@ -257,6 +257,16 @@ Map *_setElementOfAMap(Map* self, char* key, void* value) {
 
   *((int *) &self->length) = self->length + 1;
   return self;
+}
+
+Map *setAny(Map* self, char* key, void* value) {
+  return _setElementOfAMap(self, key, value, ANY_OBJECT);
+}
+
+Map *nest(Map* self, char* key) {
+  Map *newmap = newMap();
+  _setElementOfAMap(self, key, newmap, MAP_OBJECT);
+  return newmap;
 }
 
 void _clearAllKeyValuePairsFromAMap(Map *self) {
@@ -299,9 +309,10 @@ Map* newMap() {
   map->del = _deleteElementInAMap;
   map->get = _getItemInAMap;
   map->has = _hasElementInAMap;
-  map->setAny = _setElementOfAMap;
+  map->setAny = setAny;
   map->toString = _mapToString;
   map->destroy = destroyMap;
+  map->nest = nest;
   map->_items = NULL;
 
   return map;

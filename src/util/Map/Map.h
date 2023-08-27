@@ -44,6 +44,10 @@ typedef struct Map
    * Define o valor para a chave no objeto Map. Retorna o objeto Map
    */
   struct Map*(*setAny)(struct Map* self, char* key, void* value);
+  /**
+   * Adiciona uma nova chave cujo valor é um novo outro Map
+   */
+  struct Map*(*nest)(struct Map* self, char* key);
   /** 
    * Retorna o tamanho do map. */
   const int length;
