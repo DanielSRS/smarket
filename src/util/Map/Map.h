@@ -56,6 +56,10 @@ typedef struct Map
    */
   char*(*toString)(struct Map* self);
   /**
+   * Destroi o registro liberando memória
+   */
+  const void(*destroy)(struct Map** self);
+  /**
    * Itens inseridos no Map
    */
   const struct MapEntry *_items;

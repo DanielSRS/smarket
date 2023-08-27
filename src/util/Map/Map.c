@@ -53,7 +53,7 @@ boolean _deleteElementInAMap(Map* self, char* key) {
      */
     if (isItemAnMap) {
       Map *nestedMap = (Map*) itemsInTheMap->value;
-      nestedMap->clear(nestedMap);                    // deve ser desroy não clear
+      nestedMap->destroy(&nestedMap);
     }
 
     itemsInTheMap->destroy(&itemsInTheMap);
@@ -83,7 +83,7 @@ boolean _deleteElementInAMap(Map* self, char* key) {
        */
       if (isItemAnMap) {
         Map *nestedMap = (Map*) itemToDelete->value;
-        nestedMap->clear(nestedMap);        // deve ser destroy
+        nestedMap->destroy(&nestedMap);
       }
 
       itemToDelete->destroy(&itemToDelete);
@@ -198,6 +198,14 @@ void destroyMapEntry(struct MapEntry **self) {
   *self = NULL;
 }
 
+void destroyMap(struct Map **self) {
+  if (!*self) return;
+  (*self)->clear(*self);               // Apaga todos os itens
+  free(*self);
+  memset(*self, 0, sizeof(Map));
+  *self = NULL;
+}
+
 MapEntry *newMapEntry(char *key, void *value, char *type) {
   MapEntry *newEntry = (MapEntry*) malloc(sizeof(MapEntry));
   memset(newEntry, 0, sizeof(MapEntry));
@@ -268,7 +276,7 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
      */
     if (isItemAnMap) {
       Map *nestedMap = (Map*) item->value;
-      nestedMap->clear(nestedMap); // deve ser destroy na verdade
+      nestedMap->destroy(&nestedMap);
     }
 
     item->destroy(&item);
@@ -293,6 +301,7 @@ Map* newMap() {
   map->has = _hasElementInAMap;
   map->setAny = _setElementOfAMap;
   map->toString = _mapToString;
+  map->destroy = destroyMap;
   map->_items = NULL;
 
   return map;

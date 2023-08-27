@@ -499,6 +499,51 @@ TestResult _delReturnsFalseIfItemDoNotExist() {
   return expectToBeTrue(itemsCount && !isDeleted && itemsCountAfterDel && !hasThekey);
 }
 
+TestResult _destroyTheMap() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+  
+  map->setAny(map, key1, value1);
+  map->setAny(map, key2, value2);
+  map->setAny(map, key3, value3);
+  map->setAny(map, key4, value4);
+  map->setAny(map, key5, value5);
+  map->setAny(map, key6, value6);
+  map->setAny(map, key7, value7);
+
+  int itemsCount = map->length == 7;                            // Antes de destruir
+  Map *secondRef = map;                                         // a referencia map é destruída.
+  map->destroy(&map);
+  boolean itsAllDestroyed = map == NULL
+                        &&  secondRef->clear == NULL
+                        &&  secondRef->del == NULL
+                        &&  secondRef->destroy == NULL
+                        &&  secondRef->get == NULL
+                        &&  secondRef->has == NULL
+                        &&  secondRef->length == 0
+                        // &&  secondRef->nest == NULL
+                        &&  secondRef->setAny == NULL
+                        &&  secondRef->toString == NULL
+                        &&  secondRef->toString == NULL
+                        &&  secondRef->_items == NULL;
+
+  return expectToBeTrue(itemsCount && itsAllDestroyed);
+}
+
 // same key should override value
 
 /*TestResult _pointerIsNullAfterDestroy() {
@@ -616,6 +661,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_delReturnsFalseIfItemDoNotExist")
       it("tentar deletar item que não está no map retorna False", _delReturnsFalseIfItemDoNotExist);
+      break;
+    CASE ("_destroyTheMap")
+      it("destrói o Map", _destroyTheMap);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
