@@ -1,2 +1,6 @@
 {
+  "files.associations": {
+    "map.h": "c",
+    "cstrings.h": "c"
+  }
 }

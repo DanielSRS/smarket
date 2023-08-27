@@ -4,6 +4,9 @@ serve: server
 	./build/server.executable
 	@echo "\n\n"
 
+all: server map.o
+	@echo "\nBuilding all"
+
 server: server.o socket.o childProcess.o
 	@echo "\n🏗️ Construindo servidor"
 	gcc -o build/server.executable build/server.o build/socket.o build/childProcess.o
@@ -17,6 +20,9 @@ socket.o: src/socket.c | buildFolder
 
 childProcess.o: src/childProcess.c | buildFolder
 	gcc -c src/childProcess.c -o build/childProcess.o -Wall
+
+map.o: src/util/Map/Map.c | buildFolder
+	gcc -c src/util/Map/Map.c -o build/map.o -Wall
 
 buildFolder:
 	@echo "📂 Criando diretório build"
