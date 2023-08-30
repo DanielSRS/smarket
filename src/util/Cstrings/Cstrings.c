@@ -14,3 +14,10 @@ alocatedCString intToCString(int value) {
   sprintf(intString, "%d", value);
   return intString;
 }
+
+alocatedCString duplicateString(const char *stringToBeDuplicated) {
+    char *destinationString = malloc(strlen (stringToBeDuplicated) + 1);  // Space for length plus nul
+    if (destinationString == NULL) return NULL;                           // No memory
+    strcpy(destinationString, stringToBeDuplicated);                      // Copy the characters
+    return destinationString;                                             // Return the new string
+}

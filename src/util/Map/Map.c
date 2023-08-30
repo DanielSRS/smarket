@@ -2,26 +2,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../Cstrings/Cstrings.h" // isEquals
 
 #define MAP_OBJECT "__Map__"
 #define STRING_OBJECT "__String__"
 #define ANY_OBJECT "__Any__"
-
-/** Compara se duas strings são iguais */
-boolean isEquals(const char * first, const char *second) {
-  if (strcmp(first, second) == 0) return True;
-  return False;
-}
-
-/**
- * O usuário DEVE liberar a memória após o uso
-*/
-char *duplicateString(const char *stringToBeDuplicated) {
-    char *destinationString = malloc(strlen (stringToBeDuplicated) + 1);  // Space for length plus nul
-    if (destinationString == NULL) return NULL;                           // No memory
-    strcpy(destinationString, stringToBeDuplicated);                      // Copy the characters
-    return destinationString;                                             // Return the new string
-}
 
 boolean _hasElementInAMap(Map* self, char* key) {
   if (self->length == 0) return False;

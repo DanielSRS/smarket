@@ -15,4 +15,9 @@ boolean isEquals(const char * first, const char *second);
 */
 alocatedCString intToCString(int value);
 
+/**
+ * O usuário DEVE liberar a memória após o uso
+*/
+alocatedCString duplicateString(const char *stringToBeDuplicated);
+
 #endif //CSGSL_H
