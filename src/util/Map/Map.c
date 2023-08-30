@@ -41,6 +41,16 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       nestedMap->destroy(&nestedMap);
     }
 
+    /**
+     * Se for uma string, apaga o conteudo e libera a memoria
+    */
+    boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
+    if (isString) {
+      char *stringVal = (char*) itemsInTheMap->value;
+      memset((void*) stringVal, 0, strlen(stringVal));
+      free(stringVal);
+    }
+
     itemsInTheMap->destroy(&itemsInTheMap);
 
     return True;
@@ -69,6 +79,16 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       if (isItemAnMap) {
         Map *nestedMap = (Map*) itemToDelete->value;
         nestedMap->destroy(&nestedMap);
+      }
+
+      /**
+       * Se for uma string, apaga o conteudo e libera a memoria
+      */
+      boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
+      if (isString) {
+        char *stringVal = (char*) itemsInTheMap->value;
+        memset((void*) stringVal, 0, strlen(stringVal));
+        free(stringVal);
       }
 
       itemToDelete->destroy(&itemToDelete);
@@ -257,6 +277,9 @@ Map *_setElementOfAMap(Map* self, char* key, void* value, char *type) {
 Map *setAny(Map* self, char* key, void* value) {
   return _setElementOfAMap(self, key, value, ANY_OBJECT);
 }
+Map *setString(Map* self, char* key, char* value) {
+  return _setElementOfAMap(self, key, duplicateString(value), STRING_OBJECT);
+}
 
 Map *nest(Map* self, char* key) {
   Map *newmap = newMap();
@@ -284,6 +307,16 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
       nestedMap->destroy(&nestedMap);
     }
 
+    /**
+     * Se for uma string, apaga o conteudo e libera a memoria
+    */
+    boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
+    if (isString) {
+      char *stringVal = (char*) itemsInTheMap->value;
+      memset((void*) stringVal, 0, strlen(stringVal));
+      free(stringVal);
+    }
+
     item->destroy(&item);
 
     if(item != NULL) exit(1);
@@ -305,6 +338,7 @@ Map* newMap() {
   map->get = _getItemInAMap;
   map->has = _hasElementInAMap;
   map->setAny = setAny;
+  map->setString = setString;
   map->toString = _mapToString;
   map->destroy = destroyMap;
   map->nest = nest;
