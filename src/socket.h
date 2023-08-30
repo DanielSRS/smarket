@@ -4,7 +4,7 @@
 #define	SOCKET_H
 
 struct addrinfo* getAddressInfo(void (*onError)());
-int createAndBindSocket(const struct addrinfo *serverAddressInfo, void (*onError)());
+int createAndBindSocket(void (*onError)());
 void handleConnectionOnANewProcess(int parentSocketFileDescriptor, int connectedSocketFileDescriptor);
 void listenForConnections(int socketFileDescriptor, void (*onError)());
 

@@ -6,13 +6,8 @@ void onGetAddressInfoError() {
 };
 
 int main(void) {
-    struct addrinfo *servinfo;
 
-    servinfo = getAddressInfo(onGetAddressInfoError);
-
-    int socketFileDescriptor = createAndBindSocket(servinfo, onGetAddressInfoError);
-  
-    freeaddrinfo(servinfo); // Libera a memória. Essa estrutura não vai ser mais usada. 
+    int socketFileDescriptor = createAndBindSocket(onGetAddressInfoError);
 
     listenForConnections(socketFileDescriptor, onGetAddressInfoError);
 
