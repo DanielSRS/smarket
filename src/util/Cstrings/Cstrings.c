@@ -1,6 +1,7 @@
 #include <string.h> // strcmp
 #include "Cstrings.h"
 #include <stdlib.h> // malloc
+#include <stdio.h> // sprintf
 
 /** Compara se duas strings são iguais */
 boolean isEquals(const char * first, const char *second) {
