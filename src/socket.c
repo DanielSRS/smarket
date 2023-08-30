@@ -1,5 +1,6 @@
 #include <stdio.h> // null e stderr
 #include <string.h> // memset
+#include <strings.h> // bzero
 #include <unistd.h> // cloes
 #include <stdlib.h> // exit
 #include <arpa/inet.h> // inet_ntop
@@ -164,4 +165,67 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
 
         close(connectedSocketFileDescriptor);  // parent doesn't need this
     }
+}
+
+void sendRequest(int sockfd) {
+    // char buff[80];
+    // int n;
+    // for (;;) {
+    //     bzero(buff, sizeof(buff));
+    //     printf("Enter the string : ");
+    //     n = 0;
+    //     while ((buff[n++] = getchar()) != '\n')
+    //         ;
+    //     write(sockfd, buff, sizeof(buff));
+    //     bzero(buff, sizeof(buff));
+    //     read(sockfd, buff, sizeof(buff));
+    //     printf("From Server : %s", buff);
+    //     if ((strncmp(buff, "exit", 4)) == 0) {
+    //         printf("Client Exit...\n");
+    //         break;
+    //     }
+    // }
+
+    char *request = "GET /dan/niel?dfg=dsfg HTTP/1.1\
+                    \r\nHost: localhost:3492\
+                    \r\nContent-Type: application/json\
+                    \r\nUser-Agent: SensorManager/0.0.1\
+                    \r\nContent-Length: 17\
+                    \r\n\r\n{\"santa\": \"rosa\"}";
+
+    if (send(sockfd, request, strlen(request), 0) == -1)
+      perror("send");
+    
+    printf("\nRequest sent\n\n");
+}
+
+int connectTo(char *host, int port) {
+    int sockfd;
+    struct sockaddr_in servaddr;
+ 
+    // socket create and verification
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == -1) {
+        printf("socket creation failed...\n");
+        exit(0);
+    }
+    else
+        printf("Socket successfully created..\n");
+    bzero(&servaddr, sizeof(servaddr));
+ 
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(host);
+    servaddr.sin_port = htons(port);
+ 
+    // connect the client socket to server socket
+    if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr))
+        != 0) {
+        printf("connection with the server failed...\n");
+        exit(0);
+    }
+    else
+        printf("connected to the server..\n");
+
+    return sockfd;
 }
