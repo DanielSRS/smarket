@@ -5,7 +5,7 @@
 #define False 0
 
 /** Compara se duas strings são iguais */
-int isEquals(const char * first, const char *second) {
+boolean isEquals(const char * first, const char *second) {
   if (strcmp(first, second) == 0) return True;
   return False;
 }
