@@ -7,6 +7,7 @@
 #include "socket.h" //addrinfo
 
 #define PORT "3492"  // A porta usada para outros usuários se conectarem.
+#define SERVER_PORT 3492  // A porta usada para outros usuários se conectarem.
 #define BACKLOG 10   // Quantidade máxima de conexões pendentes  
 
 /**
@@ -42,68 +43,38 @@ struct addrinfo* getAddressInfo(void (*onError)()) {
 /**
  * Cria um socket e faz o bind com a porta
 */
-int createAndBindSocket(const struct addrinfo *serverAddressInfo, void (*onError)()) {
-  const struct addrinfo *addressItem;
-  int INVALID_FILE_DESCRIPTOR = -1, ERROR_ON_SET_SOCKET_OPTION = -1; // Ocoreu um ero na criação do socket
-  int yes = 1;
-  int socketFileDescriptor = -1;
-
-  // Para cada item da lista de endereços, tenta criar e fazer bind.
-  // para quando for concluido com sucesso em algum item da lista
-  // Se houver erro, tentar com o proximo item até a lista acabar
-  for(addressItem = serverAddressInfo; addressItem != NULL; addressItem = addressItem->ai_next) {
-
-    // Cria o socket
-    socketFileDescriptor = socket(
-      addressItem->ai_family,
-      addressItem->ai_socktype,
-      addressItem->ai_protocol
-    );
-
-    if (socketFileDescriptor == INVALID_FILE_DESCRIPTOR) {
-      perror("server: socket");
-      continue;                   // Tenta cria o socket com o próximo item da lista
-    }
-
-    // Força o reuso do endereço pra evitar erros de porta ocupada
-    int socketOptionRes = setsockopt(
-      socketFileDescriptor,
-      SOL_SOCKET,
-      SO_REUSEADDR,
-      &yes,
-      sizeof(int)
-    );
-
-    if (socketOptionRes == ERROR_ON_SET_SOCKET_OPTION) {
-        perror("setsockopt");
-        onError();
-    }
-
-    // Faz o bind com a porta 
-    int bindSocketResponse = bind(
-      socketFileDescriptor,
-      addressItem->ai_addr,
-      addressItem->ai_addrlen
-    );
-
-    /** Se não for possivel fazer o bind*/
-    if (bindSocketResponse == -1) {
-        close(socketFileDescriptor);
-        perror("server: bind");
-        continue;
-    }
-
-    break; // Não houve erro. Encerra iteração
+int createAndBindSocket(void (*onError)()) {
+  struct sockaddr_in serverAddress;
+  int INVALID_FILE_DESCRIPTOR = -1;
+  int socketFileDescriptor;
+   
+  // socket create and verification
+  socketFileDescriptor = socket(AF_INET, SOCK_STREAM, 0);
+  if (socketFileDescriptor == INVALID_FILE_DESCRIPTOR) {
+    printf("socket creation failed...\n");
+    perror("server: socket");
+    onError();
   }
 
+  else
+    printf("Socket successfully created..\n");
+  bzero(&serverAddress, sizeof(serverAddress));
+  
+  // assign IP, PORT
+  serverAddress.sin_family = AF_INET;
+  serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+  serverAddress.sin_port = htons(SERVER_PORT);
+  
   /**
-   * Iterou a lista inteira e não foi possivel criar socket e fazer bind com 
-   * nenum do itens
+   * Binding newly created socket to given IP and verification
   */
-  if (addressItem == NULL)  {
+  if ((bind(socketFileDescriptor, (struct sockaddr*)&serverAddress, sizeof(serverAddress))) != 0) {
     fprintf(stderr, "server: failed to bind\n");
     onError();
   }
+
+  else
+    printf("Socket successfully binded..\n");
 
   return socketFileDescriptor;
 }
@@ -113,11 +84,12 @@ void handleConnectionOnANewProcess(int parentSocketFileDescriptor, int connected
     close(parentSocketFileDescriptor); // O processo filho não precisa dessa conexão
 
     // Resposta no formato definido pelo protocolo http 
-    char *response = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\n\
-    Connection: Keep-Alive\r\n\
-    Content-Type: application/json\r\n\
-    Content-Length: 14\r\n\r\n\
-    {\"dan\": \"iel\"}";
+    char *response = "HTTP/1.1 200 OK\
+                      \r\nAccess-Control-Allow-Origin: *\
+                      \r\nConnection: Keep-Alive\
+                      \r\nContent-Type: application/json\
+                      \r\nContent-Length: 14\
+                      \r\n\r\n{\"dan\": \"iel\"}";
 
     // Envia a resposta 
     if (send(connectedSocketFileDescriptor, response, strlen(response), 0) == -1)
@@ -185,7 +157,7 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
 
         buf[numbytes] = '\0';
 
-        printf("server: received data:\n\n '%s'",buf);
+        printf("server: received data:\n\n%s",buf);
 
         // Cria um novo processo para responder a solicitação 
         handleConnectionOnANewProcess(socketFileDescriptor, connectedSocketFileDescriptor);
