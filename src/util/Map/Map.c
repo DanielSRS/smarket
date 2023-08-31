@@ -310,7 +310,7 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
     /**
      * Se for uma string, apaga o conteudo e libera a memoria
     */
-    boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
+    boolean isString = isEquals(item->type, STRING_OBJECT);
     if (isString) {
       char *stringVal = (char*) itemsInTheMap->value;
       memset((void*) stringVal, 0, strlen(stringVal));
