@@ -658,7 +658,7 @@ TestResult _getMapKeys() {
   map->setAny(map, keysToInsert[5], value1);
   map->setAny(map, keysToInsert[6], value1);
 
-  char **keys = map->getMapKeys(map);
+  char **keys = map->getKeys(map);
   if (keys == NULL) {
     return expectToBeNotNull(keys);
   }
