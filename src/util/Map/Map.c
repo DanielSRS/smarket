@@ -329,6 +329,23 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
   self->_items = NULL;
 }
 
+char **getMapKeys(Map *self) {
+  int mapSize = self->length;
+  if (mapSize == 0) {
+    return NULL;
+  }
+
+  char **keysList = malloc(mapSize * sizeof(char *));
+
+  MapEntry *itemsInTheMap = (MapEntry *) self->_items;
+
+  int i = 0;
+  for (MapEntry *item = itemsInTheMap; item != NULL; item = item->sibling, i++) {
+    keysList[i] = duplicateString(item->key);
+  }
+
+  return keysList;
+}
 
 Map* newMap() {
   Map *map = malloc(sizeof(Map));
@@ -342,6 +359,7 @@ Map* newMap() {
   map->toString = _mapToString;
   map->destroy = destroyMap;
   map->nest = nest;
+  map->getKeys = getMapKeys;
   map->_items = NULL;
 
   return map;

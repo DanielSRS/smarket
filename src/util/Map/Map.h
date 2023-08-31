@@ -66,6 +66,10 @@ typedef struct Map
    */
   char*(*toString)(struct Map* self);
   /**
+   * Retorna uma lista de strings com todas as chaves do Map
+   */
+  char**(*getKeys)(struct Map* self);
+  /**
    * Destroi o registro liberando memória
    */
   const void(*destroy)(struct Map** self);
