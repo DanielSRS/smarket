@@ -1,6 +1,7 @@
 #include "ReadTags.h"
 #include "../Cstrings/Cstrings.h"
 #include <stdio.h> // printf, null
+#include "../../libs/MercuryApi/ReadRFIDTags.h"
 
 #define DEFAULT_TMR "tmr:///dev/ttyUSB0"
 #define DEFAULT_ANTENA "1"
@@ -19,12 +20,13 @@ int mockedRead(int argc, char **argv,  Map * result) {
 }
 
 Map* readTagsWithArgs(char *tmr, char *antena, Map * result) {
-  char *args[3];
+  char *args[4];
   args[0] = "readRFID";
   args[1] = tmr;
-  args[2] = antena;
+  args[2] = "--ant";
+  args[3] = antena;
 
-  mockedRead(3, args, result);
+  readRFIDTags(4, args, result);
   return result;
 }
 
