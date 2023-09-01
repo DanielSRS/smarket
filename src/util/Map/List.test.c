@@ -37,6 +37,14 @@ TestResult pushStringShouldBeNotNull() {
   return expectToBeNotNull(list->pushString);
 }
 
+TestResult lengthShouldBeZero() {
+  List *list = newList();
+  int initialValueShouldBeZero = 0;
+  int listLength = list->length(list);
+
+  return assertEquals(initialValueShouldBeZero, listLength);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -58,6 +66,9 @@ int main(int argc, char **argv){
       break;
     CASE ("pushStringShouldBeNotNull")
       it("Atributo pushString tem valor válido (não nulo)", pushStringShouldBeNotNull);
+      break;
+    CASE ("lengthShouldBeZero")
+      it("O retorno de length() deve ser 0 (zero) quando a lista é criada", lengthShouldBeZero);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
