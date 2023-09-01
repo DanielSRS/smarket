@@ -1,2 +1,9 @@
 add_library(Map Map.c)
 target_link_libraries(Map Cstrings)
+
+
+add_executable(ListTest List.test.c)
+target_link_libraries(ListTest Map Cstrings)
+target_link_libraries(ListTest TestSuite)
+
+add_test(newListCreatesANonNullReference ListTest newListCreatesANonNullReference)
