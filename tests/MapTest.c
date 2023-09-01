@@ -741,7 +741,7 @@ int main(int argc, char **argv){
       it("Atributo length tem valor 0 (zero) quando um Map é criado", _lengthShouldBeZero);
       break;
     CASE ("_lengthShouldChangeAfterInsertion")
-      it("A quantidade de items deve ser 1 após uma inserção", _lengthShouldBeZero);
+      it("A quantidade de items deve ser 1 após uma inserção", _lengthShouldChangeAfterInsertion);
       break;
     CASE ("_lengthShouldChangeAfterMultInsertion")
       it("A quantidade de items deve ser 7 após sete inserções inserção", _lengthShouldChangeAfterMultInsertion);
