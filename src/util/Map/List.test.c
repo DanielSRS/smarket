@@ -19,6 +19,12 @@ TestResult destroyShouldBeNotNull() {
   return expectToBeNotNull(list->destroy);
 }
 
+TestResult lengthShouldBeNotNull() {
+  List *list = newList();
+
+  return expectToBeNotNull(list->length);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -31,6 +37,9 @@ int main(int argc, char **argv){
       break;
     CASE ("destroyShouldBeNotNull")
       it("Atributo destroy tem valor válido (não nulo)", destroyShouldBeNotNull);
+      break;
+    CASE ("lengthShouldBeNotNull")
+      it("Atributo length tem valor válido (não nulo)", lengthShouldBeNotNull);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
