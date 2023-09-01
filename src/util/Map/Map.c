@@ -364,3 +364,49 @@ Map* newMap() {
 
   return map;
 }
+
+int listLength(List *self) {
+  return self->_map->length;
+}
+
+int listPushAny(List *self, void *value) {
+  alocatedCString key = intToCString(self->length(self));
+  self->_map->setAny(self->_map, key, value);
+
+  return self->length(self);
+
+  free(key);
+}
+
+int listPushString(List *self, const char *value) {
+  alocatedCString key = intToCString(self->length(self));
+  self->_map->setString(self->_map, key, value);
+
+  return self->length(self);
+
+  free(key);
+}
+
+
+void destroyList(List **self) {
+  if (!*self) return;
+  (*self)->_map->destroy(&((*self)->_map));            // Apaga todos os itens
+  free(*self);
+  memset(*self, 0, sizeof(Map));
+  *self = NULL;
+}
+
+// --------------------- Lista
+
+List* newList() {
+  List *list = malloc(sizeof(List));
+  memset(list, 0, sizeof(List));
+
+  list->_map = newMap();
+  list->length = listLength;
+  list->pushAny = listPushAny;
+  list->pushString = listPushString;
+  list->destroy = destroyList;
+
+  return list;
+}
