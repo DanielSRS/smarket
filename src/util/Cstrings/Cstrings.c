@@ -1,11 +1,24 @@
-#include <string.h>
+#include <string.h> // strcmp
 #include "Cstrings.h"
-
-#define True 1
-#define False 0
+#include <stdlib.h> // malloc
+#include <stdio.h> // sprintf
 
 /** Compara se duas strings são iguais */
-int isEquals(const char * first, const char *second) {
+boolean isEquals(const char * first, const char *second) {
   if (strcmp(first, second) == 0) return True;
   return False;
+}
+
+alocatedCString intToCString(int value) {
+  int maxStringSize = 12;                 // suficiente para representar um inteiro
+  char *intString = (char*) malloc(maxStringSize * sizeof(char));
+  sprintf(intString, "%d", value);
+  return intString;
+}
+
+alocatedCString duplicateString(const char *stringToBeDuplicated) {
+    char *destinationString = malloc(strlen (stringToBeDuplicated) + 1);  // Space for length plus nul
+    if (destinationString == NULL) return NULL;                           // No memory
+    strcpy(destinationString, stringToBeDuplicated);                      // Copy the characters
+    return destinationString;                                             // Return the new string
 }

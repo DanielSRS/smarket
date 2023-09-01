@@ -18,7 +18,7 @@ add_test(_pointerIsNullAfterDestroy MapEntryTest _pointerIsNullAfterDestroy)
 add_test(_toStringHasTheExpectedFormat MapEntryTest _toStringHasTheExpectedFormat)
 
 add_executable(MapTest MapTest.c)
-target_link_libraries(MapTest Map)
+target_link_libraries(MapTest Map Cstrings)
 target_link_libraries(MapTest TestSuite)
 add_test(_newMapCreatesANonNullReference MapTest _newMapCreatesANonNullReference)
 add_test(_newMapEntry_itemsAttrShouldBeNull MapTest _newMapEntry_itemsAttrShouldBeNull)
@@ -50,3 +50,4 @@ add_test(_delReturnsFalseIfItemDoNotExist MapTest _delReturnsFalseIfItemDoNotExi
 add_test(_destroyTheMap MapTest _destroyTheMap)
 add_test(_nestedMapInsertion MapTest _nestedMapInsertion)
 add_test(_nestedMapToString MapTest _nestedMapToString)
+add_test(_getMapKeys MapTest _getMapKeys)

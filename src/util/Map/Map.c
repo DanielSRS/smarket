@@ -2,26 +2,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../Cstrings/Cstrings.h" // isEquals
 
 #define MAP_OBJECT "__Map__"
 #define STRING_OBJECT "__String__"
 #define ANY_OBJECT "__Any__"
-
-/** Compara se duas strings são iguais */
-boolean isEquals(const char * first, const char *second) {
-  if (strcmp(first, second) == 0) return True;
-  return False;
-}
-
-/**
- * O usuário DEVE liberar a memória após o uso
-*/
-char *duplicateString(const char *stringToBeDuplicated) {
-    char *destinationString = malloc(strlen (stringToBeDuplicated) + 1);  // Space for length plus nul
-    if (destinationString == NULL) return NULL;                           // No memory
-    strcpy(destinationString, stringToBeDuplicated);                      // Copy the characters
-    return destinationString;                                             // Return the new string
-}
 
 boolean _hasElementInAMap(Map* self, char* key) {
   if (self->length == 0) return False;
@@ -56,6 +41,16 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       nestedMap->destroy(&nestedMap);
     }
 
+    /**
+     * Se for uma string, apaga o conteudo e libera a memoria
+    */
+    boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
+    if (isString) {
+      char *stringVal = (char*) itemsInTheMap->value;
+      memset((void*) stringVal, 0, strlen(stringVal));
+      free(stringVal);
+    }
+
     itemsInTheMap->destroy(&itemsInTheMap);
 
     return True;
@@ -84,6 +79,16 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       if (isItemAnMap) {
         Map *nestedMap = (Map*) itemToDelete->value;
         nestedMap->destroy(&nestedMap);
+      }
+
+      /**
+       * Se for uma string, apaga o conteudo e libera a memoria
+      */
+      boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
+      if (isString) {
+        char *stringVal = (char*) itemsInTheMap->value;
+        memset((void*) stringVal, 0, strlen(stringVal));
+        free(stringVal);
       }
 
       itemToDelete->destroy(&itemToDelete);
@@ -272,6 +277,9 @@ Map *_setElementOfAMap(Map* self, char* key, void* value, char *type) {
 Map *setAny(Map* self, char* key, void* value) {
   return _setElementOfAMap(self, key, value, ANY_OBJECT);
 }
+Map *setString(Map* self, char* key, char* value) {
+  return _setElementOfAMap(self, key, duplicateString(value), STRING_OBJECT);
+}
 
 Map *nest(Map* self, char* key) {
   Map *newmap = newMap();
@@ -299,6 +307,16 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
       nestedMap->destroy(&nestedMap);
     }
 
+    /**
+     * Se for uma string, apaga o conteudo e libera a memoria
+    */
+    boolean isString = isEquals(item->type, STRING_OBJECT);
+    if (isString) {
+      char *stringVal = (char*) itemsInTheMap->value;
+      memset((void*) stringVal, 0, strlen(stringVal));
+      free(stringVal);
+    }
+
     item->destroy(&item);
 
     if(item != NULL) exit(1);
@@ -311,6 +329,23 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
   self->_items = NULL;
 }
 
+char **getMapKeys(Map *self) {
+  int mapSize = self->length;
+  if (mapSize == 0) {
+    return NULL;
+  }
+
+  char **keysList = malloc(mapSize * sizeof(char *));
+
+  MapEntry *itemsInTheMap = (MapEntry *) self->_items;
+
+  int i = 0;
+  for (MapEntry *item = itemsInTheMap; item != NULL; item = item->sibling, i++) {
+    keysList[i] = duplicateString(item->key);
+  }
+
+  return keysList;
+}
 
 Map* newMap() {
   Map *map = malloc(sizeof(Map));
@@ -320,9 +355,11 @@ Map* newMap() {
   map->get = _getItemInAMap;
   map->has = _hasElementInAMap;
   map->setAny = setAny;
+  map->setString = setString;
   map->toString = _mapToString;
   map->destroy = destroyMap;
   map->nest = nest;
+  map->getKeys = getMapKeys;
   map->_items = NULL;
 
   return map;

@@ -1,5 +1,6 @@
 #include "../src/util/TestSuite/TestSuite.h" // strcpy
 #include "../src/util/Map/Map.h"
+#include "../src/util/Cstrings/Cstrings.h"
 #include <stdlib.h> // free
 #include <stdio.h> //snprintf
 
@@ -637,6 +638,46 @@ TestResult _nestedMapToString() {
   return expectStringsToBeEquals("expected", stringfied);
 }
 
+TestResult _getMapKeys() {
+  Map *map = newMap();
+  char *keysToInsert[] = {"0",
+                        "1",
+                        "2",
+                        "3",
+                        "4",
+                        "5",
+                        "6"};
+  
+  char *value1 = "value1";
+  
+  map->setAny(map, keysToInsert[0], value1);
+  map->setAny(map, keysToInsert[1], value1);
+  map->setAny(map, keysToInsert[2], value1);
+  map->setAny(map, keysToInsert[3], value1);
+  map->setAny(map, keysToInsert[4], value1);
+  map->setAny(map, keysToInsert[5], value1);
+  map->setAny(map, keysToInsert[6], value1);
+
+  char **keys = map->getKeys(map);
+  if (keys == NULL) {
+    return expectToBeNotNull(keys);
+  }
+
+  boolean keysMatch[map->length];
+
+  // Compara se as chaves retornadas são iguas as inseridas no map
+  for (int i = 0; i < map->length; i++) {
+    keysMatch[i] = isEquals(keysToInsert[i], keys[i]);
+  }
+  
+  boolean result = True;
+  for (int i = 0; i < map->length; i++) {
+    result = result && keysMatch[i];
+  }
+
+  return expectToBeTrue(result);
+}
+
 /*TestResult _pointerIsNullAfterDestroy() {
   char *key = "idDaEntrada";
   char *value = "Sou um valor qualquer";
@@ -761,6 +802,9 @@ int main(int argc, char **argv){
       break;
     CASE ("_nestedMapToString")
       it("Maps aninhados em forma de string ", _nestedMapToString);
+      break;
+    CASE ("_getMapKeys")
+      it("Retorna todas as chaves inseridas no map", _getMapKeys);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
