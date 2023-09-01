@@ -31,6 +31,12 @@ TestResult pushAnyShouldBeNotNull() {
   return expectToBeNotNull(list->pushAny);
 }
 
+TestResult pushStringShouldBeNotNull() {
+  List *list = newList();
+
+  return expectToBeNotNull(list->pushString);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -49,6 +55,9 @@ int main(int argc, char **argv){
       break;
     CASE ("pushAnyShouldBeNotNull")
       it("Atributo pushAny tem valor válido (não nulo)", pushAnyShouldBeNotNull);
+      break;
+    CASE ("pushStringShouldBeNotNull")
+      it("Atributo pushString tem valor válido (não nulo)", pushStringShouldBeNotNull);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
