@@ -10,3 +10,4 @@ add_test(newListCreatesANonNullReference ListTest newListCreatesANonNullReferenc
 add_test(_mapAttrShouldBeNotNull ListTest _mapAttrShouldBeNotNull)
 add_test(destroyShouldBeNotNull ListTest destroyShouldBeNotNull)
 add_test(lengthShouldBeNotNull ListTest lengthShouldBeNotNull)
+add_test(pushAnyShouldBeNotNull ListTest pushAnyShouldBeNotNull)

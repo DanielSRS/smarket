@@ -25,6 +25,12 @@ TestResult lengthShouldBeNotNull() {
   return expectToBeNotNull(list->length);
 }
 
+TestResult pushAnyShouldBeNotNull() {
+  List *list = newList();
+
+  return expectToBeNotNull(list->pushAny);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -40,6 +46,9 @@ int main(int argc, char **argv){
       break;
     CASE ("lengthShouldBeNotNull")
       it("Atributo length tem valor válido (não nulo)", lengthShouldBeNotNull);
+      break;
+    CASE ("pushAnyShouldBeNotNull")
+      it("Atributo pushAny tem valor válido (não nulo)", pushAnyShouldBeNotNull);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
