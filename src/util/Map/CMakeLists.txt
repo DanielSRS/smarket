@@ -7,3 +7,4 @@ target_link_libraries(ListTest Map Cstrings)
 target_link_libraries(ListTest TestSuite)
 
 add_test(newListCreatesANonNullReference ListTest newListCreatesANonNullReference)
+add_test(_mapAttrShouldBeNotNull ListTest _mapAttrShouldBeNotNull)
