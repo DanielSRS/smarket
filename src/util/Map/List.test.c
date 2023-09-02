@@ -45,6 +45,15 @@ TestResult lengthShouldBeZero() {
   return assertEquals(initialValueShouldBeZero, listLength);
 }
 
+TestResult lengthShouldChangeAfterInsertion() {
+  List *list = newList();
+  list->pushString(list, "first value");
+  int insertedValues = 1;
+  int listLength = list->length(list);
+
+  return assertEquals(insertedValues, listLength);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -69,6 +78,9 @@ int main(int argc, char **argv){
       break;
     CASE ("lengthShouldBeZero")
       it("O retorno de length() deve ser 0 (zero) quando a lista é criada", lengthShouldBeZero);
+      break;
+    CASE ("lengthShouldChangeAfterInsertion")
+      it("A quantidade de items deve ser 1 após uma inserção", lengthShouldChangeAfterInsertion);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
