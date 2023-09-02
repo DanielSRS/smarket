@@ -54,6 +54,14 @@ TestResult lengthShouldChangeAfterInsertion() {
   return assertEquals(insertedValues, listLength);
 }
 
+TestResult lengthIsTheSameAsPushResult() {
+  List *list = newList();
+  int listLength = list->pushString(list, "first value");
+  int insertedValues = 1;
+
+  return assertEquals(insertedValues, listLength);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -81,6 +89,9 @@ int main(int argc, char **argv){
       break;
     CASE ("lengthShouldChangeAfterInsertion")
       it("A quantidade de items deve ser 1 após uma inserção", lengthShouldChangeAfterInsertion);
+      break;
+    CASE ("lengthIsTheSameAsPushResult")
+      it("Push deve retornar 1 se for a primeira inserção", lengthIsTheSameAsPushResult);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
