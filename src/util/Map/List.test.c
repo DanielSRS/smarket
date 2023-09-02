@@ -81,6 +81,23 @@ TestResult lengthShouldChangeAfterMultInsertion() {
   return assertEquals(insertedValues, listLength);
 }
 
+TestResult pushReturnTheNewLengthAfterMultInsertion() {
+  List *list = newList();
+  list->pushString(list, "first value");
+  list->pushString(list, "first value2");
+  list->pushString(list, "first value3");
+  list->pushString(list, "first value4");
+  list->pushString(list, "first value5");
+  list->pushString(list, "first value7");
+  list->pushString(list, "first value8");
+  list->pushString(list, "first value9");
+  int listLength = list->pushString(list, "first value10");
+
+  int insertedValues = 9;
+
+  return assertEquals(insertedValues, listLength);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -114,6 +131,9 @@ int main(int argc, char **argv){
       break;
     CASE ("lengthShouldChangeAfterMultInsertion")
       it("A quantidade de items deve ser 10 após dez inserções", lengthShouldChangeAfterMultInsertion);
+      break;
+    CASE ("pushReturnTheNewLengthAfterMultInsertion")
+      it("Push deve retornar o tamanho após multiplas inserções", pushReturnTheNewLengthAfterMultInsertion);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
