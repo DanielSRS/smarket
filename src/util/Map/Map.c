@@ -392,7 +392,7 @@ void destroyList(List **self) {
   if (!*self) return;
   (*self)->_map->destroy(&((*self)->_map));            // Apaga todos os itens
   free(*self);
-  memset(*self, 0, sizeof(Map));
+  memset(*self, 0, sizeof(List));
   *self = NULL;
 }
 

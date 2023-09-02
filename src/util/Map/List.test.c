@@ -98,6 +98,33 @@ TestResult pushReturnTheNewLengthAfterMultInsertion() {
   return assertEquals(insertedValues, listLength);
 }
 
+TestResult destroyAList() {
+  List *list = newList();
+
+  List *listRef = list;
+  Map *mapRef = (Map*) list->_map;
+
+  list->destroy(&list);
+
+  boolean listIsNullAfterDestroy = list == NULL;
+  boolean mapIsNull = listRef->_map == NULL;
+  boolean lengthIsNull = listRef->length == NULL;
+  boolean destroyIsNull = listRef->destroy == NULL;
+  boolean pushAnyIsNull = listRef->pushAny == NULL;
+  boolean pushStringIsNull = listRef->pushString == NULL;
+  boolean mapItemsIsNull = mapRef->_items == NULL;
+
+  boolean assertAll = listIsNullAfterDestroy
+                      && mapIsNull
+                      && lengthIsNull
+                      && pushAnyIsNull
+                      && pushStringIsNull
+                      && mapItemsIsNull
+                      && destroyIsNull;
+
+  return expectToBeTrue(assertAll);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -134,6 +161,9 @@ int main(int argc, char **argv){
       break;
     CASE ("pushReturnTheNewLengthAfterMultInsertion")
       it("Push deve retornar o tamanho após multiplas inserções", pushReturnTheNewLengthAfterMultInsertion);
+      break;
+    CASE ("destroyAList")
+      it("Destrói a lista", destroyAList);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
