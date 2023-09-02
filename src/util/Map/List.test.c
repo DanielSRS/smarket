@@ -62,6 +62,25 @@ TestResult lengthIsTheSameAsPushResult() {
   return assertEquals(insertedValues, listLength);
 }
 
+TestResult lengthShouldChangeAfterMultInsertion() {
+  List *list = newList();
+  list->pushString(list, "first value");
+  list->pushString(list, "first value2");
+  list->pushString(list, "first value3");
+  list->pushString(list, "first value4");
+  list->pushString(list, "first value5");
+  list->pushString(list, "first value6");
+  list->pushString(list, "first value7");
+  list->pushString(list, "first value8");
+  list->pushString(list, "first value9");
+  list->pushString(list, "first value10");
+
+  int insertedValues = 10;
+  int listLength = list->length(list);
+
+  return assertEquals(insertedValues, listLength);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -92,6 +111,9 @@ int main(int argc, char **argv){
       break;
     CASE ("lengthIsTheSameAsPushResult")
       it("Push deve retornar 1 se for a primeira inserção", lengthIsTheSameAsPushResult);
+      break;
+    CASE ("lengthShouldChangeAfterMultInsertion")
+      it("A quantidade de items deve ser 10 após dez inserções", lengthShouldChangeAfterMultInsertion);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
