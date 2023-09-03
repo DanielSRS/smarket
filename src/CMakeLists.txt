@@ -9,7 +9,6 @@ add_subdirectory(Apps)
 add_subdirectory(libs)
 
 add_library(socket socket.c)
-add_library(childProcess childProcess.c)
 
 target_link_libraries(socket childProcess)
 

@@ -4,7 +4,7 @@
 #include <unistd.h> // cloes
 #include <stdlib.h> // exit
 #include <arpa/inet.h> // inet_ntop
-#include "childProcess.h" // handleChildProcessTermination
+#include "util/ChildProcess/childProcess.h" // handleChildProcessTermination
 #include "socket.h" //addrinfo
 
 #define PORT "3492"  // A porta usada para outros usuários se conectarem.
