@@ -2,6 +2,7 @@
   "files.associations": {
     "map.h": "c",
     "cstrings.h": "c",
-    "childprocess.h": "c"
+    "childprocess.h": "c",
+    "socket.h": "c"
   }
 }

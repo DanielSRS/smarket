@@ -8,10 +8,6 @@ add_subdirectory(util)
 add_subdirectory(Apps)
 add_subdirectory(libs)
 
-add_library(socket socket.c)
-
-target_link_libraries(socket childProcess)
-
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)

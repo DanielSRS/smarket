@@ -1,4 +1,4 @@
-#include "../../socket.h" // connectTo, sendRequest
+#include "../../util/Socket/socket.h" // connectTo, sendRequest
 #include "../../util/ReadTags/ReadTags.h" //readtags
 #include <unistd.h> // close
 #include <stdio.h> // printf
