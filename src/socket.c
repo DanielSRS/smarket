@@ -158,7 +158,7 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
 
         buf[numbytes] = '\0';
 
-        printf("server: received data:\n\n%s",buf);
+        printf("server: received %d bytes of data:\n\n%s",numbytes, buf);
 
         // Cria um novo processo para responder a solicitação 
         handleConnectionOnANewProcess(socketFileDescriptor, connectedSocketFileDescriptor);

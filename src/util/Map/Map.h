@@ -1,4 +1,5 @@
 #include "../Boolean/Boolean.h"
+#include "../Cstrings/Cstrings.h" // isEquals alocated cstrings
 
 #ifndef MAP_H
 #define MAP_H
@@ -120,6 +121,10 @@ typedef struct List
    * no dado salvo.
    */
   int (*pushString)(struct List* self, void *value);
+  /**
+   * Retorna uma string com todos os valores da Lista
+   */
+  alocatedCString (*toString)(struct List* self);
   /**
    * Destroi a lista liberando memória. Todos os itens são destruídos junto
    * com a lista, exceto os itens salvos como referencia.

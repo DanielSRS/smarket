@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../Cstrings/Cstrings.h" // isEquals
 
 #define MAP_OBJECT "__Map__"
 #define STRING_OBJECT "__String__"
@@ -148,6 +147,43 @@ char* _mapEntryToString(MapEntry* self) {
   int bufferSize = keyLenght + separatorLenght + typeLenght + 1;
   char *buffer = malloc(bufferSize);
   snprintf(buffer, bufferSize, "%s%s%s", self->key, separator, self->type);
+
+  return buffer;
+}
+
+alocatedCString mapEntryValueToString(MapEntry* self) {
+  int keyLenght = strlen(self->key);
+  int typeLenght = strlen(self->type);
+  int separatorLenght = 2;
+  char *separator = ": ";
+
+  /** Se o valor guardado for uma string */
+  if (isEquals(self->type, STRING_OBJECT)) {
+    int valueLenght = strlen((char*) self->value);
+    int bufferSize = valueLenght + 1;
+    char *buffer = malloc(bufferSize);
+    snprintf(buffer, bufferSize, "%s", (char*) self->value);
+
+    return buffer;
+  }
+
+  /** Se o valor guardado for um map */
+  if (isEquals(self->type, MAP_OBJECT)) {
+    char *mapStringfied = ((Map *) self->value)->toString((Map *) self->value);
+    int valueLenght = strlen(mapStringfied);
+    int bufferSize = valueLenght + 1;
+    char *buffer = malloc(bufferSize);
+    snprintf(buffer, bufferSize, "%s", mapStringfied);
+
+    mapStringfied == NULL ? 0 : free(mapStringfied); // map.toString() aloca memoria
+
+    return buffer;
+  }
+
+  /** Se o valor guardado for de outro tipo */
+  int bufferSize = typeLenght + 1;
+  char *buffer = malloc(bufferSize);
+  snprintf(buffer, bufferSize, "%s", self->type);
 
   return buffer;
 }
@@ -396,6 +432,51 @@ void destroyList(List **self) {
   *self = NULL;
 }
 
+alocatedCString listToString(List* self) {
+  int numberOfItems = self->length(self);
+  if (numberOfItems == 0) return "[ ]";
+  char *begginingOfTheString = "[\n";
+  char *endingOfTheString = "]";
+  char *identation = "\t";
+  char *endOfLine = ",\n";
+  int identationLen = 1, endOfLineLen = 2;
+  int endOfStringLen = 1; // \0 ao final da strin
+
+  alocatedCString buffer = duplicateString("");
+  for (MapEntry *item = (MapEntry *) self->_map->_items; item != NULL; item = item->sibling) {
+    /** Representação em string do valor da entrada*/
+    alocatedCString serializedValue = mapEntryValueToString(item);
+    
+    /** O tamanho do buffer e da representação do valor e do novo buffer para gurdar ambos */
+    int bufferLength = strlen(buffer);
+    int serializedValueLen = strlen(serializedValue);
+    int newBufferLenght = bufferLength + identationLen + endOfLineLen + serializedValueLen + endOfStringLen;
+
+    /** Aloca espaço suficiente para guradar os tamanhos */
+    char *newBuffer = malloc(newBufferLenght);
+
+    /** Copia todos os dado para o novo buffer */
+    snprintf(newBuffer, newBufferLenght, "%s%s%s%s", buffer, identation, serializedValue, endOfLine);
+    
+    /** Libera o espaço aclocado anteriorrmente */
+    free(buffer);
+    free(serializedValue);
+
+    // atualiza a referencia do buffer
+    buffer = (char*) newBuffer;
+  }
+
+  int newBufferLenght = strlen(buffer) + strlen(begginingOfTheString) + strlen(endingOfTheString) + endOfStringLen;
+  char *newBuffer = malloc(newBufferLenght);
+  snprintf(newBuffer, newBufferLenght, "%s%s%s", begginingOfTheString, buffer, endingOfTheString);
+
+  /** Libera o espaço aclocado anteriorrmente */
+  free(buffer);
+
+  return newBuffer;
+}
+
+
 // --------------------- Lista
 
 List* newList() {
@@ -407,6 +488,7 @@ List* newList() {
   list->pushAny = listPushAny;
   list->pushString = listPushString;
   list->destroy = destroyList;
+  list->toString = listToString;
 
   return list;
 }
