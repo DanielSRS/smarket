@@ -1,4 +1,5 @@
 #include "../Boolean/Boolean.h"
+#include "../Cstrings/Cstrings.h" // isEquals alocated cstrings
 
 #ifndef MAP_H
 #define MAP_H
@@ -92,5 +93,54 @@ Map* newMap();
 */
 MapEntry *newMapEntry(char *key, void *value, char *type);
 
+/**
+ * Uma lista
+*/
+typedef struct List
+{
+  /**
+   * Retorna a quantidade de itens inseridos na lista
+   */
+  int (*length)(struct List* self);
+  /**
+   * Insere um item de qualquer tipo da lista.
+   * 
+   * O item é salvo como uma referencia. ao destruir o map o
+   * dado não é destruido junto
+   * 
+   * retorna o novo tamanho da lista
+   */
+  int (*pushAny)(struct List* self, void *value);
+  /**
+   * Insere um item de tipo string na lsita.
+   * 
+   * O item é salvo como uma cópia do valor passado como parametro 
+   * e é destruído junto com a destruição da lista.
+   * 
+   * modificar value após a inserção na lista não causa nenhum efeito
+   * no dado salvo.
+   */
+  int (*pushString)(struct List* self, void *value);
+  /**
+   * Retorna uma string com todos os valores da Lista
+   */
+  alocatedCString (*toString)(struct List* self);
+  /**
+   * Destroi a lista liberando memória. Todos os itens são destruídos junto
+   * com a lista, exceto os itens salvos como referencia.
+   */
+  const void(*destroy)(struct List** self);
+  /**
+   * Dados da lista.
+   * 
+   * A lista é um envolucro ao redor de um Map
+   */
+  const struct Map *_map;
+} List;
+
+/**
+ * Cria um nova lista
+*/
+List* newList();
 
 #endif // MAP_H

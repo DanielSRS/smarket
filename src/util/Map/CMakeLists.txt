@@ -1,2 +1,20 @@
 add_library(Map Map.c)
 target_link_libraries(Map Cstrings)
+
+
+add_executable(ListTest List.test.c)
+target_link_libraries(ListTest Map Cstrings)
+target_link_libraries(ListTest TestSuite)
+
+add_test(newListCreatesANonNullReference ListTest newListCreatesANonNullReference)
+add_test(_mapAttrShouldBeNotNull ListTest _mapAttrShouldBeNotNull)
+add_test(destroyShouldBeNotNull ListTest destroyShouldBeNotNull)
+add_test(lengthShouldBeNotNull ListTest lengthShouldBeNotNull)
+add_test(pushAnyShouldBeNotNull ListTest pushAnyShouldBeNotNull)
+add_test(pushStringShouldBeNotNull ListTest pushStringShouldBeNotNull)
+add_test(lengthShouldBeZero ListTest lengthShouldBeZero)
+add_test(lengthShouldChangeAfterInsertion ListTest lengthShouldChangeAfterInsertion)
+add_test(lengthIsTheSameAsPushResult ListTest lengthIsTheSameAsPushResult)
+add_test(lengthShouldChangeAfterMultInsertion ListTest lengthShouldChangeAfterMultInsertion)
+add_test(pushReturnTheNewLengthAfterMultInsertion ListTest pushReturnTheNewLengthAfterMultInsertion)
+add_test(destroyAList ListTest destroyAList)
