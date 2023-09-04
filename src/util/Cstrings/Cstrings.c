@@ -22,3 +22,10 @@ alocatedCString duplicateString(const char *stringToBeDuplicated) {
     strcpy(destinationString, stringToBeDuplicated);                      // Copy the characters
     return destinationString;                                             // Return the new string
 }
+
+alocatedCString duplicateStringWithSize(const char *stringToBeDuplicated, int length) {
+    char *destinationString = malloc(length + 1);  // Space for length plus nul
+    if (destinationString == NULL) return NULL;                           // No memory
+    snprintf(destinationString, length + 1, "%s", stringToBeDuplicated);                      // Copy the characters
+    return destinationString;                                             // Return the new string
+}

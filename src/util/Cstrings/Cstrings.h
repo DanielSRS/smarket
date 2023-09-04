@@ -20,4 +20,6 @@ alocatedCString intToCString(int value);
 */
 alocatedCString duplicateString(const char *stringToBeDuplicated);
 
+alocatedCString duplicateStringWithSize(const char *stringToBeDuplicated, int length);
+
 #endif //CSGSL_H
