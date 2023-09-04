@@ -6,6 +6,7 @@
 #include <arpa/inet.h> // inet_ntop
 #include "../ChildProcess/childProcess.h" // handleChildProcessTermination
 #include "socket.h" //addrinfo
+#include "../Http/http.h" // RequestHeaderInfo, getHeadersInfo
 
 #define PORT "3492"  // A porta usada para outros usuários se conectarem.
 #define SERVER_PORT 3492  // A porta usada para outros usuários se conectarem.
@@ -146,7 +147,7 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
             originIpAddress,
             sizeof originIpAddress);
 
-        printf("server: got connection from %s\n", originIpAddress);
+        printf("\nserver: got connection from %s\n", originIpAddress);
 
         // printando dados enviados pelo cliente 
         int numbytes;
@@ -158,7 +159,14 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
 
         buf[numbytes] = '\0';
 
-        printf("server: received %d bytes of data:\n\n%s",numbytes, buf);
+        //printf("\nserver: received %d bytes of data:\n\n%s\n__END__\n\n",numbytes, buf);
+        RequestHeaderInfo info = getHeadersInfo(buf, numbytes);
+        // IOPrintRequestHeaderInfo(info);
+
+        Request request = parseRequest(buf, numbytes);
+        IOPrintRequest(request);
+
+        // request.destroy(&request);
 
         // Cria um novo processo para responder a solicitação 
         handleConnectionOnANewProcess(socketFileDescriptor, connectedSocketFileDescriptor);

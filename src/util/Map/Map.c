@@ -30,6 +30,7 @@ boolean _deleteElementInAMap(Map* self, char* key) {
     *((int *) &self->length) = self->length - 1;      // reduz a contagem de itens
 
     boolean isItemAnMap = isEquals(itemsInTheMap->type, MAP_OBJECT);
+    boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
 
     /**
      * Se o valor do item for um mapa aninhado, limpa todas
@@ -43,7 +44,6 @@ boolean _deleteElementInAMap(Map* self, char* key) {
     /**
      * Se for uma string, apaga o conteudo e libera a memoria
     */
-    boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
     if (isString) {
       char *stringVal = (char*) itemsInTheMap->value;
       memset((void*) stringVal, 0, strlen(stringVal));
@@ -69,7 +69,8 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       previousItem->sibling = nextItem->sibling;
       *((int *) &self->length) = self->length - 1;      // reduz a contagem de itens
 
-      boolean isItemAnMap = isEquals(itemsInTheMap->type, MAP_OBJECT);
+      boolean isItemAnMap = isEquals(itemToDelete->type, MAP_OBJECT);
+      boolean isString = isEquals(itemToDelete->type, STRING_OBJECT);
 
       /**
        * Se o valor do item for um mapa aninhado, limpa todas
@@ -83,9 +84,8 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       /**
        * Se for uma string, apaga o conteudo e libera a memoria
       */
-      boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
       if (isString) {
-        char *stringVal = (char*) itemsInTheMap->value;
+        char *stringVal = (char*) itemToDelete->value;
         memset((void*) stringVal, 0, strlen(stringVal));
         free(stringVal);
       }
@@ -333,6 +333,7 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
   for (MapEntry *item = itemsInTheMap; item != NULL;) {
     MapEntry *nextItem = item->sibling;
     boolean isItemAnMap = isEquals(item->type, MAP_OBJECT);
+    boolean isString = isEquals(item->type, STRING_OBJECT);
 
     /**
      * Se o valor do item for um mapa aninhado, limpa todas
@@ -346,9 +347,8 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
     /**
      * Se for uma string, apaga o conteudo e libera a memoria
     */
-    boolean isString = isEquals(item->type, STRING_OBJECT);
     if (isString) {
-      char *stringVal = (char*) itemsInTheMap->value;
+      char *stringVal = (char*) item->value;
       memset((void*) stringVal, 0, strlen(stringVal));
       free(stringVal);
     }
