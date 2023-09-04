@@ -161,7 +161,12 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
 
         //printf("\nserver: received %d bytes of data:\n\n%s\n__END__\n\n",numbytes, buf);
         RequestHeaderInfo info = getHeadersInfo(buf, numbytes);
-        IOPrintRequestHeaderInfo(info);
+        // IOPrintRequestHeaderInfo(info);
+
+        Request request = parseRequest(buf, numbytes);
+        IOPrintRequest(request);
+
+        // request.destroy(&request);
 
         // Cria um novo processo para responder a solicitação 
         handleConnectionOnANewProcess(socketFileDescriptor, connectedSocketFileDescriptor);
