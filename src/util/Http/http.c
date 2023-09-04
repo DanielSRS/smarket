@@ -166,7 +166,7 @@ Request parseRequest(const char *requestBuffer, int length) {
         // printf("\nkey lida: %s", key);
 
         char *valueSubS = fildSubstring + m + 1; // ignora a key e o espaço
-        alocatedCString value = duplicateStringWithSize(valueSubS, substringLen - m);
+        alocatedCString value = trimEnd(valueSubS, substringLen - m);
         // printf("\nvalue lida: %s", value);
 
         request.headers->setString(request.headers, key, value);
