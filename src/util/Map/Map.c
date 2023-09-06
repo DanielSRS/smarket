@@ -313,8 +313,13 @@ Map *_setElementOfAMap(Map* self, char* key, void* value, char *type) {
 Map *setAny(Map* self, char* key, void* value) {
   return _setElementOfAMap(self, key, value, ANY_OBJECT);
 }
+
 Map *setString(Map* self, char* key, char* value) {
   return _setElementOfAMap(self, key, duplicateString(value), STRING_OBJECT);
+}
+
+Map *setMap(Map* self, char* key, Map* value) {
+  return _setElementOfAMap(self, key, value, MAP_OBJECT);
 }
 
 Map *nest(Map* self, char* key) {
@@ -392,6 +397,7 @@ Map* newMap() {
   map->has = _hasElementInAMap;
   map->setAny = setAny;
   map->setString = setString;
+  map->setMap = setMap;
   map->toString = _mapToString;
   map->destroy = destroyMap;
   map->nest = nest;
