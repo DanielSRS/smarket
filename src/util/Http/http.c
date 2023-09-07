@@ -1,6 +1,7 @@
 #include "http.h"
 #include <stdio.h> // printf
 #include <stdlib.h> // free
+#include "../JsonParser/JsonParser.h" // parseObject
 
 RequestHeaderInfo getHeadersInfo(const char *requestBuffer, int length) {
   RequestHeaderInfo info = { 0 };
@@ -90,7 +91,7 @@ Request parseRequest(const char *requestBuffer, int length) {
   int charNaoLidos = info.fildLengths[0];
 
   /** Se houve algum erro apenas retorna sem processar o resto */
-  if (info.size == 0 || info.tooManyFields, info.numberOfFields < 1 || info.fildLengths[0] < 14) {
+  if (info.size == 0 || info.tooManyFields || info.numberOfFields < 1 || info.fildLengths[0] < 14) {
     request.thereWasErrors = True;
     return request;
   }
@@ -150,7 +151,6 @@ Request parseRequest(const char *requestBuffer, int length) {
   request.protocolVersion = version;
 
   request.headers = newMap();
-  request.data = newMap();
 
   // parsing das headers
   for (int n = 1; n < info.numberOfFields; n++) {
@@ -176,6 +176,13 @@ Request parseRequest(const char *requestBuffer, int length) {
   }
 
   // body starts at info.size + 1
+  int offset = info.size + 1;
+  if (requestBuffer[offset] == '{') {
+    offset++; // consome a abertura de chaves: "{";
+    request.data = parseObject(&offset, length, requestBuffer);
+  } else {
+    request.data = newMap();
+  }
 
   request.destroy = destroyRequest;
 

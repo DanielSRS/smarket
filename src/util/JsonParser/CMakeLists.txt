@@ -1,0 +1,17 @@
+add_library(JsonParser JsonParser.c)
+target_link_libraries(JsonParser Cstrings Map)
+
+
+add_executable(JsonParserTest JsonParser.test.c)
+target_link_libraries(JsonParserTest TestSuite JsonParser)
+add_test(parseCorrectString JsonParserTest parseCorrectString)
+add_test(parseStringValueType JsonParserTest parseStringValueType)
+add_test(parseStringValue JsonParserTest parseStringValue)
+add_test(parseBooleanValue JsonParserTest parseBooleanValue)
+add_test(parseBooleanValueType JsonParserTest parseBooleanValueType)
+add_test(parseBooleanFalseValue JsonParserTest parseBooleanFalseValue)
+add_test(parseBooleanValueFalseType JsonParserTest parseBooleanValueFalseType)
+add_test(parseNullType JsonParserTest parseNullType)
+add_test(parsedObjReturnsNotNull JsonParserTest parsedObjReturnsNotNull)
+add_test(parsedObjCreateCorrectMap JsonParserTest parsedObjCreateCorrectMap)
+add_test(parsedObjectValue JsonParserTest parsedObjectValue)

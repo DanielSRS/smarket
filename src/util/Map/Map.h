@@ -52,6 +52,13 @@ typedef struct Map
    */
   struct Map*(*setString)(struct Map* self, char* key, char* value);
   /**
+   * Define um outro Map como valor para a chave no objeto Map. Retorna o objeto Map
+   * 
+   * IMPORTANTE: value é integrado ao Map! Na destruição do map, esse novo map aninhado
+   * também vai ser destruído!
+   */
+  struct Map*(*setMap)(struct Map* self, char* key, struct Map* value);
+  /**
    * Adiciona uma nova chave cujo valor é um novo outro Map
    */
   struct Map*(*nest)(struct Map* self, char* key);
