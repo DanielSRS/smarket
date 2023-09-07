@@ -91,7 +91,7 @@ Request parseRequest(const char *requestBuffer, int length) {
   int charNaoLidos = info.fildLengths[0];
 
   /** Se houve algum erro apenas retorna sem processar o resto */
-  if (info.size == 0 || info.tooManyFields, info.numberOfFields < 1 || info.fildLengths[0] < 14) {
+  if (info.size == 0 || info.tooManyFields || info.numberOfFields < 1 || info.fildLengths[0] < 14) {
     request.thereWasErrors = True;
     return request;
   }
