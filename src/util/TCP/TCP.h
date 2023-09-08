@@ -40,6 +40,57 @@ typedef struct TCPServer
   void (*destroy)(struct TCPServer** self);
 } TCPServer;
 
+/** Informações de uma conexão tcp estabelecida */
+typedef struct _TCPConnectionInfo TCPConnectionInfo;
+
+/**
+ * Uma conexão tcp estabelecida
+*/
+typedef struct TCPConnection
+{
+  TCPConnectionInfo* connectionInfo;
+  /**
+   * Recebe os dados enviados.
+   * 
+   * Escreve um máximo de bufferSize-1 dados no buffer e insere
+   * null terminator at bufferSize index
+   * 
+   * @param buffer Buffer para guardar os dados recebidos
+   * @param bufferSize Tamanho do buffer.
+   * @returns Numero de bytes efetivamente escritos no buffer
+  */
+  int (*receive)(struct TCPConnection* self, char* buffer, int bufferSize);
+  /**
+   * Send numBytes of data from buffer
+   * 
+   * @param numBytes Number of bytes to sent throught the connection
+   * @param buffer Data to be sent
+   * @returns Numero de bytes enviados ou -1 (erro)
+  */
+  int (*send)(struct TCPConnection* self, int numBytes, char* buffer);
+  /**
+   * Fecha a conexão
+  */
+  void (*close)(struct TCPConnection* self);
+  /**
+   * Destrói o objeto TCPConnection.
+   * 
+   * Se a conexão ainda estiver aberta, é fechada antes da
+   * destruição do objeto.
+  */
+  void (*destroy)(struct TCPConnection** self);
+} TCPConnection;
+
+/**
+ * Cria um servidor TCP
+*/
 TCPServer *createTCPServer();
+
+/**
+ * Cria um novo objeto TCPConnection
+ * 
+ * @param socketDescriptor socket descriptor da nova conexão
+*/
+TCPConnection* newTCPConnection(int socketDescriptor);
 
 #endif // TCP_H

@@ -7,6 +7,7 @@
 #include "../ChildProcess/childProcess.h" // handleChildProcessTermination
 #include "socket.h" //addrinfo
 #include "../Http/http.h" // RequestHeaderInfo, getHeadersInfo
+#include "../TCP/TCP.h" // newTCPConnection
 
 #define PORT "3492"  // A porta usada para outros usuários se conectarem.
 #define SERVER_PORT 3492  // A porta usada para outros usuários se conectarem.
@@ -140,6 +141,8 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
             continue;
         }
 
+        TCPConnection* newConnection = newTCPConnection(connectedSocketFileDescriptor);
+
         // Imprime o IP de origem da conexão 
         inet_ntop(
             originConnectionAddress.ss_family,
@@ -152,7 +155,8 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
         // printando dados enviados pelo cliente 
         int numbytes;
         char buf[1000];
-        if ((numbytes = recv(connectedSocketFileDescriptor, buf, 1000 - 1, 0)) == -1) {
+        numbytes = newConnection->receive(newConnection, buf, 1000);
+        if (numbytes == -1) {
             perror("recv");
             onError();
         }
