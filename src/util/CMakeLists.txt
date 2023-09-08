@@ -7,4 +7,5 @@ add_subdirectory(ChildProcess)
 add_subdirectory(Socket)
 add_subdirectory(Http)
 add_subdirectory(JsonParser)
+add_subdirectory(Logger)
 
