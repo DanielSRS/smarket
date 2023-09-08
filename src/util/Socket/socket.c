@@ -7,7 +7,6 @@
 #include "../ChildProcess/childProcess.h" // handleChildProcessTermination
 #include "socket.h" //addrinfo
 #include "../Http/http.h" // RequestHeaderInfo, getHeadersInfo
-#include "../TCP/TCP.h" // newTCPConnection
 
 #define PORT "3492"  // A porta usada para outros usuários se conectarem.
 #define SERVER_PORT 3492  // A porta usada para outros usuários se conectarem.
@@ -46,7 +45,7 @@ struct addrinfo* getAddressInfo(void (*onError)()) {
 /**
  * Cria um socket e faz o bind com a porta
 */
-int createAndBindSocket(void (*onError)()) {
+int createAndBindSocket(uint16_t port, void (*onError)()) {
   struct sockaddr_in serverAddress;
   int INVALID_FILE_DESCRIPTOR = -1;
   int socketFileDescriptor;
@@ -66,7 +65,7 @@ int createAndBindSocket(void (*onError)()) {
   // assign IP, PORT
   serverAddress.sin_family = AF_INET;
   serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-  serverAddress.sin_port = htons(SERVER_PORT);
+  serverAddress.sin_port = htons(port);
   
   /**
    * Binding newly created socket to given IP and verification
@@ -82,24 +81,40 @@ int createAndBindSocket(void (*onError)()) {
   return socketFileDescriptor;
 }
 
-void handleConnectionOnANewProcess(int parentSocketFileDescriptor, int connectedSocketFileDescriptor) {
-  if (!fork()) { // Este é o processo filho 
-    close(parentSocketFileDescriptor); // O processo filho não precisa dessa conexão
+void handleConnectionOnANewProcess(TCPConnection* newConnection) {
+  // printando dados enviados pelo cliente 
+  int numbytes;
+  char buf[1000];
+  numbytes = newConnection->receive(newConnection, buf, 1000);
+  if (numbytes == -1) {
+      perror("recv");
+      // onError();
+  }
+
+  buf[numbytes] = '\0';
+
+  //printf("\nserver: received %d bytes of data:\n\n%s\n__END__\n\n",numbytes, buf);
+  RequestHeaderInfo info = getHeadersInfo(buf, numbytes);
+  // IOPrintRequestHeaderInfo(info);
+
+  Request request = parseRequest(buf, numbytes);
+  IOPrintRequest(request);
+
+  if (!fork()) { // Este é o processo filho
 
     // Resposta no formato definido pelo protocolo http 
     char *response = "HTTP/1.1 200 OK\
                       \r\nAccess-Control-Allow-Origin: *\
-                      \r\nConnection: Keep-Alive\
                       \r\nContent-Type: application/json\
                       \r\nContent-Length: 14\
-                      \r\n\r\n{\"dan\": \"iel\"}";
+                      \r\n\r\n{\"han\": \"ddled\"}";
 
     // Envia a resposta 
-    if (send(connectedSocketFileDescriptor, response, strlen(response), 0) == -1)
-      perror("send");
-    close(connectedSocketFileDescriptor);
+    newConnection->send(newConnection,  strlen(response), response);
+    newConnection->close(newConnection);
     exit(0);                                // Termina execução do processo filho
   }
+  newConnection->close(newConnection);
 }
 
 // Abstrai o tipo do endereço do socket. De modo que funcione com IPs tanto de versão 4 como 6
@@ -111,7 +126,7 @@ void *get_in_addr(struct sockaddr *sa) {
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-void listenForConnections(int socketFileDescriptor, void (*onError)()) {
+void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdler)(TCPConnection* newConnection), void (*onError)()) {
     struct sockaddr_storage originConnectionAddress; // Informações do endereço da conexão de origem
     socklen_t sin_size = sizeof originConnectionAddress;
     int connectedSocketFileDescriptor;
@@ -124,7 +139,7 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
         onError();
     }
 
-    printf("\n\n✅ server: waiting for connections on port: %s ...\n", PORT);
+    printf("\n\n✅ server: waiting for connections on port: %d ...\n", port);
 
     // Loop principal para lidar com as solicitações de conexão 
     while(1) {
@@ -152,30 +167,7 @@ void listenForConnections(int socketFileDescriptor, void (*onError)()) {
 
         printf("\nserver: got connection from %s\n", originIpAddress);
 
-        // printando dados enviados pelo cliente 
-        int numbytes;
-        char buf[1000];
-        numbytes = newConnection->receive(newConnection, buf, 1000);
-        if (numbytes == -1) {
-            perror("recv");
-            onError();
-        }
-
-        buf[numbytes] = '\0';
-
-        //printf("\nserver: received %d bytes of data:\n\n%s\n__END__\n\n",numbytes, buf);
-        RequestHeaderInfo info = getHeadersInfo(buf, numbytes);
-        // IOPrintRequestHeaderInfo(info);
-
-        Request request = parseRequest(buf, numbytes);
-        IOPrintRequest(request);
-
-        // request.destroy(&request);
-
-        // Cria um novo processo para responder a solicitação 
-        handleConnectionOnANewProcess(socketFileDescriptor, connectedSocketFileDescriptor);
-
-        close(connectedSocketFileDescriptor);  // parent doesn't need this
+        handdler(newConnection);
     }
 }
 

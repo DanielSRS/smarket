@@ -2,6 +2,7 @@
 #include <stdlib.h> // calloc, free, NULL
 #include "../Socket/socket.h" //recv
 #include <unistd.h> // close
+#include "../Logger/Logger.h"
 
 #define SOCKET_NOT_SETTED_YET -2
 
@@ -116,6 +117,10 @@ typedef struct _tcpServerConfig
   */
   int socketDescriptor;
   /**
+   * Processa novas conexões
+  */
+  void (*newConnectionHanddler)(TCPConnection* newConnection);
+  /**
    * Destrói o objeto _tcpServerConfig
   */
   void (*destroy)(struct _tcpServerConfig** self);
@@ -123,7 +128,16 @@ typedef struct _tcpServerConfig
 
 /** Destrói um objeto tcpServerConfig */
 void destroyTcpServerConfig(tcpServerConfig** self) {
+  Logger* console = createLogger();
+  console->extend(console, "TCP");
+
   if(!(*self)) return;
+
+  int sd = (*self)->socketDescriptor;
+  if (sd != SOCKET_NOT_SETTED_YET) {
+    console->debug(console, "Close tcpServerConfig socket\n");
+    close(sd);
+  }
 
   free(*self);
   *self = NULL;
@@ -136,6 +150,7 @@ tcpServerConfig* newTcpServerConfig() {
   newConfig->backlog = DEFAULT_BACKLOG_SIZE;
   newConfig->socketDescriptor = SOCKET_NOT_SETTED_YET;
   newConfig->destroy = destroyTcpServerConfig;
+  newConfig->newConnectionHanddler = NULL;
 
   return newConfig;
 }
@@ -161,8 +176,24 @@ void destroyTCPServer(TCPServer** self) {
  * Começa a escutar por connexões com as configurações definidas
 */
 void serve(struct TCPServer* self) {
-  int socketDescriptor = createAndBindSocket(onGetAddressInfoError);
-  listenForConnections(socketDescriptor, onGetAddressInfoError);
+  Logger* console = createLogger();
+  console->extend(console, "TCP");
+
+  int port = self->serverConfiguration->port;
+  int socketDescriptor = createAndBindSocket(port, onGetAddressInfoError);
+  self->serverConfiguration->socketDescriptor = socketDescriptor;
+
+  if  (!(self->serverConfiguration->newConnectionHanddler)) {
+    console->error(console, "Cannot serve. Handdler is null!\n");
+    return;
+  }
+
+  listenForConnections(
+    port,
+    self->serverConfiguration->socketDescriptor,
+    self->serverConfiguration->newConnectionHanddler,
+    onGetAddressInfoError
+  );
 }
 
 /**
@@ -173,6 +204,12 @@ void serve(struct TCPServer* self) {
 int setBacklogSize(struct TCPServer* self, unsigned int newSize) {
   self->serverConfiguration->backlog = newSize;
   return self->serverConfiguration->backlog;
+}
+
+
+/** Define a função de processamento de novas conexões */
+void setNewConnectionHanddler(struct TCPServer* self, void (*handdler)(TCPConnection* newConnection)) {
+  self->serverConfiguration->newConnectionHanddler = handdler;
 }
 
 /**
@@ -193,6 +230,7 @@ TCPServer* createTCPServer() {
   newServer->serverConfiguration = newTcpServerConfig();
   newServer->setBacklogSize = setBacklogSize;
   newServer->setPort = setPort;
+  newServer->setNewConnectionHanddler = setNewConnectionHanddler;
 
   return newServer;
 }

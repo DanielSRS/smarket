@@ -4,41 +4,9 @@
 #define TCP_H
 
 #define DEFAULT_BACKLOG_SIZE 10
-#define DEFAULT_SERVER_PORT 3492
+#define DEFAULT_SERVER_PORT 3490
 
 typedef struct _tcpServerConfig tcpServerConfig;
-
-
-/**
- * Servidor tcp
-*/
-typedef struct TCPServer
-{
-  /**
-   * configurações do servidor
-  */
-  tcpServerConfig* serverConfiguration;
-  /**
-   * Servidor tcp começa a escutar por conexões
-  */
-  void (*serve)(struct TCPServer* self);
-  /**
-   * Define o tamanho da file no backlog
-   * 
-   * @returns O novo tamanho da fila
-  */
-  int (*setBacklogSize)(struct TCPServer* self, unsigned int newSize);
-  /**
-   * Define a porta que o servidor vai escutar por conexões
-   * 
-   * @returns A nova porta definida
-  */
-  uint16_t (*setPort)(struct TCPServer* self, uint16_t newPort);
-  /**
-   * Destrói o objeto TCPServer
-  */
-  void (*destroy)(struct TCPServer** self);
-} TCPServer;
 
 /** Informações de uma conexão tcp estabelecida */
 typedef struct _TCPConnectionInfo TCPConnectionInfo;
@@ -80,6 +48,41 @@ typedef struct TCPConnection
   */
   void (*destroy)(struct TCPConnection** self);
 } TCPConnection;
+
+/**
+ * Servidor tcp
+*/
+typedef struct TCPServer
+{
+  /**
+   * configurações do servidor
+  */
+  tcpServerConfig* serverConfiguration;
+  /**
+   * Servidor tcp começa a escutar por conexões
+  */
+  void (*serve)(struct TCPServer* self);
+  /**
+   * Define o tamanho da file no backlog
+   * 
+   * @returns O novo tamanho da fila
+  */
+  int (*setBacklogSize)(struct TCPServer* self, unsigned int newSize);
+  /**
+   * Define a porta que o servidor vai escutar por conexões
+   * 
+   * @returns A nova porta definida
+  */
+  uint16_t (*setPort)(struct TCPServer* self, uint16_t newPort);
+  /**
+   * Define uma função para lidar com uma nova conexão
+  */
+  void (*setNewConnectionHanddler)(struct TCPServer* self, void (*handdler)(TCPConnection* newConnection));
+  /**
+   * Destrói o objeto TCPServer
+  */
+  void (*destroy)(struct TCPServer** self);
+} TCPServer;
 
 /**
  * Cria um servidor TCP
