@@ -1,15 +1,11 @@
 #include <stdlib.h> // exit
-#include "../../util/Socket/socket.h" // freeaddrinfo, getAddressInfo, createAndBindSocket, listenForConnections, addrinfo
-
-void onGetAddressInfoError() {
-    exit(1);
-};
+#include "../../util/TCP/TCP.h" // createTCPServer
 
 int main(void) {
 
-    int socketFileDescriptor = createAndBindSocket(onGetAddressInfoError);
+    TCPServer* server = createTCPServer();
 
-    listenForConnections(socketFileDescriptor, onGetAddressInfoError);
+    server->serve(server);
 
     return 0;
 }
