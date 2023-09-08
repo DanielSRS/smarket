@@ -1,5 +1,5 @@
 #include <stdlib.h> // exit
-#include "socket.h" // freeaddrinfo, getAddressInfo, createAndBindSocket, listenForConnections, addrinfo
+#include "../../util/Socket/socket.h" // freeaddrinfo, getAddressInfo, createAndBindSocket, listenForConnections, addrinfo
 
 void onGetAddressInfoError() {
     exit(1);
