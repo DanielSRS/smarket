@@ -8,4 +8,5 @@ add_subdirectory(Socket)
 add_subdirectory(Http)
 add_subdirectory(JsonParser)
 add_subdirectory(Logger)
+add_subdirectory(TCP)
 
