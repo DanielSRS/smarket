@@ -171,38 +171,6 @@ void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdl
     }
 }
 
-void sendRequest(int sockfd) {
-    // char buff[80];
-    // int n;
-    // for (;;) {
-    //     bzero(buff, sizeof(buff));
-    //     printf("Enter the string : ");
-    //     n = 0;
-    //     while ((buff[n++] = getchar()) != '\n')
-    //         ;
-    //     write(sockfd, buff, sizeof(buff));
-    //     bzero(buff, sizeof(buff));
-    //     read(sockfd, buff, sizeof(buff));
-    //     printf("From Server : %s", buff);
-    //     if ((strncmp(buff, "exit", 4)) == 0) {
-    //         printf("Client Exit...\n");
-    //         break;
-    //     }
-    // }
-
-    char *request = "GET /dan/niel?dfg=dsfg HTTP/1.1\
-                    \r\nHost: localhost:3492\
-                    \r\nContent-Type: application/json\
-                    \r\nUser-Agent: SensorManager/0.0.1\
-                    \r\nContent-Length: 17\
-                    \r\n\r\n{\"santa\": \"rosa\"}";
-
-    if (send(sockfd, request, strlen(request), 0) == -1)
-      perror("send");
-    
-    printf("\nRequest sent\n\n");
-}
-
 int connectTo(char *host, int port) {
     int sockfd;
     struct sockaddr_in servaddr;

@@ -234,3 +234,9 @@ TCPServer* createTCPServer() {
 
   return newServer;
 }
+
+TCPClient* newTCPClient(char *host, uint16_t port) {
+  int sockeDescriptor = connectTo(host, port);
+
+  return newTCPConnection(sockeDescriptor);
+}

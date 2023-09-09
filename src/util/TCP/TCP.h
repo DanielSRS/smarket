@@ -49,6 +49,8 @@ typedef struct TCPConnection
   void (*destroy)(struct TCPConnection** self);
 } TCPConnection;
 
+typedef TCPConnection TCPClient;
+
 /**
  * Servidor tcp
 */
@@ -95,5 +97,10 @@ TCPServer *createTCPServer();
  * @param socketDescriptor socket descriptor da nova conexão
 */
 TCPConnection* newTCPConnection(int socketDescriptor);
+
+/**
+ * Cria um cliente TCP
+*/
+TCPClient* newTCPClient(char *host, uint16_t port);
 
 #endif // TCP_H
