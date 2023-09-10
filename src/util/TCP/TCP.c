@@ -184,7 +184,9 @@ typedef struct _tcpServerConfig
   /**
    * Processa novas conexões
   */
-  void (*newConnectionHanddler)(TCPConnection* newConnection);
+  void (*newConnectionHanddler)(TCPConnection* newConnection, void* context);
+  /** Contexto para ser passado para newConnectionHanddler */
+  void* context;
   /**
    * Destrói o objeto _tcpServerConfig
   */
@@ -224,6 +226,7 @@ tcpServerConfig* newTcpServerConfig() {
   newConfig->socketDescriptor = SOCKET_NOT_SETTED_YET;
   newConfig->destroy = destroyTcpServerConfig;
   newConfig->newConnectionHanddler = NULL;
+  newConfig->context = NULL;
 
   console->debug(console, "Cria novo tcpServerConfig\n");
   console->destroy(&console);
@@ -284,6 +287,7 @@ void serve(struct TCPServer* self) {
     port,
     self->serverConfiguration->socketDescriptor,
     self->serverConfiguration->newConnectionHanddler,
+    self->serverConfiguration->context,
     onGetAddressInfoError
   );
 }
@@ -309,7 +313,7 @@ int setBacklogSize(struct TCPServer* self, unsigned int newSize) {
 
 
 /** Define a função de processamento de novas conexões */
-void setNewConnectionHanddler(struct TCPServer* self, void (*handdler)(TCPConnection* newConnection)) {
+TCPServer* setNewConnectionHanddler(struct TCPServer* self, void (*handdler)(TCPConnection* newConnection, void* context)) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
   console->extend(console, "TCP");
@@ -319,6 +323,8 @@ void setNewConnectionHanddler(struct TCPServer* self, void (*handdler)(TCPConnec
 
   console->debug(console, "Atualizado TCPServer handler\n");
   console->destroy(&console);
+
+  return self;
 }
 
 /**
@@ -340,6 +346,23 @@ uint16_t setPort(struct TCPServer* self, uint16_t newPort) {
   return self->serverConfiguration->port;
 }
 
+/**
+ * Altera o contexto a ser passado para o handle
+*/
+TCPServer* setContext(struct TCPServer* self, void* context) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "TCP");
+
+  /** Atualiza o contexto */
+  self->serverConfiguration->context = context;
+
+  console->debug(console, "Atualizado o contexto do TCPServer\n");
+  console->destroy(&console);
+
+  return self;
+}
+
 TCPServer* createTCPServer() {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
@@ -353,6 +376,7 @@ TCPServer* createTCPServer() {
   newServer->setBacklogSize = setBacklogSize;
   newServer->setPort = setPort;
   newServer->setNewConnectionHanddler = setNewConnectionHanddler;
+  newServer->setContext = setContext;
 
   console->debug(console, "Criado TCPServer\n");
   console->destroy(&console);

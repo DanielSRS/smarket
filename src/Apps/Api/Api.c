@@ -6,8 +6,10 @@ int main(void) {
 
     TCPServer* server = createTCPServer();
 
-    server->setNewConnectionHanddler(server, handleConnectionOnANewProcess);
-    server->serve(server);
+    server
+        ->setNewConnectionHanddler(server, handleConnectionOnANewProcess)
+        ->setContext(server, "Sou o contexto!!")
+        ->serve(server);
 
     server->destroy(&server);
 

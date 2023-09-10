@@ -81,8 +81,9 @@ int createAndBindSocket(uint16_t port, void (*onError)()) {
   return socketFileDescriptor;
 }
 
-void handleConnectionOnANewProcess(TCPConnection* newConnection) {
+void handleConnectionOnANewProcess(TCPConnection* newConnection, void* context) {
   // printando dados enviados pelo cliente 
+  printf("Contexto recebido:%s\n", (char*) context);
   int numbytes;
   char buf[1000];
   numbytes = newConnection->receive(newConnection, buf, 1000);
@@ -126,7 +127,7 @@ void *get_in_addr(struct sockaddr *sa) {
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdler)(TCPConnection* newConnection), void (*onError)()) {
+void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdler)(TCPConnection* newConnection, void* context), void* context, void (*onError)()) {
     struct sockaddr_storage originConnectionAddress; // Informações do endereço da conexão de origem
     socklen_t sin_size = sizeof originConnectionAddress;
     int connectedSocketFileDescriptor;
@@ -167,7 +168,7 @@ void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdl
 
         printf("\nserver: got connection from %s\n", originIpAddress);
 
-        handdler(newConnection);
+        handdler(newConnection, context);
     }
 }
 

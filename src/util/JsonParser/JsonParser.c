@@ -31,7 +31,7 @@ alocatedCString parseString(int *offset, int max, const char *buffer) {
       /** se a string é vazia */
       if (*offset == stringStart) exit(1);                                                // erro! string não pode ser vazia
       int stringLength = *offset - stringStart;                                       // calula o tamanho da string
-      printf("stirng len: %d\n", stringLength);
+      // printf("stirng len: %d\n", stringLength);
       string = duplicateStringWithSize(buffer + stringStart, stringLength);       // salva a string
       if (string == NULL) {
         printf("string invalida\n");
