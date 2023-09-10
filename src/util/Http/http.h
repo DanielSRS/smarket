@@ -1,6 +1,7 @@
 #include "../Boolean/Boolean.h"
 #include "../Map/Map.h"
 #include "../Cstrings/Cstrings.h"
+#include <stdint.h> // uint16_t
 
 #ifndef HTTP_H
 #define HTTP_H
@@ -92,5 +93,74 @@ Request parseRequest(const char *requestBuffer, int length);
  * @param info Request
 */
 void IOPrintRequest(Request request);
+
+/** Configurações de um servidor http */
+typedef struct _httpServerConfig httpServerConfig;
+
+/** Informações de uma conexão tcp estabelecida */
+typedef struct _HTTPConnectionInfo HTTPConnectionInfo;
+
+/**
+ * Conexão http
+*/
+typedef struct HTTPConnection
+{
+  HTTPConnectionInfo* connectionInfo;
+  /** Informações sobre o processamento das headers da requisição */
+  RequestHeaderInfo headerInfo;
+  /** Requisição recebido */
+  Request request;
+  /**
+   * Send the response object
+   * 
+  */
+  void (*sendResponse)(struct HTTPConnection* self);
+  /**
+   * Fecha a conexão
+  */
+  void (*close)(struct HTTPConnection* self);
+  /**
+   * Destrói o objeto HTTPConnection.
+   * 
+   * Se a conexão ainda estiver aberta, é fechada antes da
+   * destruição do objeto.
+  */
+  void (*destroy)(struct HTTPConnection** self);
+} HTTPConnection;
+
+
+/**
+ * Servidor http
+*/
+typedef struct HTTPServer
+{
+  /**
+   * configurações do servidor
+  */
+  httpServerConfig* serverConfiguration;
+  /**
+   * Servidor http começa a escutar por conexões
+  */
+  void (*serve)(struct HTTPServer* self);
+  /**
+   * Define o tamanho da file no backlog
+  */
+  struct HTTPServer* (*setBacklogSize)(struct HTTPServer* self, unsigned int newSize);
+  /**
+   * Define a porta que o servidor vai escutar por conexões
+  */
+  struct HTTPServer* (*setPort)(struct HTTPServer* self, uint16_t newPort);
+  /**
+   * Define uma função para lidar com uma nova conexão
+  */
+  struct HTTPServer* (*setNewConnectionHanddler)(struct HTTPServer* self, void (*handdler)(HTTPConnection* newConnection));
+  /**
+   * Destrói o objeto HTTPServer
+  */
+  void (*destroy)(struct HTTPServer** self);
+} HTTPServer;
+
+/** Cria um servidor http */
+HTTPServer* createHTTPServer();
 
 #endif // HTTP_H

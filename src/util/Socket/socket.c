@@ -81,37 +81,10 @@ int createAndBindSocket(uint16_t port, void (*onError)()) {
   return socketFileDescriptor;
 }
 
-void handleConnectionOnANewProcess(TCPConnection* newConnection, void* context) {
-  // printando dados enviados pelo cliente 
-  printf("Contexto recebido:%s\n", (char*) context);
-  int numbytes;
-  char buf[1000];
-  numbytes = newConnection->receive(newConnection, buf, 1000);
-  if (numbytes == -1) {
-      perror("recv");
-      // onError();
-  }
-
-  buf[numbytes] = '\0';
-
-  //printf("\nserver: received %d bytes of data:\n\n%s\n__END__\n\n",numbytes, buf);
-  RequestHeaderInfo info = getHeadersInfo(buf, numbytes);
-  // IOPrintRequestHeaderInfo(info);
-
-  Request request = parseRequest(buf, numbytes);
-  IOPrintRequest(request);
-
+void handleConnectionOnANewProcess(HTTPConnection* newConnection) {
   if (!fork()) { // Este é o processo filho
 
-    // Resposta no formato definido pelo protocolo http 
-    char *response = "HTTP/1.1 200 OK\
-                      \r\nAccess-Control-Allow-Origin: *\
-                      \r\nContent-Type: application/json\
-                      \r\nContent-Length: 14\
-                      \r\n\r\n{\"han\": \"ddled\"}";
-
-    // Envia a resposta 
-    newConnection->send(newConnection,  strlen(response), response);
+    newConnection->sendResponse(newConnection);
     newConnection->close(newConnection);
     exit(0);                                // Termina execução do processo filho
   }
