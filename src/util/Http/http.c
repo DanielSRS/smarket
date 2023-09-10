@@ -1,7 +1,10 @@
 #include "http.h"
 #include <stdio.h> // printf
-#include <stdlib.h> // free
+#include <stdlib.h> // free, calloc
 #include "../JsonParser/JsonParser.h" // parseObject
+#include "../TCP/TCP.h" // TCPServer
+#include "../Logger/Logger.h"
+#include <string.h> // strlen
 
 RequestHeaderInfo getHeadersInfo(const char *requestBuffer, int length) {
   RequestHeaderInfo info = { 0 };
@@ -199,3 +202,289 @@ void IOPrintRequest(Request request) {
   printf("\tData: %s\n", request.data->toString(request.data));
   printf("}\n");
 }
+
+/**** httpServerConfig *************************************************************************************************/
+
+/** implementando opaque data type httpServerConfig */
+typedef struct _httpServerConfig {
+  /** Conexão tcp */
+  TCPServer* tcpServer;
+  /** Callback function */
+  void (*handdler)(HTTPConnection *newConnection);
+  /** Logger */
+  Logger* logger;
+  /**
+   * Destrói o objeto _httpServerConfig.
+  */
+  void (*destroy)(struct _httpServerConfig** self);
+} httpServerConfig;
+
+/** Destrói o objeto httpServerConfig. */
+void destroyHttpServerConfig(httpServerConfig** self) {
+  if (!(*self)) return;
+
+  /** libera o servidor tcp */
+  (*self)->tcpServer->destroy(&((*self)->tcpServer));
+
+  (*self)->handdler = NULL;
+  (*self)->logger->destroy(&((*self)->logger));
+
+  free(*self);        // libera a estrutura
+  *self = NULL;       // aponta para null
+}
+
+/** Cria novo objeto httpServerConfig */
+static httpServerConfig* newHttpServerConfig() {
+  httpServerConfig* newConfig = calloc(1, sizeof(httpServerConfig));
+
+  newConfig->destroy = destroyHttpServerConfig;
+  newConfig->tcpServer = createTCPServer();
+  newConfig->handdler = NULL;
+  newConfig->logger = createLogger();
+
+  return newConfig;
+}
+
+/**** end ****/
+
+/**** HTTPConnectionInfo ***********************************************************************************************/
+
+typedef struct _HTTPConnectionInfo
+{
+  /** Conexão tcp */
+  TCPConnection* tcpConnection;
+  /**
+   * Destrói o objeto _HTTPConnectionInfo.
+  */
+  void (*destroy)(struct _HTTPConnectionInfo** self);
+} HTTPConnectionInfo;
+
+/** Destrói o objeto HTTPConnectionInfo. */
+void destroyHTTPConnectionInfo(HTTPConnectionInfo** self) {
+  if (!(*self)) return;
+
+  (*self)->tcpConnection->close((*self)->tcpConnection); // termina a conexão tcp
+  (*self)->tcpConnection->destroy(&((*self)->tcpConnection)); // destroi a conexão
+
+  free(*self);
+  *self = NULL;
+}
+
+HTTPConnectionInfo* newHTTPConnectionInfo(TCPConnection* connection) {
+  HTTPConnectionInfo* new = calloc(1, sizeof(HTTPConnectionInfo));
+
+  new->destroy = destroyHTTPConnectionInfo;
+  new->tcpConnection = connection;
+
+  return new;
+}
+
+/**** end ****/
+
+/**** HTTPConnection ***************************************************************************************************/
+
+/** Destroy objeto HTTPConnection */
+void destroyHTTPConnection(HTTPConnection** self) {
+  if (!(*self)) return;
+
+  (*self)->close(*self);                                            // Encerra a conexão
+  (*self)->connectionInfo->destroy(&((*self)->connectionInfo));     // libera conection info
+
+  free(*self);
+  *self = NULL;
+}
+
+void closeHTTPConnection(HTTPConnection* self) {
+  self->connectionInfo->tcpConnection->close(self->connectionInfo->tcpConnection);
+}
+
+void responseHTTPConnection(HTTPConnection* self) {
+  TCPConnection* tcpConnection = self->connectionInfo->tcpConnection;
+  char *response = "HTTP/1.1 200 OK\
+                      \r\nAccess-Control-Allow-Origin: *\
+                      \r\nContent-Type: application/json\
+                      \r\nContent-Length: 14\
+                      \r\n\r\n{\"han\": \"ddled\"}";
+
+  tcpConnection->send(tcpConnection, strlen(response), response);
+}
+
+/** Cria objeto HTTPConnection */
+HTTPConnection* newHTTPConnection(TCPConnection* connection, RequestHeaderInfo headerInfo, Request request) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "HTTP");
+
+  HTTPConnection* new = calloc(1, sizeof(HTTPConnection));
+
+  new->destroy = destroyHTTPConnection;
+  new->close = closeHTTPConnection;
+  new->connectionInfo = newHTTPConnectionInfo(connection);
+  new->headerInfo = headerInfo;
+  new->request = request;
+  new->sendResponse = responseHTTPConnection;
+
+  console->debug(console, "Criado HTTPConnection\n");
+  console->destroy(&console);
+
+  return new;
+}
+
+/**** end ****/
+
+/**** HTTPServer *******************************************************************************************************/
+
+/** destroi o objeto HTTPServer */
+void destroyHTTPServer(HTTPServer** self) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "HTTP");
+
+  if(!(*self)) {
+    console->error(console, "Destrindo uma referencia invalida de HTTPServer\n");
+    console->destroy(&console);
+    return;
+  };
+
+  console->error(console, "Destrindo objeto HTTPServer\n");
+  console->destroy(&console);
+
+  /** Destroi as configurações do servidor */
+  (*self)->serverConfiguration->destroy(&((*self)->serverConfiguration));
+
+  free(*self);
+  *self = NULL;
+}
+
+/** Executa o servidor http */
+void serveHTTPServer(HTTPServer *self) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "HTTP");
+
+  /** Verifica se foi definido uma função de callback */
+  void* handler = self->serverConfiguration->handdler;
+  if (handler == NULL) {
+    console->error(console, "Cannot serve. Handler was not set!\n");
+    return;
+  }
+
+  console->debug(console, "Iniciando servidor\n");
+  console->destroy(&console);
+
+  /** Inicia servidor */
+  TCPServer* tcpServer = self->serverConfiguration->tcpServer;
+  tcpServer->serve(tcpServer);
+}
+
+/** Configura o tamanho do backlog do servidor */
+HTTPServer* setHTTPServerBacklogSize(HTTPServer *self, unsigned int newSize) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "HTTP");
+
+  /** Atualiza backlog size */
+  TCPServer* tcpServer = self->serverConfiguration->tcpServer;
+  tcpServer->setBacklogSize(tcpServer, newSize);
+
+  console->debug(console, "Atualiza HTTPServer backlog\n");
+  console->destroy(&console);
+
+  return self;
+}
+
+/** Configura a porta que o servidor escuta */
+HTTPServer* setHTTPServerPort(HTTPServer *self, uint16_t newPort) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "HTTP");
+
+  /** Atualiza porta */
+  TCPServer* tcpServer = self->serverConfiguration->tcpServer;
+  tcpServer->setPort(tcpServer, newPort);
+
+  console->debug(console, "Atualiza HTTPServer porta\n");
+  console->destroy(&console);
+
+  return self;
+}
+
+/** Configura a função de callback */
+HTTPServer* setHTTPServerHandler(struct HTTPServer *self, void (*handdler)(HTTPConnection *newConnection)) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "HTTP");
+
+  /** atualiza handler */
+  self->serverConfiguration->handdler = handdler;
+
+  console->debug(console, "Atualiza HTTPServer handdler\n");
+  console->destroy(&console);
+
+  return self;
+}
+
+/** dispacher */
+void dispatcher(TCPConnection* newConnection, void* context) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "HTTP");
+
+  /** Obtem referencia do servidor */
+  HTTPServer* server = (HTTPServer*) context;
+  
+  int numberOfBytesWritten = 0;
+  char buffer[1000];
+
+  /** Lê os dados enviados pelo cliente */
+  numberOfBytesWritten = newConnection->receive(newConnection, buffer, 1000);
+
+  /** Verifica se houve erro */
+  if (numberOfBytesWritten == -1) {
+    console->error(console, "Erro ao ler request!!\n");
+  }
+
+  /** Garante que existe um null terminator na string */
+  buffer[numberOfBytesWritten] = '\0';
+
+  /** Processa a requisição */
+  RequestHeaderInfo info = getHeadersInfo(buffer, numberOfBytesWritten);
+  // IOPrintRequestHeaderInfo(info);
+  Request request = parseRequest(buffer, numberOfBytesWritten);
+  IOPrintRequest(request);
+
+  /** Cria uma nova conexão http */
+  HTTPConnection* httpcon = newHTTPConnection(newConnection, info, request);
+
+  /** Chama o handler para lidar com a solicitação */
+  server->serverConfiguration->handdler(httpcon);
+
+  console->destroy(&console);
+}
+
+HTTPServer* createHTTPServer() {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "HTTP");
+
+  HTTPServer* new = calloc(1, sizeof(HTTPServer));
+
+  new->destroy = destroyHTTPServer;
+  new->serve = serveHTTPServer;
+  new->serverConfiguration = newHttpServerConfig();
+
+  TCPServer* tcpServer = new->serverConfiguration->tcpServer;
+  tcpServer->setNewConnectionHanddler(tcpServer, dispatcher);
+  tcpServer->setContext(tcpServer, new); // define o próprio servidor http com contexto
+
+  new->setBacklogSize = setHTTPServerBacklogSize;
+  new->setNewConnectionHanddler = setHTTPServerHandler;
+  new->setPort = setHTTPServerPort;
+
+  console->debug(console, "Criado HTTPServer\n");
+  console->destroy(&console);
+
+  return new;
+}
+
+/**** end ****/

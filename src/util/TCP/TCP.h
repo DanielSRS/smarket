@@ -79,7 +79,11 @@ typedef struct TCPServer
   /**
    * Define uma função para lidar com uma nova conexão
   */
-  void (*setNewConnectionHanddler)(struct TCPServer* self, void (*handdler)(TCPConnection* newConnection));
+  struct TCPServer* (*setNewConnectionHanddler)(struct TCPServer* self, void (*handdler)(TCPConnection* newConnection, void* context));
+  /**
+   * Altera o contexto a ser passado para o handle
+  */
+  struct TCPServer* (*setContext)(struct TCPServer* self, void* context);
   /**
    * Destrói o objeto TCPServer
   */
