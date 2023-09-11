@@ -7,6 +7,9 @@
 #define STRING_OBJECT "__String__"
 #define ANY_OBJECT "__Any__"
 
+
+alocatedCString htttpHeadersCString(Map* self);
+
 boolean _hasElementInAMap(Map* self, char* key) {
   if (self->length == 0) return False;
   MapEntry *itemsInTheMap = (MapEntry *) self->_items;
@@ -402,6 +405,7 @@ Map* newMap() {
   map->destroy = destroyMap;
   map->nest = nest;
   map->getKeys = getMapKeys;
+  map->toHtttpHeadersCString = htttpHeadersCString;
   map->_items = NULL;
 
   return map;
@@ -497,4 +501,30 @@ List* newList() {
   list->toString = listToString;
 
   return list;
+}
+
+
+/**
+ * USE APENAS SE TODOS OS VALORES NO MAP FOREM STRINGS!!!
+*/
+alocatedCString htttpHeadersCString(Map* self) {
+  int numberOfItems = self->length;
+  if (numberOfItems == 0) return "\r\n";
+
+  alocatedCString buffer = duplicateString("");
+  for (MapEntry *item = (MapEntry *) self->_items; item != NULL; item = item->sibling) {
+    /** Formata os valores */ 
+    alocatedCString newBuffer = formatedCString("%s%s: %s\r\n", buffer, item->key, (char*) item->value);
+    
+    /** Libera o espaço aclocado anteriorrmente */
+    free(buffer);
+
+    // atualiza a referencia do buffer
+    buffer = newBuffer;
+  }
+
+  // adiciona linha em branco ao fim das headers
+  alocatedCString newBuffer = formatedCString("%s\r\n", buffer);
+  free(buffer);
+  return newBuffer;
 }

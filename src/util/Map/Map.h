@@ -74,6 +74,10 @@ typedef struct Map
    */
   char*(*toString)(struct Map* self);
   /**
+   * Retorna uma das headers http
+   */
+  char*(*toHtttpHeadersCString)(struct Map* self);
+  /**
    * Retorna uma lista de strings com todas as chaves do Map
    */
   char**(*getKeys)(struct Map* self);
