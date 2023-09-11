@@ -27,6 +27,8 @@ static Response* setResponseHeader(char* key, char* value, Response* self);
 static Response* setResponseStatusMessage(const char* message, Response* self);
 static Response* setResponseJsonBody(Response* self);
 alocatedCString stringfyResponse(Response* self);
+struct Response* addStringToJson(char* key, char* value, struct Response* self);
+struct Response* addObjectToJson(char* key, Map* object, struct Response* self);
 
 void destroyResponseData(ResponseData** self);                          //--------- ResponseData -------/
 ResponseData* newResponseData();
@@ -49,6 +51,8 @@ Response* newResponse() {
   res->withJSON = setResponseJsonBody;
   res->toString = stringfyResponse;
   res->data = newResponseData();
+  res->addStringToJson = addStringToJson;
+  res->addObjectToJson = addObjectToJson;
 
   /** Define as headers padrão */
   res->withHeader("Access-Control-Allow-Origin", "*", res);
@@ -140,6 +144,24 @@ static Response* setResponseJsonBody(Response* self) {
     self->data->jsonBody = newMap();
     self->withHeader("Content-Type", "application/json", self);
   }
+
+  return self;
+}
+
+struct Response* addStringToJson(char* key, char* value, struct Response* self) {
+  Map* body = self->data->jsonBody;
+  if (body == NULL) return self;
+
+  body->setString(body, key, value);
+
+  return self;
+}
+
+struct Response* addObjectToJson(char* key, Map* object, struct Response* self) {
+  Map* body = self->data->jsonBody;
+  if (body == NULL) return self;
+
+  body->setMap(body, key, object);
 
   return self;
 }

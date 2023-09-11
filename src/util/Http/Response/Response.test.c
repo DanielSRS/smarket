@@ -24,6 +24,21 @@ TestResult toStringResponseWithBody() {
   return expectStringsToBeEquals(expectedString, headers);
 }
 
+TestResult toStringResponseWithBodyFilled() {
+  Response* res = newResponse();
+  res
+    ->withStatusCode(201, res)
+    ->withStatusMessage("KO", res)
+    ->withJSON(res)
+    ->addStringToJson("keya", "valuea", res)
+    ->addStringToJson("surfando", "na terra", res);
+
+  alocatedCString headers = res->toString(res);
+  char* expectedString = "HTTP/1.1 201 KO\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json\r\nContent-Length: 39\r\n\r\n{\"keya\":\"valuea\",\"surfando\":\"na terra\"}";
+
+  return expectStringsToBeEquals(expectedString, headers);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -36,6 +51,9 @@ int main(int argc, char **argv){
       break;
     CASE ("toStringResponseWithBody")
       it("toString com json body", toStringResponseWithBody);
+      break;
+    CASE ("toStringResponseWithBodyFilled")
+      it("toString com json body que tem elementos", toStringResponseWithBodyFilled);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
