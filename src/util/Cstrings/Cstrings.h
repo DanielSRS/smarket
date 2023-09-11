@@ -30,4 +30,7 @@ int formatedCStringSize(const char *__restrict__ __format, ...);
 /** Cria uma CString formatada considerando */
 alocatedCString formatedCString(const char *__restrict__ __format, ...);
 
+/** Calcula o tamanho de uma string */
+int cStringLenght(const char* string);
+
 #endif //CSGSL_H

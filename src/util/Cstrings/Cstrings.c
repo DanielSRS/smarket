@@ -86,3 +86,10 @@ alocatedCString formatedCString(const char *__restrict__ __format, ...) {
 
   return newString;
 }
+
+/** Calcula o tamanho de uma string */
+int cStringLenght(const char* string) {
+  if(string == NULL) return -1;
+
+  return strlen(string);
+}
