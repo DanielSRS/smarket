@@ -4,6 +4,8 @@
 #include "../../Cstrings/Cstrings.h" // alocatedCString
 #include "../../Map/Map.h" // Map
 
+#define HTTP_VERSION "HTTP/1.1"
+
 /** Dados da response */
 typedef struct _ResponseData
 {
@@ -21,6 +23,7 @@ static void destroyResponse(Response** self);                           //------
 static Response* setResponseStatusCode(unsigned code, Response* self);
 static Response* setResponseHeader(char* key, char* value, Response* self);
 static Response* setResponseStatusMessage(const char* message, Response* self);
+alocatedCString stringfyResponse(Response* self);
 
 void destroyResponseData(ResponseData** self);                          //--------- ResponseData -------/
 ResponseData* newResponseData();
@@ -40,6 +43,11 @@ Response* newResponse() {
   res->withStatusCode = setResponseStatusCode;
   res->withHeader = setResponseHeader;
   res->withStatusMessage = setResponseStatusMessage;
+  res->toString = stringfyResponse;
+  res->data = newResponseData();
+
+  /** Define as headers padrão */
+  res->withHeader("Access-Control-Allow-Origin", "*", res);
 
   console->debug(console, "Criando nova Response\n");
 
@@ -88,6 +96,23 @@ static Response* setResponseHeader(char* key, char* value, Response* self) {
   self->data->headers->setString(self->data->headers, key, value);
 
   return self;
+}
+
+/** Response To string */
+alocatedCString stringfyResponse(Response* self) {
+  Map* headers = self->data->headers;
+  alocatedCString headerFilds = headers->toHtttpHeadersCString(headers);
+  alocatedCString stringHeaders = formatedCString(
+    "%s %d %s\r\n%s",
+    HTTP_VERSION,
+    self->data->code,
+    self->data->statusMessage,
+    headerFilds
+  );
+
+  free(headerFilds);
+
+  return stringHeaders;
 }
 
 // end ----------------//
