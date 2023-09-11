@@ -17,6 +17,8 @@ typedef struct Response
   struct Response* (*withStatusMessage)(const char* message, struct Response* self);
   /** Adiciona header na resposta */
   struct Response* (*withHeader)(char* key, char* value, struct Response* self);
+  /** Define o corpo da resposta como JSON */
+  struct Response* (*withJSON)(struct Response* self);
   /** Formata como string para poder enviar pela rede */
   alocatedCString (*toString)(struct Response* self);
   /** Destroi o objeto Response liberando a memória alocada */

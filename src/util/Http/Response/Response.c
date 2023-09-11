@@ -15,6 +15,8 @@ typedef struct _ResponseData
   alocatedCString statusMessage;
   /** Headers */
   Map* headers;
+  /** JSON body */
+  Map* jsonBody;
   /** Destroi o objeto ResponseData liberando a memória alocada */
   void (*destroy)(struct _ResponseData** self);
 } ResponseData;
@@ -23,6 +25,7 @@ static void destroyResponse(Response** self);                           //------
 static Response* setResponseStatusCode(unsigned code, Response* self);
 static Response* setResponseHeader(char* key, char* value, Response* self);
 static Response* setResponseStatusMessage(const char* message, Response* self);
+static Response* setResponseJsonBody(Response* self);
 alocatedCString stringfyResponse(Response* self);
 
 void destroyResponseData(ResponseData** self);                          //--------- ResponseData -------/
@@ -43,6 +46,7 @@ Response* newResponse() {
   res->withStatusCode = setResponseStatusCode;
   res->withHeader = setResponseHeader;
   res->withStatusMessage = setResponseStatusMessage;
+  res->withJSON = setResponseJsonBody;
   res->toString = stringfyResponse;
   res->data = newResponseData();
 
@@ -100,19 +104,44 @@ static Response* setResponseHeader(char* key, char* value, Response* self) {
 
 /** Response To string */
 alocatedCString stringfyResponse(Response* self) {
+  // se houver um corpo na resposta
+  int jsonBodyLength = 0;
+  alocatedCString body = self->data->jsonBody != NULL ? self->data->jsonBody->toJsonString(self->data->jsonBody) : NULL;
+  body == NULL ? 0 : (jsonBodyLength = cStringLenght(body));
+
+  if(jsonBodyLength > 0) {
+    alocatedCString len = intToCString(jsonBodyLength);
+    self->withHeader("Content-Length", len, self);
+    freeAlocatedCString(len);
+  }
+
+  /** Gera a string com as headers */
   Map* headers = self->data->headers;
   alocatedCString headerFilds = headers->toHtttpHeadersCString(headers);
+
   alocatedCString stringHeaders = formatedCString(
-    "%s %d %s\r\n%s",
+    "%s %d %s\r\n%s%s",
     HTTP_VERSION,
     self->data->code,
     self->data->statusMessage,
-    headerFilds
+    headerFilds,
+    body != NULL && jsonBodyLength > 0 ? body : ""
   );
 
-  free(headerFilds);
+  /** Libera a memoria */
+  freeAlocatedCString(headerFilds);
+  freeAlocatedCString(body);
 
   return stringHeaders;
+}
+
+static Response* setResponseJsonBody(Response* self) {
+  if (self->data->jsonBody == NULL) {
+    self->data->jsonBody = newMap();
+    self->withHeader("Content-Type", "application/json", self);
+  }
+
+  return self;
 }
 
 // end ----------------//
@@ -130,6 +159,7 @@ ResponseData* newResponseData() {
   new->code = 200;
   new->statusMessage = duplicateString("OK");
   new->headers = newMap();
+  new->jsonBody = NULL;
 
   return new;
 }

@@ -15,6 +15,15 @@ TestResult toStringResponse() {
   return expectStringsToBeEquals(expectedString, headers);
 }
 
+TestResult toStringResponseWithBody() {
+  Response* res = newResponse();
+  res->withJSON(res);
+  alocatedCString headers = res->toString(res);
+  char* expectedString = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json\r\nContent-Length: 3\r\n\r\n{ }";
+
+  return expectStringsToBeEquals(expectedString, headers);
+}
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -24,6 +33,9 @@ int main(int argc, char **argv){
       break;
     CASE ("toStringResponse")
       it("toString retorna as headers formatadas", toStringResponse);
+      break;
+    CASE ("toStringResponseWithBody")
+      it("toString com json body", toStringResponseWithBody);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
