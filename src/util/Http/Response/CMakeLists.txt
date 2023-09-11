@@ -6,4 +6,5 @@ add_executable(ResponseTest Response.test.c)
 target_link_libraries(ResponseTest Response TestSuite)
 add_test(newResponseIsNotNull ResponseTest newResponseIsNotNull)
 add_test(toStringResponse ResponseTest toStringResponse)
-
+add_test(toStringResponseWithBody ResponseTest toStringResponseWithBody)
+add_test(toStringResponseWithBodyFilled ResponseTest toStringResponseWithBodyFilled)
