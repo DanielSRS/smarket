@@ -2,6 +2,7 @@
 #include "Cstrings.h"
 #include <stdlib.h> // malloc
 #include <stdio.h> // sprintf
+#include <stdarg.h> // va_list, va_arg, va_end
 
 /** Compara se duas strings são iguais */
 boolean isEquals(const char * first, const char *second) {
@@ -49,4 +50,39 @@ alocatedCString trimEnd(const char *stringToBeTrimmed, int length) {
   }
 
   return duplicateStringWithSize(stringToBeTrimmed, maxEnd);
+}
+
+/** Calcula o tamanho da string formatada considerando o null terminator */
+int vFormatedCStringSize(const char *__restrict__ __format, va_list args) {
+  int size = vsnprintf(NULL, 0, __format, args) + 1;
+  return size;
+}
+
+/** Formated CStrings size */
+int formatedCStringSize(const char *__restrict__ __format, ...) {
+  va_list args;
+  va_start(args, __format);
+  int size = vFormatedCStringSize(__format, args);
+  va_end(args);
+
+  return size;
+}
+
+/** Formated CStrings */
+alocatedCString formatedCString(const char *__restrict__ __format, ...) {
+  va_list args;
+  /** Obtem o tamanho da nova string */
+  va_start(args, __format);
+  int newStringSize = vFormatedCStringSize(__format, args);
+  va_end(args);
+
+  /** Aloca memória */
+  alocatedCString newString = calloc(newStringSize, sizeof(char));
+  
+  /** Cria a nova string */
+  va_start(args, __format);
+  int size = vsnprintf(newString, newStringSize, __format, args);
+  va_end(args);
+
+  return newString;
 }

@@ -24,4 +24,10 @@ alocatedCString duplicateStringWithSize(const char *stringToBeDuplicated, int le
 
 alocatedCString trimEnd(const char *stringToBeTrimmed, int length);
 
+/** Calcula o tamanho de uma string formatada */
+int formatedCStringSize(const char *__restrict__ __format, ...);
+
+/** Cria uma CString formatada considerando */
+alocatedCString formatedCString(const char *__restrict__ __format, ...);
+
 #endif //CSGSL_H

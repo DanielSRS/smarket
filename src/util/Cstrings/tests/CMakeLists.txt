@@ -1,0 +1,5 @@
+add_executable(formatedCStringSizeTest formatedCStringSize.test.c)
+
+target_link_libraries(formatedCStringSizeTest Cstrings TestSuite)
+add_test(returnsRightSize formatedCStringSizeTest returnsRightSize)
+add_test(returnsExpectedFormatedCString formatedCStringSizeTest returnsExpectedFormatedCString)
