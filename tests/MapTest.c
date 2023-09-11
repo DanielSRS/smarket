@@ -709,6 +709,51 @@ TestResult _toStringHasTheExpectedFormat() {
 */
 
 
+TestResult toJsonStringOnEmptyMap() {
+  Map *map = newMap();
+
+  char *expectedFormat = "{ }";
+  char *mapStringRepresentation = map->toJsonString(map);
+
+  return expectStringsToBeEquals(expectedFormat, mapStringRepresentation);
+}
+
+TestResult toJsonStringOnNonEmptyMap() {
+  Map *map = newMap();
+  char *key1 = "key1",
+       *key2 = "key2",
+       *key3 = "key3",
+       *key4 = "key4",
+       *key5 = "key5",
+       *key6 = "key6",
+       *key7 = "key7";
+  
+  char *value1 = "value1",
+       *value2 = "value2",
+       *value3 = "value3",
+       *value4 = "value4",
+       *value5 = "value5",
+       *value6 = "value6",
+       *value7 = "value7";
+
+  char *type = "__Any__";
+  
+  map->setString(map, key1, value1);
+  map->setString(map, key2, value2);
+  Map* nested = map->nest(map, key4);
+  map->setString(map, key3, value3);
+  nested->setString(nested, key5, value5);
+  nested->setString(nested, key6, value6);
+  nested->setString(nested, key7, value7);
+
+  char* expectedFormat = "{\"key1\":\"value1\",\"key2\":\"value2\",\"key4\":{\"key5\":\"value5\",\"key6\":\"value6\",\"key7\":\"value7\"},\"key3\":\"value3\"}";
+  char* mapStringRepresentation = map->toJsonString(map);
+
+  return expectStringsToBeEquals(expectedFormat, mapStringRepresentation);
+}
+
+
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -805,6 +850,12 @@ int main(int argc, char **argv){
       break;
     CASE ("_getMapKeys")
       it("Retorna todas as chaves inseridas no map", _getMapKeys);
+      break;
+    CASE ("toJsonStringOnEmptyMap")
+      it("JSON representação de um Map vazio", toJsonStringOnEmptyMap);
+      break;
+    CASE ("toJsonStringOnNonEmptyMap")
+      it("JSON representação de um Map com valores", toJsonStringOnNonEmptyMap);
       break;
 /*
     CASE ("_pointerIsNullAfterDestroy")
