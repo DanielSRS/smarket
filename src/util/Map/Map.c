@@ -196,9 +196,9 @@ alocatedCString mapEntryValueToString(MapEntry* self) {
 /**
  * Libere a memoria apos o uso!!!!!!
 */
-char* _mapToString(Map* self) {
+alocatedCString _mapToString(Map* self) {
   int numberOfItems = self->length;
-  if (numberOfItems == 0) return "{ }";
+  if (numberOfItems == 0) return duplicateString("{ }");
   char *begginingOfTheString = "{\n";
   char *endingOfTheString = "}";
   char *identation = "\t";
@@ -560,7 +560,7 @@ alocatedCString mapEntryToJSONString(MapEntry* self) {
 
 alocatedCString mapToJsonString(Map* self) {
   int numberOfItems = self->length;
-  if (numberOfItems == 0) return "{ }";
+  if (numberOfItems == 0) return duplicateString("{ }");
 
   alocatedCString buffer = duplicateString("");
   int itemCount = 0;
