@@ -19,6 +19,10 @@ typedef struct MapEntry
    */
   char*(*toString)(struct MapEntry* self);
   /**
+   * Retorna uma string com a chave e o valor no formato json
+   */
+  char*(*toJsonString)(struct MapEntry* self);
+  /**
    * Destroi o registro liberando memória
    */
   const void(*destroy)(struct MapEntry** self);
@@ -73,6 +77,10 @@ typedef struct Map
    * Retorna uma string com todos os valores do Map
    */
   char*(*toString)(struct Map* self);
+  /**
+   * Retorna uma string formatada como JSON com todos os valores do Map
+   */
+  char*(*toJsonString)(struct Map* self);
   /**
    * Retorna uma das headers http
    */

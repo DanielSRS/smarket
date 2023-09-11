@@ -9,6 +9,8 @@
 
 
 alocatedCString htttpHeadersCString(Map* self);
+alocatedCString mapEntryToJSONString(MapEntry* self);
+alocatedCString mapToJsonString(Map* self);
 
 boolean _hasElementInAMap(Map* self, char* key) {
   if (self->length == 0) return False;
@@ -271,6 +273,7 @@ MapEntry *newMapEntry(char *key, void *value, char *type) {
 
   newEntry->destroy = destroyMapEntry;
   newEntry->toString = _mapEntryToString;
+  newEntry->toJsonString = mapEntryToJSONString;
   return newEntry;
 }
 
@@ -402,6 +405,7 @@ Map* newMap() {
   map->setString = setString;
   map->setMap = setMap;
   map->toString = _mapToString;
+  map->toJsonString = mapToJsonString;
   map->destroy = destroyMap;
   map->nest = nest;
   map->getKeys = getMapKeys;
@@ -526,5 +530,65 @@ alocatedCString htttpHeadersCString(Map* self) {
   // adiciona linha em branco ao fim das headers
   alocatedCString newBuffer = formatedCString("%s\r\n", buffer);
   free(buffer);
+  return newBuffer;
+}
+
+alocatedCString mapEntryToJSONString(MapEntry* self) {
+  /** Se o valor guardado for uma string */
+  if (isEquals(self->type, STRING_OBJECT)) {
+    alocatedCString buffer = formatedCString("\"%s\":\"%s\"", self->key, (char*) self->value);
+
+    return buffer;
+  }
+
+  /** Se o valor guardado for um map */
+  if (isEquals(self->type, MAP_OBJECT)) {
+    alocatedCString mapJsonString = ((Map *) self->value)->toJsonString((Map *) self->value);
+    
+    alocatedCString buffer = formatedCString("\"%s\":%s", self->key, mapJsonString);
+
+    mapJsonString == NULL ? 0 : free(mapJsonString); // map.toString() aloca memoria
+
+    return buffer;
+  }
+
+  /** Se o valor guardado for de outro tipo */
+  alocatedCString buffer = formatedCString("\"%s\":\"type -> %s\"", self->key, self->type);
+
+  return buffer;
+}
+
+alocatedCString mapToJsonString(Map* self) {
+  int numberOfItems = self->length;
+  if (numberOfItems == 0) return "{ }";
+
+  alocatedCString buffer = duplicateString("");
+  int itemCount = 0;
+  for (MapEntry *item = (MapEntry *) self->_items; item != NULL; item = item->sibling, ++itemCount) {
+    /** Representação em string do valor da entrada*/
+    alocatedCString keyValuePairs = item->toJsonString(item);
+    
+    /** Cria uma string formatada */
+    alocatedCString newBuffer = NULL;
+    if (itemCount != numberOfItems - 1) {                             // Se não for o ultimo da lista
+      newBuffer = formatedCString("%s%s,", buffer, keyValuePairs);    // coloca virgula antes do proximo item
+    } else {                                                          // caso seja o ultimo
+      newBuffer = formatedCString("%s%s", buffer, keyValuePairs);     // não tem virgula
+    }
+    
+    /** Libera o espaço aclocado anteriorrmente */
+    buffer == NULL ? 0 : free(buffer);
+    keyValuePairs == NULL ? 0 : free(keyValuePairs);
+
+    // atualiza a referencia do buffer
+    buffer = newBuffer;
+  }
+
+  // coloca as chaves no objeto
+  alocatedCString newBuffer = formatedCString("%s%s%s", "{", buffer, "}");
+
+  /** Libera o espaço aclocado anteriorrmente */
+  buffer == NULL ? 0 : free(buffer);
+
   return newBuffer;
 }
