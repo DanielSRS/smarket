@@ -300,13 +300,11 @@ void closeHTTPConnection(HTTPConnection* self) {
 
 void responseHTTPConnection(HTTPConnection* self) {
   TCPConnection* tcpConnection = self->connectionInfo->tcpConnection;
-  char *response = "HTTP/1.1 200 OK\
-                      \r\nAccess-Control-Allow-Origin: *\
-                      \r\nContent-Type: application/json\
-                      \r\nContent-Length: 14\
-                      \r\n\r\n{\"han\": \"ddled\"}";
 
-  tcpConnection->send(tcpConnection, strlen(response), response);
+  alocatedCString response = self->response->toString(self->response);
+  int responseLength = cStringLenght(response);
+
+  tcpConnection->send(tcpConnection, responseLength, response);
 }
 
 /** Cria objeto HTTPConnection */
@@ -323,6 +321,7 @@ HTTPConnection* newHTTPConnection(TCPConnection* connection, RequestHeaderInfo h
   new->headerInfo = headerInfo;
   new->request = request;
   new->sendResponse = responseHTTPConnection;
+  new->response = newResponse();
 
   console->debug(console, "Criado HTTPConnection\n");
   console->destroy(&console);

@@ -2,6 +2,7 @@
 #include "../Map/Map.h"
 #include "../Cstrings/Cstrings.h"
 #include <stdint.h> // uint16_t
+#include "./Response/Response.h" // Response
 
 #ifndef HTTP_H
 #define HTTP_H
@@ -110,6 +111,8 @@ typedef struct HTTPConnection
   RequestHeaderInfo headerInfo;
   /** Requisição recebido */
   Request request;
+  /** Resposta a ser enviada */
+  Response* response;
   /**
    * Send the response object
    * 
