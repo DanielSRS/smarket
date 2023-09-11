@@ -33,4 +33,7 @@ alocatedCString formatedCString(const char *__restrict__ __format, ...);
 /** Calcula o tamanho de uma string */
 int cStringLenght(const char* string);
 
+/** Libera a memoria de uma string alocada */
+void freeAlocatedCString(alocatedCString string);
+
 #endif //CSGSL_H

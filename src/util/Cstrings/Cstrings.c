@@ -93,3 +93,10 @@ int cStringLenght(const char* string) {
 
   return strlen(string);
 }
+
+/** Libera a memoria de uma string alocada */
+void freeAlocatedCString(alocatedCString string) {
+  if (string == NULL) return;
+
+  free(string);
+}
