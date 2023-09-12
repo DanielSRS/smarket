@@ -15,6 +15,7 @@ alocatedCString mapToJsonString(Map* self);
 alocatedCString listToJsonString(List* self);
 Map *nestList(Map* self, char* key);
 Map *setList(Map* self, char* key, void* value);
+int listPushMap(List *self, Map *value);
 
 boolean _hasElementInAMap(Map* self, char* key) {
   if (self->length == 0) return False;
@@ -554,6 +555,7 @@ List* newList() {
   list->destroy = destroyList;
   list->toString = listToString;
   list->toJsonString = listToJsonString;
+  list->pushMap = listPushMap;
 
   return list;
 }
@@ -737,4 +739,14 @@ Map *nestList(Map* self, char* key) {
 
 Map *setList(Map* self, char* key, void* value) {
   return _setElementOfAMap(self, key, value, LIST_OBJECT);
+}
+
+
+int listPushMap(List *self, Map *value) {
+  alocatedCString key = intToCString(self->length(self));
+  self->_map->setMap((Map*)self->_map, key, value);
+
+  return self->length(self);
+
+  freeAlocatedCString(key);
 }

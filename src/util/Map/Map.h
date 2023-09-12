@@ -145,6 +145,7 @@ typedef struct List
    * no dado salvo.
    */
   int (*pushString)(struct List* self, char *value);
+  int (*pushMap)(struct List* self, Map *value);
   /**
    * Retorna uma string com todos os valores da Lista
    */
