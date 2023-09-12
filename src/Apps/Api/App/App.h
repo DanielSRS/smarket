@@ -12,13 +12,13 @@ typedef struct App
   /** Configurações do app */
   AppConfig* config;
   /** Adiciona rota que processa requisições de metodo GET para um determinado recurso */
-  struct App* (*get)(const char* path, void (*handler)(Request* req, Response* res), struct App* self);
+  struct App* (*get)(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
   /** Adiciona rota que processa requisições de metodo POST para um determinado recurso */
-  struct App* (*post)(const char* path, void (*handler)(Request* req, Response* res), struct App* self);
+  struct App* (*post)(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
   /** Adiciona rota que processa requisições de metodo PUT para um determinado recurso */
-  struct App* (*put)(const char* path, void (*handler)(Request* req, Response* res), struct App* self);
+  struct App* (*put)(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
   /** Adiciona rota que processa requisições de metodo DELETE para um determinado recurso */
-  struct App* (*delete)(const char* path, void (*handler)(Request* req, Response* res), struct App* self);
+  struct App* (*delete)(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
   /** Inicia servidor */
   void (*listen)(struct App* self);
   /** destroi */

@@ -26,4 +26,5 @@ RouterConfig* newRouterConfig() {
 
   config->destroy = destroyRouterConfig;
   config->routes = routes;
+  config->context = NULL;
 }

@@ -5,4 +5,4 @@
 #include "../../../util/Http/http.h" // Request
 
 /** Retorna informações sobre a API */
-void about(Request* req, Response* res);
+void about(Request* req, Response* res, void* context);

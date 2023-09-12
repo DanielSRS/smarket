@@ -2,9 +2,12 @@
 #include "../../../util/Map/Map.h" // Map
 
 /** Retorna informações sobre a API */
-void about(Request* req, Response* res) {
+void about(Request* req, Response* res, void* context) {
+  Map* appState = (Map*) context;
+  alocatedCString appVersion = appState->get(appState, "version");
+
   Map* data = newMap();
-  data->setString(data, "version", "0.0.1");
+  data->setString(data, "version", appVersion ? appVersion : "unknown");
 
   res
     ->withStatusCode(200, res)
