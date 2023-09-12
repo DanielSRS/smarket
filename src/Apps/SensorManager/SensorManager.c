@@ -4,30 +4,51 @@
 #include <stdio.h> // printf
 #include <string.h> // strlen
 
-void sendRequest(TCPClient* tcpClient);
+void readerHandler(HTTPConnection *newConnection, void *context);
+
+// #define ANSI_COLOR_RED     "\x1b[31m"
+// #define ANSI_COLOR_GREEN   "\x1b[32m"
+// #define ANSI_COLOR_YELLOW  "\x1b[33m"
+// #define ANSI_COLOR_BLUE    "\x1b[34m"
+// #define ANSI_COLOR_MAGENTA "\x1b[35m"
+// #define ANSI_COLOR_CYAN    "\x1b[36m"
+// #define ANSI_COLOR_RESET   "\x1b[0m"
 
 int main() {
-    TCPClient* tcpClient = newTCPClient("127.0.0.1", 3490);
-    Map *tagsList = readTags();
 
-    printf("\n\nTags lidas: \n%s", tagsList->toString(tagsList));
- 
-    // function for chat
-    sendRequest(tcpClient);
-    tcpClient->close(tcpClient);
+    // printf(ANSI_COLOR_RED     "This text is RED!"     ANSI_COLOR_RESET "\n");
+    // printf(ANSI_COLOR_GREEN   "This text is GREEN!"   ANSI_COLOR_RESET "\n");
+    // printf(ANSI_COLOR_YELLOW  "This text is YELLOW!"  ANSI_COLOR_RESET "\n");
+    // printf(ANSI_COLOR_BLUE    "This text is BLUE!"    ANSI_COLOR_RESET "\n");
+    // printf(ANSI_COLOR_MAGENTA "This text is MAGENTA!" ANSI_COLOR_RESET "\n");
+    // printf(ANSI_COLOR_CYAN    "This text is CYAN!"    ANSI_COLOR_RESET "\n");
+
+    HTTPServer *server = createHTTPServer();
+
+    server
+        ->setNewConnectionHanddler(server, readerHandler)
+        ->setPort(server, 3497)
+        ->serve(server);
+
+    server->destroy(&server);
 }
 
-void sendRequest(TCPClient* tcpClient) {
-    char *request = "GET /dan/niel?dfg=dsfg HTTP/1.1\
-                    \r\nHost: localhost:3492\
-                    \r\nContent-Type: application/json\
-                    \r\nUser-Agent: SensorManager/0.0.1\
-                    \r\nContent-Length: 17\
-                    \r\n\r\n{\"with\": \"tcpclient\"}";
 
-    int numberOfBytesSent = tcpClient->send(tcpClient, strlen(request), request);
-    if (numberOfBytesSent == -1)
-        perror("send");
+void readerHandler(HTTPConnection *newConnection, void *context) {
+    Map *tagsList = readTags();
+    alocatedCString tags = tagsList->toJsonString(tagsList);
 
-    printf("\nRequest sent\n\n");
+    Map* data = newMap();
+    data->setMap(data, "tags", tagsList);
+
+    newConnection->response
+        ->withJSON(newConnection->response)
+        ->withStatusCode(200, newConnection->response)
+        ->addStringToJson("success", "true", newConnection->response)
+        ->addObjectToJson("data", data, newConnection->response)
+        ->addStringToJson("message", "Tags read with success", newConnection->response);
+
+    newConnection->sendResponse(newConnection);
+    newConnection->close(newConnection);
+    newConnection->destroy(&newConnection);
 }
