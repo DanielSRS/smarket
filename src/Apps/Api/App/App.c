@@ -17,13 +17,17 @@ App* apppost(const char* path, void (*handler)(Request* req, Response* res, void
 App* appput(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
 App* appdelete(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
 void applisten(App* self);
+Map* initializeDatabase();
 
 App* createApp() {
   App* app = calloc(1, sizeof(App));
   HTTPServer* server = createHTTPServer();
   Router* router = createRouter();
+
+  /** Criando estado do app */
   Map* appState = newMap();
   appState->setString(appState, "version", "0.0.2");
+  appState->setMap(appState, "db", initializeDatabase());
 
   /** Contexto para propagar para os handlers */
   router->setContext(appState, router);
@@ -102,4 +106,15 @@ App* appdelete(const char* path, void (*handler)(Request* req, Response* res, vo
 /** Inicia servidor */
 void applisten(App* self) {
   self->config->server->serve(self->config->server);
+}
+
+Map* initializeDatabase() {
+  Map* database = newMap();
+
+  /** Caixas */
+  Map* cashier = database->nest(database, "cashier");
+  Map* caixa1 = cashier->nest(cashier, "CAIXA01");
+  caixa1->setString(caixa1, "id", "CAIXA01");
+
+  return database;
 }
