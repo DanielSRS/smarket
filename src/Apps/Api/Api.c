@@ -12,6 +12,7 @@ int main(void) {
         ->get("/about", about, server)
         ->get("/cashiers/list", listCashiers, server)
         ->post("/cashiers/registry", registryCashier, server)
+        ->get("/purchases/all", getAllPurchases, server)
         ->listen(server);
 
     server->destroy(&server);

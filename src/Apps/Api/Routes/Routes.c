@@ -98,3 +98,34 @@ void registryCashier(Request* req, Response* res, void* context) {
     ->addObjectToJson("data", responseData, res)
     ->addStringToJson("message", "Caixa registrado com sucesso", res);
 }
+
+/** retorna a lista de compras realizadas */
+void getAllPurchases(Request* req, Response* res, void* context) {
+  /** Global state */
+  Map* appState = (Map*) context;
+
+  /** Banco de dados */
+  Map* database = appState->get(appState, "db");
+  Map* purchases = database->get(database, "purchases");   // tabela de caixas
+
+  Map* responseData = newMap();
+  char** keys = purchases->getKeys(purchases);
+  int numberOfPurchases = purchases->length;
+
+  Map* responsePurchases = responseData->nest(responseData, "purchases");
+
+  for (int i = 0; i < numberOfPurchases; i++) {
+    alocatedCString key = intToCString(i);
+    Map* purchase = purchases->get(purchases, keys[i]);
+    responsePurchases->setMap(responsePurchases, key, purchase);
+    freeAlocatedCString(key);
+  }
+
+  res
+    ->withStatusCode(200, res)
+    ->withStatusMessage("OK", res)
+    ->withJSON(res)
+    ->addStringToJson("sucess", "true", res)
+    ->addObjectToJson("data", responseData, res)
+    ->addStringToJson("message", "Lista de todas as compras retornadas com sucesso", res);
+}
