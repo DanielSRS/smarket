@@ -156,7 +156,11 @@ typedef struct HTTPServer
   /**
    * Define uma função para lidar com uma nova conexão
   */
-  struct HTTPServer* (*setNewConnectionHanddler)(struct HTTPServer* self, void (*handdler)(HTTPConnection* newConnection));
+  struct HTTPServer* (*setNewConnectionHanddler)(struct HTTPServer* self, void (*handdler)(HTTPConnection* newConnection, void* context));
+  /**
+   * Define uma valor ao contexto
+  */
+  struct HTTPServer* (*setContext)(void* context, struct HTTPServer* self);
   /**
    * Destrói o objeto HTTPServer
   */
