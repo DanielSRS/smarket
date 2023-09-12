@@ -11,6 +11,7 @@
 alocatedCString htttpHeadersCString(Map* self);
 alocatedCString mapEntryToJSONString(MapEntry* self);
 alocatedCString mapToJsonString(Map* self);
+alocatedCString listToJsonString(List* self);
 
 boolean _hasElementInAMap(Map* self, char* key) {
   if (self->length == 0) return False;
@@ -503,6 +504,7 @@ List* newList() {
   list->pushString = listPushString;
   list->destroy = destroyList;
   list->toString = listToString;
+  list->toJsonString = listToJsonString;
 
   return list;
 }
@@ -592,3 +594,39 @@ alocatedCString mapToJsonString(Map* self) {
 
   return newBuffer;
 }
+
+alocatedCString listToJsonString(List* self) {
+  int numberOfItems = self->length;
+  if (numberOfItems == 0) return duplicateString("[ ]");
+
+  alocatedCString buffer = duplicateString("");
+  int itemCount = 0;
+  for (MapEntry *item = (MapEntry *) self->_map->_items; item != NULL; item = item->sibling, ++itemCount) {
+    /** Representação em string do valor da entrada*/
+    alocatedCString keyValuePairs = item->toJsonString(item);
+    
+    /** Cria uma string formatada */
+    alocatedCString newBuffer = NULL;
+    if (itemCount != numberOfItems - 1) {                             // Se não for o ultimo da lista
+      newBuffer = formatedCString("%s%s,", buffer, keyValuePairs);    // coloca virgula antes do proximo item
+    } else {                                                          // caso seja o ultimo
+      newBuffer = formatedCString("%s%s", buffer, keyValuePairs);     // não tem virgula
+    }
+    
+    /** Libera o espaço aclocado anteriorrmente */
+    buffer == NULL ? 0 : free(buffer);
+    keyValuePairs == NULL ? 0 : free(keyValuePairs);
+
+    // atualiza a referencia do buffer
+    buffer = newBuffer;
+  }
+
+  // coloca as chaves no objeto
+  alocatedCString newBuffer = formatedCString("%s%s%s", "[", buffer, "]");
+
+  /** Libera o espaço aclocado anteriorrmente */
+  buffer == NULL ? 0 : free(buffer);
+
+  return newBuffer;
+}
+

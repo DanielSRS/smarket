@@ -145,6 +145,10 @@ typedef struct List
    */
   alocatedCString (*toString)(struct List* self);
   /**
+   * Retorna uma json string com todos os valores da Lista
+   */
+  alocatedCString (*toJsonString)(struct List* self);
+  /**
    * Destroi a lista liberando memória. Todos os itens são destruídos junto
    * com a lista, exceto os itens salvos como referencia.
    */
