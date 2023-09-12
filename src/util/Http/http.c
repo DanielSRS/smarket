@@ -112,6 +112,12 @@ Request parseRequest(const char *requestBuffer, int length) {
       // printf("\nMetodo recebido: %s\n", method);
       if (isEquals("GET", method)){
         request.method = GET;
+      } else if (isEquals("POST", method)) {
+        request.method = POST;
+      } else if (isEquals("PUT", method)) {
+        request.method = PUT;
+      } else if (isEquals("DELETE", method)) {
+        request.method = DELETE;
       } else {
         request.thereWasErrors = True;
         free(method);
