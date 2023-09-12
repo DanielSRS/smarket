@@ -10,7 +10,7 @@
 #define MAX_HEADER_FIELDS 10
 
 /** Métodos http */
-typedef enum Method { GET } Method;
+typedef enum Method { GET, POST, PUT, DELETE } Method;
 
 typedef struct Request
 {
