@@ -12,16 +12,21 @@ typedef struct _AppConfig
 void destroyAppConfig(AppConfig** self);
 AppConfig* newAppConfig(HTTPServer* server, Router* router);
 void destroyApp(App** self);
-App* appget(const char* path, void (*handler)(Request* req, Response* res), struct App* self);
-App* apppost(const char* path, void (*handler)(Request* req, Response* res), struct App* self);
-App* appput(const char* path, void (*handler)(Request* req, Response* res), struct App* self);
-App* appdelete(const char* path, void (*handler)(Request* req, Response* res), struct App* self);
+App* appget(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
+App* apppost(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
+App* appput(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
+App* appdelete(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
 void applisten(App* self);
 
 App* createApp() {
   App* app = calloc(1, sizeof(App));
   HTTPServer* server = createHTTPServer();
   Router* router = createRouter();
+  Map* appState = newMap();
+  appState->setString(appState, "version", "0.0.2");
+
+  /** Contexto para propagar para os handlers */
+  router->setContext(appState, router);
 
   server
     ->setNewConnectionHanddler(server, dispatchRoutes)
@@ -71,25 +76,25 @@ AppConfig* newAppConfig(HTTPServer* server, Router* router) {
 }
 
 /** GET */
-App* appget(const char* path, void (*handler)(Request* req, Response* res), struct App* self) {
+App* appget(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self) {
   self->config->router->get(path, handler, self->config->router);
   return self;
 }
 
 /** POST */
-App* apppost(const char* path, void (*handler)(Request* req, Response* res), struct App* self) {
+App* apppost(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self) {
   self->config->router->post(path, handler, self->config->router);
   return self;
 }
 
 /** PUT */
-App* appput(const char* path, void (*handler)(Request* req, Response* res), struct App* self) {
+App* appput(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self) {
   self->config->router->put(path, handler, self->config->router);
   return self;
 }
 
 /** DELETE */
-App* appdelete(const char* path, void (*handler)(Request* req, Response* res), struct App* self) {
+App* appdelete(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self) {
   self->config->router->delete(path, handler, self->config->router);
   return self;
 }

@@ -3,10 +3,11 @@
 #include <stdlib.h> // NULL
 #include "../../../util/Logger/Logger.h" // Logger, CreateLogger
 
-Router* addGetRoute(const char* path, void (*handler)(Request* req, Response* res), Router* self);
-Router* addPostRoute(const char* path, void (*handler)(Request* req, Response* res), Router* self);
-Router* addPutRoute(const char* path, void (*handler)(Request* req, Response* res), Router* self);
-Router* addDeleteRoute(const char* path, void (*handler)(Request* req, Response* res), Router* self);
+Router* addGetRoute(const char* path, void (*handler)(Request* req, Response* res, void* context), Router* self);
+Router* addPostRoute(const char* path, void (*handler)(Request* req, Response* res, void* context), Router* self);
+Router* addPutRoute(const char* path, void (*handler)(Request* req, Response* res, void* context), Router* self);
+Router* addDeleteRoute(const char* path, void (*handler)(Request* req, Response* res, void* context), Router* self);
+Router* setRouterContext(void* context, Router* self);
 void dispatchRoutes(HTTPConnection* connection, void* router);
 void destroyRouter(Router** self);
 
@@ -19,12 +20,13 @@ Router* createRouter() {
   router->put = addPutRoute;
   router->delete = addDeleteRoute;
   router->destroy = destroyRouter;
+  router->setContext = setRouterContext;
   
   return router;
 }
 
 /** Adiciona rota que processa requisições de metodo GET para um determinado recurso */
-Router* addGetRoute(const char* path, void (*handler)(Request* req, Response* res), Router* self) {
+Router* addGetRoute(const char* path, void (*handler)(Request* req, Response* res, void* context), Router* self) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
   console->extend(console, "Router");
@@ -61,7 +63,7 @@ Router* addGetRoute(const char* path, void (*handler)(Request* req, Response* re
 }
 
 /** Adiciona rota que processa requisições de metodo POST para um determinado recurso */
-Router* addPostRoute(const char* path, void (*handler)(Request* req, Response* res), Router* self) {
+Router* addPostRoute(const char* path, void (*handler)(Request* req, Response* res, void* context), Router* self) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
   console->extend(console, "Router");
@@ -98,7 +100,7 @@ Router* addPostRoute(const char* path, void (*handler)(Request* req, Response* r
 }
 
 /** Adiciona rota que processa requisições de metodo PUT para um determinado recurso */
-Router* addPutRoute(const char* path, void (*handler)(Request* req, Response* res), Router* self) {
+Router* addPutRoute(const char* path, void (*handler)(Request* req, Response* res, void* context), Router* self) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
   console->extend(console, "Router");
@@ -135,7 +137,7 @@ Router* addPutRoute(const char* path, void (*handler)(Request* req, Response* re
 }
 
 /** Adiciona rota que processa requisições de metodo DELETE para um determinado recurso */
-Router* addDeleteRoute(const char* path, void (*handler)(Request* req, Response* res), Router* self) {
+Router* addDeleteRoute(const char* path, void (*handler)(Request* req, Response* res, void* context), Router* self) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
   console->extend(console, "Router");
@@ -175,7 +177,8 @@ Router* addDeleteRoute(const char* path, void (*handler)(Request* req, Response*
 void dispatchRoutes(HTTPConnection* connection, void* router) {
   char* path = connection->request.path;
   Map* routes = ((Router*) router)->config->routes;
-  void (*handler)(Request* req, Response* res) = NULL;
+  void* routeContext = ((Router*) router)->config->context;
+  void (*handler)(Request* req, Response* res, void* context) = NULL;
 
   /** Seleciona o grupo de acordo com o metodo e encontra o handler com o path */
   switch (connection->request.method){
@@ -205,7 +208,7 @@ void dispatchRoutes(HTTPConnection* connection, void* router) {
   }
 
   /** Se encontrado o recurso */
-  if (handler != NULL) handler(&(connection->request), connection->response);
+  if (handler != NULL) handler(&(connection->request), connection->response, routeContext);
 
   /** Não encontrado */
   else {
@@ -232,4 +235,9 @@ void destroyRouter(Router** self) {
 
   free(*self);
   *self = NULL;
+}
+
+/** Atualiza o contexto */
+Router* setRouterContext(void* context, Router* self) {
+  self->config->context = context;
 }
