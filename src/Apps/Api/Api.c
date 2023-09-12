@@ -1,15 +1,16 @@
 #include <stdlib.h> // exit
 #include "../../util/Http/http.h" // createHTTPServer
 #include "../../util/Socket/socket.h" // handleConnectionOnANewProcess
+#include "./App/App.h"
+#include "./Routes/Routes.h" // about
 
 int main(void) {
 
-    HTTPServer* server = createHTTPServer();
+    App* server = createApp();
 
     server
-        ->setNewConnectionHanddler(server, handleConnectionOnANewProcess)
-        // ->setContext(server, "Sou o contexto!!") // http server ainda não tem contexto
-        ->serve(server);
+        ->get("/about", about, server)
+        ->listen(server);
 
     server->destroy(&server);
 
