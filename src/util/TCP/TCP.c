@@ -11,7 +11,7 @@ void onGetAddressInfoError() {
   Logger* console = createLogger();
   console->extend(console, "TCP");
 
-  console->error(console, "Houve um erro!! encerrando por onGetAddressInfoError\n");
+  console->error(console, "Houve um erro!! encerrando por onGetAddressInfoError");
   console->destroy(&console);
 
   exit(1);
@@ -32,7 +32,7 @@ void destroyTCPConnectionInfo(TCPConnectionInfo** self) {
   console->extend(console, "TCP");
 
   if(!(*self)) {
-    console->error(console, "Destruindo refferencia nula TCPConnecitonInfo\n");
+    console->error(console, "Destruindo refferencia nula TCPConnecitonInfo");
     console->destroy(&console);
 
     return;
@@ -41,7 +41,7 @@ void destroyTCPConnectionInfo(TCPConnectionInfo** self) {
   free(*self);
   *self = NULL;
 
-  console->debug(console, "Destruindo TCPConnectionInfo\n");
+  console->debug(console, "Destruindo TCPConnectionInfo");
   console->destroy(&console);
 }
 
@@ -56,7 +56,7 @@ TCPConnectionInfo* newTCPConnectionInfo(int socketDescriptor) {
   newConnectionInfo->connectionDescriptor = socketDescriptor;
   newConnectionInfo->destroy = destroyTCPConnectionInfo;
 
-  console->debug(console, "Criado novo objeto TCPConnectionInfo\n");
+  console->debug(console, "Criado novo objeto TCPConnectionInfo");
   console->destroy(&console);
 
   return newConnectionInfo;
@@ -76,7 +76,7 @@ int receive(TCPConnection *self, char *buffer, int bufferSize) {
   numberOfReceivedBytes = recv(connectioSocketFileDescriptor, buffer, bufferSize - 1, 0);
   buffer[numberOfReceivedBytes] = '\0';
 
-  console->debug(console, "TCPConnection received\n");
+  console->debug(console, "TCPConnection received");
   console->destroy(&console);
 
   return numberOfReceivedBytes;
@@ -95,7 +95,7 @@ int TCPConnectionSend(TCPConnection* self, int numBytes, char* buffer) {
 
   numberOfBytesSent = send(connectioSocketFileDescriptor, buffer, numBytes, 0);
 
-  console->debug(console, "TCPConnection send\n");
+  console->debug(console, "TCPConnection send");
   console->destroy(&console);
 
   return numberOfBytesSent;
@@ -113,7 +113,7 @@ void TCPConnectionClose(struct TCPConnection* self) {
   int connectioSocketFileDescriptor = self->connectionInfo->connectionDescriptor;
   close(connectioSocketFileDescriptor);
 
-  console->debug(console, "Fechando TCPConnection\n");
+  console->debug(console, "Fechando TCPConnection");
   console->destroy(&console);
 }
 
@@ -126,7 +126,7 @@ void destroyTCPConnection(struct TCPConnection** self) {
   console->extend(console, "TCP");
 
   if(!(*self)) {
-    console->error(console, "Destruindo refenrencia invalida de TCPConnection\n");
+    console->error(console, "Destruindo refenrencia invalida de TCPConnection");
     console->destroy(&console);
     return;
   }
@@ -138,7 +138,7 @@ void destroyTCPConnection(struct TCPConnection** self) {
   free(*self);
   *self = NULL;
 
-  console->debug(console, "Destroi objeto TCPConnection\n");
+  console->debug(console, "Destroi objeto TCPConnection");
   console->destroy(&console);
 }
 
@@ -155,7 +155,7 @@ TCPConnection* newTCPConnection(int socketDescriptor) {
   newConnection->receive = receive;
   newConnection->send = TCPConnectionSend;
 
-  console->debug(console, "Novo objeto TCPConnection\n");
+  console->debug(console, "Novo objeto TCPConnection");
   console->destroy(&console);
 
   return newConnection;
@@ -202,7 +202,7 @@ void destroyTcpServerConfig(tcpServerConfig** self) {
 
   int sd = (*self)->socketDescriptor;
   if (sd != SOCKET_NOT_SETTED_YET) {
-    console->debug(console, "Close tcpServerConfig socket\n");
+    console->debug(console, "Close tcpServerConfig socket");
     console->destroy(&console);
     close(sd);
   }
@@ -210,7 +210,7 @@ void destroyTcpServerConfig(tcpServerConfig** self) {
   free(*self);
   *self = NULL;
 
-  console->debug(console, "Destroi objeto tcpServerConfig\n");
+  console->debug(console, "Destroi objeto tcpServerConfig");
   console->destroy(&console);
 }
 
@@ -228,7 +228,7 @@ tcpServerConfig* newTcpServerConfig() {
   newConfig->newConnectionHanddler = NULL;
   newConfig->context = NULL;
 
-  console->debug(console, "Cria novo tcpServerConfig\n");
+  console->debug(console, "Cria novo tcpServerConfig");
   console->destroy(&console);
 
   return newConfig;
@@ -241,7 +241,7 @@ void destroyTCPServer(TCPServer** self) {
   console->extend(console, "TCP");
 
   if(!(*self)) {
-    console->error(console, "Tendo destruir TCPServer nulo\n");
+    console->error(console, "Tendo destruir TCPServer nulo");
     console->destroy(&console);
     return;
   };
@@ -275,12 +275,12 @@ void serve(struct TCPServer* self) {
   self->serverConfiguration->socketDescriptor = socketDescriptor;
 
   if  (!(self->serverConfiguration->newConnectionHanddler)) {
-    console->error(console, "Cannot serve. Handdler is null!\n");
+    console->error(console, "Cannot serve. Handdler is null!");
     console->destroy(&console);
     return;
   }
 
-  console->debug(console, "Iniciando servidor TCP\n");
+  console->debug(console, "Iniciando servidor TCP");
   console->destroy(&console);
 
   listenForConnections(
@@ -305,7 +305,7 @@ int setBacklogSize(struct TCPServer* self, unsigned int newSize) {
   /** Atualiza backlog */
   self->serverConfiguration->backlog = newSize;
 
-  console->debug(console, "Atualiza tamanho do backlog do TCPServer\n");
+  console->debug(console, "Atualiza tamanho do backlog do TCPServer");
   console->destroy(&console);
 
   return self->serverConfiguration->backlog;
@@ -321,7 +321,7 @@ TCPServer* setNewConnectionHanddler(struct TCPServer* self, void (*handdler)(TCP
   /** Atualiza configuração */
   self->serverConfiguration->newConnectionHanddler = handdler;
 
-  console->debug(console, "Atualizado TCPServer handler\n");
+  console->debug(console, "Atualizado TCPServer handler");
   console->destroy(&console);
 
   return self;
@@ -340,7 +340,7 @@ uint16_t setPort(struct TCPServer* self, uint16_t newPort) {
   /** Atualiza configuração */
   self->serverConfiguration->port = newPort;
 
-  console->debug(console, "Atualizado porta do TCPServer\n");
+  console->debug(console, "Atualizado porta do TCPServer");
   console->destroy(&console);
 
   return self->serverConfiguration->port;
@@ -357,7 +357,7 @@ TCPServer* setContext(struct TCPServer* self, void* context) {
   /** Atualiza o contexto */
   self->serverConfiguration->context = context;
 
-  console->debug(console, "Atualizado o contexto do TCPServer\n");
+  console->debug(console, "Atualizado o contexto do TCPServer");
   console->destroy(&console);
 
   return self;
@@ -378,7 +378,7 @@ TCPServer* createTCPServer() {
   newServer->setNewConnectionHanddler = setNewConnectionHanddler;
   newServer->setContext = setContext;
 
-  console->debug(console, "Criado TCPServer\n");
+  console->debug(console, "Criado TCPServer");
   console->destroy(&console);
 
   return newServer;
@@ -391,7 +391,7 @@ TCPClient* newTCPClient(char *host, uint16_t port) {
 
   int sockeDescriptor = connectTo(host, port);
 
-  console->debug(console, "Criado TCPClient\n");
+  console->debug(console, "Criado TCPClient");
   console->destroy(&console);
 
   return newTCPConnection(sockeDescriptor);

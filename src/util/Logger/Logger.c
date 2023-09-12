@@ -25,22 +25,22 @@ loggerOptions* newLoggerOptions() {
 
 /** Envia para a saída padrão a mensagem de log */
 void debug(Logger* self, const char* logMessage) {
-  printf("%s | DEBUG : %s", self->_loggerOptions->namespace, logMessage);
+  printf("%s | DEBUG : %s\n", self->_loggerOptions->namespace, logMessage);
 }
 
 /** Envia para a saída padrão a mensagem de log */
 void info(Logger* self, const char* logMessage) {
-  printf("%s | INFO : %s", self->_loggerOptions->namespace, logMessage);
+  printf("%s | INFO : %s\n", self->_loggerOptions->namespace, logMessage);
 }
 
 /** Envia para a saída padrão a mensagem de log */
 void warn(Logger* self, const char* logMessage) {
-  printf("%s | WARN : %s", self->_loggerOptions->namespace, logMessage);
+  printf("%s | WARN : %s\n", self->_loggerOptions->namespace, logMessage);
 }
 
 /** Envia para a saída de erro a mensagem de log */
 void error(Logger* self, const char* logMessage) {
-  printf("%s | ERROR : %s", self->_loggerOptions->namespace, logMessage);
+  printf("%s | ERROR : %s\n", self->_loggerOptions->namespace, logMessage);
 }
 
 /** Extende o logger para o namespace informado */

@@ -58,8 +58,8 @@ int createAndBindSocket(uint16_t port, void (*onError)()) {
     onError();
   }
 
-  else
-    printf("Socket successfully created..\n");
+//   else
+//     printf("Socket successfully created..\n");
   bzero(&serverAddress, sizeof(serverAddress));
   
   // assign IP, PORT
@@ -75,8 +75,8 @@ int createAndBindSocket(uint16_t port, void (*onError)()) {
     onError();
   }
 
-  else
-    printf("Socket successfully binded..\n");
+//   else
+//     printf("Socket successfully binded..\n");
 
   return socketFileDescriptor;
 }

@@ -326,7 +326,7 @@ HTTPConnection* newHTTPConnection(TCPConnection* connection, RequestHeaderInfo h
   new->sendResponse = responseHTTPConnection;
   new->response = newResponse();
 
-  console->debug(console, "Criado HTTPConnection\n");
+  console->debug(console, "Criado HTTPConnection");
   console->destroy(&console);
 
   return new;
@@ -343,12 +343,12 @@ void destroyHTTPServer(HTTPServer** self) {
   console->extend(console, "HTTP");
 
   if(!(*self)) {
-    console->error(console, "Destrindo uma referencia invalida de HTTPServer\n");
+    console->error(console, "Destrindo uma referencia invalida de HTTPServer");
     console->destroy(&console);
     return;
   };
 
-  console->error(console, "Destrindo objeto HTTPServer\n");
+  console->error(console, "Destrindo objeto HTTPServer");
   console->destroy(&console);
 
   /** Destroi as configurações do servidor */
@@ -367,11 +367,11 @@ void serveHTTPServer(HTTPServer *self) {
   /** Verifica se foi definido uma função de callback */
   void* handler = self->serverConfiguration->handdler;
   if (handler == NULL) {
-    console->error(console, "Cannot serve. Handler was not set!\n");
+    console->error(console, "Cannot serve. Handler was not set!");
     return;
   }
 
-  console->debug(console, "Iniciando servidor\n");
+  console->debug(console, "Iniciando servidor");
   console->destroy(&console);
 
   /** Inicia servidor */
@@ -389,7 +389,7 @@ HTTPServer* setHTTPServerBacklogSize(HTTPServer *self, unsigned int newSize) {
   TCPServer* tcpServer = self->serverConfiguration->tcpServer;
   tcpServer->setBacklogSize(tcpServer, newSize);
 
-  console->debug(console, "Atualiza HTTPServer backlog\n");
+  console->debug(console, "Atualiza HTTPServer backlog");
   console->destroy(&console);
 
   return self;
@@ -405,7 +405,7 @@ HTTPServer* setHTTPServerPort(HTTPServer *self, uint16_t newPort) {
   TCPServer* tcpServer = self->serverConfiguration->tcpServer;
   tcpServer->setPort(tcpServer, newPort);
 
-  console->debug(console, "Atualiza HTTPServer porta\n");
+  console->debug(console, "Atualiza HTTPServer porta");
   console->destroy(&console);
 
   return self;
@@ -420,7 +420,7 @@ HTTPServer* setHTTPServerHandler(struct HTTPServer *self, void (*handdler)(HTTPC
   /** atualiza handler */
   self->serverConfiguration->handdler = handdler;
 
-  console->debug(console, "Atualiza HTTPServer handdler\n");
+  console->debug(console, "Atualiza HTTPServer handdler");
   console->destroy(&console);
 
   return self;
@@ -443,7 +443,7 @@ void dispatcher(TCPConnection* newConnection, void* context) {
 
   /** Verifica se houve erro */
   if (numberOfBytesWritten == -1) {
-    console->error(console, "Erro ao ler request!!\n");
+    console->error(console, "Erro ao ler request!!");
   }
 
   /** Garante que existe um null terminator na string */
@@ -489,7 +489,7 @@ HTTPServer* createHTTPServer() {
   new->setPort = setHTTPServerPort;
   new->setContext = setHTTPServerContext;
 
-  console->debug(console, "Criado HTTPServer\n");
+  console->debug(console, "Criado HTTPServer");
   console->destroy(&console);
 
   return new;
