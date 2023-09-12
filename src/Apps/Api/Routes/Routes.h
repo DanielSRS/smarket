@@ -6,3 +6,5 @@
 
 /** Retorna informações sobre a API */
 void about(Request* req, Response* res, void* context);
+
+void listCashiers(Request* req, Response* res, void* context);

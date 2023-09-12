@@ -10,6 +10,7 @@ int main(void) {
 
     server
         ->get("/about", about, server)
+        ->get("/cashiers/list", listCashiers, server)
         ->listen(server);
 
     server->destroy(&server);
