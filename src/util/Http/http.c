@@ -210,9 +210,11 @@ typedef struct _httpServerConfig {
   /** Conexão tcp */
   TCPServer* tcpServer;
   /** Callback function */
-  void (*handdler)(HTTPConnection *newConnection);
+  void (*handdler)(HTTPConnection *newConnection, void* context);
   /** Logger */
   Logger* logger;
+  /** Contexto */
+  void* context;
   /**
    * Destrói o objeto _httpServerConfig.
   */
@@ -241,6 +243,7 @@ static httpServerConfig* newHttpServerConfig() {
   newConfig->tcpServer = createTCPServer();
   newConfig->handdler = NULL;
   newConfig->logger = createLogger();
+  newConfig->context = NULL;
 
   return newConfig;
 }
@@ -409,7 +412,7 @@ HTTPServer* setHTTPServerPort(HTTPServer *self, uint16_t newPort) {
 }
 
 /** Configura a função de callback */
-HTTPServer* setHTTPServerHandler(struct HTTPServer *self, void (*handdler)(HTTPConnection *newConnection)) {
+HTTPServer* setHTTPServerHandler(struct HTTPServer *self, void (*handdler)(HTTPConnection *newConnection, void* context)) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
   console->extend(console, "HTTP");
@@ -456,9 +459,14 @@ void dispatcher(TCPConnection* newConnection, void* context) {
   HTTPConnection* httpcon = newHTTPConnection(newConnection, info, request);
 
   /** Chama o handler para lidar com a solicitação */
-  server->serverConfiguration->handdler(httpcon);
+  server->serverConfiguration->handdler(httpcon, server->serverConfiguration->context);
 
   console->destroy(&console);
+}
+
+/** Define o contexto */
+HTTPServer* setHTTPServerContext(void* context, struct HTTPServer* self) {
+  self->serverConfiguration->context = context;
 }
 
 HTTPServer* createHTTPServer() {
@@ -479,6 +487,7 @@ HTTPServer* createHTTPServer() {
   new->setBacklogSize = setHTTPServerBacklogSize;
   new->setNewConnectionHanddler = setHTTPServerHandler;
   new->setPort = setHTTPServerPort;
+  new->setContext = setHTTPServerContext;
 
   console->debug(console, "Criado HTTPServer\n");
   console->destroy(&console);

@@ -10,7 +10,7 @@
 #define MAX_HEADER_FIELDS 10
 
 /** Métodos http */
-typedef enum Method { GET } Method;
+typedef enum Method { GET, POST, PUT, DELETE } Method;
 
 typedef struct Request
 {
@@ -156,7 +156,11 @@ typedef struct HTTPServer
   /**
    * Define uma função para lidar com uma nova conexão
   */
-  struct HTTPServer* (*setNewConnectionHanddler)(struct HTTPServer* self, void (*handdler)(HTTPConnection* newConnection));
+  struct HTTPServer* (*setNewConnectionHanddler)(struct HTTPServer* self, void (*handdler)(HTTPConnection* newConnection, void* context));
+  /**
+   * Define uma valor ao contexto
+  */
+  struct HTTPServer* (*setContext)(void* context, struct HTTPServer* self);
   /**
    * Destrói o objeto HTTPServer
   */
