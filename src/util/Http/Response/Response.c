@@ -57,7 +57,7 @@ Response* newResponse() {
   /** Define as headers padrão */
   res->withHeader("Access-Control-Allow-Origin", "*", res);
 
-  console->debug(console, "Criando nova Response\n");
+  console->debug(console, "Criando nova Response");
 
   return res;
 }
@@ -69,14 +69,14 @@ static void destroyResponse(Response** self) {
   console->extend(console, "Response");
 
   if(!(*self)) {
-    console->error(console, "Destruindo Response, mas self é NULL\n");
+    console->error(console, "Destruindo Response, mas self é NULL");
     return; // self é null, não é possivel destruir
   }
 
   free(*self);
   *self = NULL;
 
-  console->debug(console, "Destruindo Response\n");
+  console->debug(console, "Destruindo Response");
   console->destroy(&console);
 }
 

@@ -2,6 +2,7 @@
 #include <stdio.h> // printf
 #include <stdlib.h> // malloc
 #include "../Cstrings/Cstrings.h" // duplicateString
+#include <time.h> // time_t, tm
 
 typedef struct _loggerOpt {
   alocatedCString namespace;
@@ -23,24 +24,42 @@ loggerOptions* newLoggerOptions() {
   return _newLoggerOptions;
 }
 
+alocatedCString formatTime(){
+  time_t rawtime;
+  struct tm * timeinfo;
+  
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+  
+  return formatedCString("%02d:%d:%d", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+}
+
 /** Envia para a saída padrão a mensagem de log */
 void debug(Logger* self, const char* logMessage) {
-  printf("DEBUG : %s", logMessage);
+  alocatedCString currentTime = formatTime();
+  printf("%s | %s | DEBUG : %s\n", currentTime, self->_loggerOptions->namespace, logMessage);
+  freeAlocatedCString(currentTime);
 }
 
 /** Envia para a saída padrão a mensagem de log */
 void info(Logger* self, const char* logMessage) {
-  printf("INFO : %s", logMessage);
+  alocatedCString currentTime = formatTime();
+  printf("%s | %s | INFO : %s\n", currentTime, self->_loggerOptions->namespace, logMessage);
+  freeAlocatedCString(currentTime);
 }
 
 /** Envia para a saída padrão a mensagem de log */
 void warn(Logger* self, const char* logMessage) {
-  printf("WARN : %s", logMessage);
+  alocatedCString currentTime = formatTime();
+  printf("%s | %s | WARN : %s\n", currentTime, self->_loggerOptions->namespace, logMessage);
+  freeAlocatedCString(currentTime);
 }
 
 /** Envia para a saída de erro a mensagem de log */
 void error(Logger* self, const char* logMessage) {
-  printf("ERROR : %s", logMessage);
+  alocatedCString currentTime = formatTime();
+  printf("%s | %s | ERROR : %s\n", currentTime, self->_loggerOptions->namespace, logMessage);
+  freeAlocatedCString(currentTime);
 }
 
 /** Extende o logger para o namespace informado */

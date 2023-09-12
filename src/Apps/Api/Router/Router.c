@@ -31,7 +31,7 @@ Router* addGetRoute(const char* path, void (*handler)(Request* req, Response* re
 
   /** Caso self não exista */
   if (self == NULL) {
-    console->error(console, "addGetRoute failed because self is NULL!\n");
+    console->error(console, "addGetRoute failed because self is NULL!");
     console->destroy(&console);
     return self;
   }
@@ -40,14 +40,14 @@ Router* addGetRoute(const char* path, void (*handler)(Request* req, Response* re
 
   /** Se Router foi criado de forma incorreta e não existe o grupo GET */
   if (getRoutes == NULL) {
-    console->error(console, "Malformed Router! there is no GET routes\n");
+    console->error(console, "Malformed Router! there is no GET routes");
     console->destroy(&console);
     return self;
   }
 
   /** Se os argumentos forem invalidos */
   if (path == NULL || handler == NULL) {
-    console->error(console, "passed invalid args to addGetRoute\n");
+    console->error(console, "passed invalid args to addGetRoute");
     console->destroy(&console);
     return self;
   }
@@ -68,7 +68,7 @@ Router* addPostRoute(const char* path, void (*handler)(Request* req, Response* r
 
   /** Caso self não exista */
   if (self == NULL) {
-    console->error(console, "addPostRoute failed because self is NULL!\n");
+    console->error(console, "addPostRoute failed because self is NULL!");
     console->destroy(&console);
     return self;
   }
@@ -77,14 +77,14 @@ Router* addPostRoute(const char* path, void (*handler)(Request* req, Response* r
 
   /** Se Router foi criado de forma incorreta e não existe o grupo POST */
   if (postRoutes == NULL) {
-    console->error(console, "Malformed Router! there is no POST routes\n");
+    console->error(console, "Malformed Router! there is no POST routes");
     console->destroy(&console);
     return self;
   }
 
   /** Se os argumentos forem invalidos */
   if (path == NULL || handler == NULL) {
-    console->error(console, "passed invalid args to addPostRoute\n");
+    console->error(console, "passed invalid args to addPostRoute");
     console->destroy(&console);
     return self;
   }
@@ -105,7 +105,7 @@ Router* addPutRoute(const char* path, void (*handler)(Request* req, Response* re
 
   /** Caso self não exista */
   if (self == NULL) {
-    console->error(console, "addPutRoute failed because self is NULL!\n");
+    console->error(console, "addPutRoute failed because self is NULL!");
     console->destroy(&console);
     return self;
   }
@@ -114,14 +114,14 @@ Router* addPutRoute(const char* path, void (*handler)(Request* req, Response* re
 
   /** Se Router foi criado de forma incorreta e não existe o grupo PUT */
   if (putRoutes == NULL) {
-    console->error(console, "Malformed Router! there is no PUT routes\n");
+    console->error(console, "Malformed Router! there is no PUT routes");
     console->destroy(&console);
     return self;
   }
 
   /** Se os argumentos forem invalidos */
   if (path == NULL || handler == NULL) {
-    console->error(console, "passed invalid args to addPutRoute\n");
+    console->error(console, "passed invalid args to addPutRoute");
     console->destroy(&console);
     return self;
   }
@@ -142,7 +142,7 @@ Router* addDeleteRoute(const char* path, void (*handler)(Request* req, Response*
 
   /** Caso self não exista */
   if (self == NULL) {
-    console->error(console, "addDeleteRoute failed because self is NULL!\n");
+    console->error(console, "addDeleteRoute failed because self is NULL!");
     console->destroy(&console);
     return self;
   }
@@ -151,14 +151,14 @@ Router* addDeleteRoute(const char* path, void (*handler)(Request* req, Response*
 
   /** Se Router foi criado de forma incorreta e não existe o grupo DELETE */
   if (deleteRoutes == NULL) {
-    console->error(console, "Malformed Router! there is no DELETE routes\n");
+    console->error(console, "Malformed Router! there is no DELETE routes");
     console->destroy(&console);
     return self;
   }
 
   /** Se os argumentos forem invalidos */
   if (path == NULL || handler == NULL) {
-    console->error(console, "passed invalid args to addDeleteRoute\n");
+    console->error(console, "passed invalid args to addDeleteRoute");
     console->destroy(&console);
     return self;
   }
