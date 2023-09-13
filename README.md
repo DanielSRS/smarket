@@ -1,6 +1,16 @@
 # smart-supermarket
 
-Configuração do ambiente de desenvolvimento:
+## Tabela de Conteúdo
+
+- [Tabela de Conteúdo](#tabela-de-conte%C3%BAdo)
+- [Sobre o Projeto](#sobre-o-projeto)
+
+## Sobre o Projeto
+
+O prjeto consite de um protótipo de caixa de supermercado inteligente usando RFID. O objetivo é melhorar a experiência do cliente, reduzir os tempos de espera e otimizar as operações do supermercado. O sistema deve ser implementado usando uma arquitetura de Nuvem IoT centralizada, contêineres Docker, API REST e Raspberry Pi. Além da interação com clientes através dos caixas, devem estar presentes também funções adiministrativas para gerenciamentos dos caixas, das compras e de estoque.
+
+
+## Configuração do ambiente de desenvolvimento:
 
 Ubuntu:
 ``` bash
