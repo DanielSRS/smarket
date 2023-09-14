@@ -121,5 +121,8 @@ Map* initializeDatabase() {
   /** Produtos */
   initProductTable(database);
 
+  /** ItensCompra */
+  initItensCompraTable(database);
+
   return database;
 }

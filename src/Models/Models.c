@@ -16,6 +16,11 @@ Purchase newPurchase(char* CompraID, char* CaixaID, int DataHoraInicio, int Data
 Purchase copyPurchase(Purchase toBeCopied);
 void initPurchasesTable(Map* database);
 
+/** ItenCompra */
+ItenCompra newItensCompra(char* ItemCompraID, char* CompraID, char* ProdutoID, int Quantidade, double PrecoUnitario);
+ItenCompra copyItensCompra(ItenCompra toBeCopied);
+void initItensCompraTable(Map* database);
+
 
 Product newProduct(char* ProdutoID, char* NomeProduto, char* Descricao, double Preco, int QuantidadeEmEstoque) {
   Product product = newMap();
@@ -127,5 +132,46 @@ Cashier copyCashier(Cashier toBeCopied) {
 void initCashierTable(Map* database) {
   /** Produtos */
   Map* Caixas = database->nest(database, "Cashier");
+}
+
+//-----
+
+/** Cria novo ItenCompra */
+ItenCompra newItensCompra(char* ItemCompraID, char* CompraID, char* ProdutoID, int Quantidade, double PrecoUnitario) {
+  ItenCompra itensCompra = newMap();
+
+  itensCompra
+    ->setString(itensCompra, "ItemCompraID", ItemCompraID)
+    ->setString(itensCompra, "CompraID", CompraID)
+    ->setString(itensCompra, "ProdutoID", ProdutoID)
+    ->setNumber(itensCompra, "Quantidade", (double) Quantidade)
+    ->setNumber(itensCompra, "PrecoUnitario", PrecoUnitario);
+
+  return itensCompra;
+}
+
+/** Copia os dados de um ItenCompra */
+ItenCompra copyItensCompra(ItenCompra toBeCopied) {
+  alocatedCString ItemCompraID = (alocatedCString) toBeCopied->get(toBeCopied, "ItemCompraID");
+  alocatedCString CompraID = (alocatedCString) toBeCopied->get(toBeCopied, "CompraID");
+  alocatedCString ProdutoID = (alocatedCString) toBeCopied->get(toBeCopied, "ProdutoID");
+  double Quantidade = *((double*) toBeCopied->get(toBeCopied, "Quantidade"));
+  double PrecoUnitario = *((double*) toBeCopied->get(toBeCopied, "PrecoUnitario"));
+
+  ItenCompra itensCompra = newItensCompra(
+    ItemCompraID,
+    CompraID,
+    ProdutoID,
+    Quantidade,
+    PrecoUnitario
+  );
+
+  return itensCompra;
+}
+
+/** Inicia a tabela de ItenCompra */
+void initItensCompraTable(Map* database) {
+  /** ItenCompra */
+  Map* itensCompra = database->nest(database, ITENS_COMPRA_TABLE_NAME);
 }
 

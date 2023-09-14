@@ -6,6 +6,7 @@
 #include <time.h> // time_t, time
 
 double currentTime();
+Product _getProductByID(char* ProductID, void* context);
 
 /** Api */
 void about(Request* req, Response* res, void* context);
@@ -416,14 +417,14 @@ void createPurchase(Request* req, Response* res, void* context) {
   if (caixa == NULL) {
     console->error(console, "Caixa não existe!");
     Map* data = newMap();
-    List* errors = newList();
+    Map* errors = newMap();
 
-    errors->pushString(errors, "CaixaID não pertence a nenhum caixa cadastrado!");
+    errors->setString(errors, "0", "CaixaID não pertence a nenhum caixa cadastrado!");
 
-    data->setMap(data, "errors", (Map*) errors->_map);
-    errors->_map->setString((Map*) errors->_map, "length", intToCString(errors->length(errors)));
-    errors->_map = newMap();
-    errors->destroy(&errors);
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
 
     res
       ->withStatusCode(400, res)
@@ -574,6 +575,224 @@ void getAllCashierPurchases(Request* req, Response* res, void* context) {
 
   console->info(console, "Listado todas as compras");
   console->destroy(&console);
+}
+
+/** Atualiza uma compra com itens */
+void addItensToPurchase(Request* req, Response* res, void* context) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "Routes[addItensToPurchase]");
+
+  console->debug(console, "Adicionando produtos à compra...");
+
+  /** Compra onde serão adicionados os itens */
+  char* CompraID = (char*) req->data->get(req->data, "CompraID");
+  Map* itens = (Map*) req->data->get(req->data, "itens");
+
+  boolean isInvalid = CompraID == NULL || itens == NULL;
+
+  /** Se alguem for nulo */
+  if (isInvalid) {
+    console->warn(console, "Tentando atualizar uma compra com dados invalidos");
+    Map* data = newMap();
+    Map* errors = newMap();
+
+    /** Lista os erros */
+    if (CompraID == NULL)
+      errors->setString(errors, "0", "CompraID é requerido e deve ser uma string");
+    if (itens == NULL)
+      errors->setString(errors, "1", "itens é requerido e deve ser um Objeto não vazio");
+
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
+
+    res
+      ->withStatusCode(400, res)
+      ->withStatusMessage("Bad Request", res)
+      ->withJSON(res)
+      ->addStringToJson("sucess", "false", res)
+      ->addObjectToJson("data", data, res)
+      ->addStringToJson("message", "Erro ao atualizar compra. Dados inválidos", res);
+    
+    console->destroy(&console);
+    return;
+  }
+
+  console->debug(console, "Dados validados");
+
+  /** Global state */
+  Map* appState = (Map*) context;
+
+  /** Banco de dados */
+  Map* database = appState->get(appState, "db");
+  Map* Compras = database->get(database, PURCHASE_TABLE_NAME);
+  Map* Produtos = database->get(database, PRODUCTS_TABLE_NAME);
+  Map* ItensCompra = database->get(database, ITENS_COMPRA_TABLE_NAME);
+
+  if (Compras == NULL)
+    console->error(console, "Tabela de Compras não existe");
+  if (Produtos == NULL)
+    console->error(console, "Tabela de Produtos não existe");
+  if (ItensCompra == NULL)
+    console->error(console, "Tabela de ItensCompra não existe");
+
+  int ComprasCount = Compras->length;
+  /** Busca a compra */
+  Purchase compra = (Purchase) Compras->get(Compras, CompraID);
+
+  /** Se a compra não existe */
+  if (compra == NULL) {
+    console->error(console, "Compra não existe!");
+    Map* data = newMap();
+    Map* errors = newMap();
+
+    errors->setString(errors, "0", "CompraID não pertence a nenhuma compra iniciada!");
+
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
+
+    res
+      ->withStatusCode(400, res)
+      ->withStatusMessage("Bad Request", res)
+      ->withJSON(res)
+      ->addStringToJson("sucess", "false", res)
+      ->addObjectToJson("data", data, res)
+      ->addStringToJson("message", "Erro ao atualizar compra. Dados inválidos", res);
+    
+    console->destroy(&console);
+    return;
+  }
+
+  /** Resposta para o cliente */
+  Map* responseData = newMap();
+  Map* responseItensCompra = responseData->nest(responseData, "itens");
+  
+  char* len = (char*) itens->get(itens, "length");
+  int length = len ? atoi(len) : 0;
+  double valorTotal = 0;
+
+  /** Se os ids dos produtos não forem enviados */
+  if (len == NULL || length <= 0) {
+    console->error(console, "Quantidade de itens não informada!");
+    Map* data = newMap();
+    Map* errors = newMap();
+
+    errors->setString(errors, "0", "itens.length deve existir. Deve ser uma string com valor numérico maior que 0!");
+
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
+
+    res
+      ->withStatusCode(400, res)
+      ->withStatusMessage("Bad Request", res)
+      ->withJSON(res)
+      ->addStringToJson("sucess", "false", res)
+      ->addObjectToJson("data", data, res)
+      ->addStringToJson("message", "Erro ao atualizar compra. Dados inválidos", res);
+    
+    console->destroy(&console);
+    return;
+  }
+
+  Product cart[length];
+
+  /** Verifica se os itens no carrinho são validos */
+  for (int i = 0; i < length; i++) {
+    alocatedCString key = intToCString(i);
+    char* id = itens->get(itens, key);
+    if (id == NULL) {
+      res
+        ->withStatusCode(400, res)
+        ->withStatusMessage("Bad Request", res)
+        ->withJSON(res)
+        ->addStringToJson("sucess", "false", res)
+        // ->addObjectToJson("data", data, res)
+        ->addStringToJson("message", "Erro ao atualizar compra. Dados inválidos (Lista incompleta)", res);
+      
+      return;
+    }
+    Product prodCopy = _getProductByID(id, context);
+    if (prodCopy == NULL) {
+      res
+        ->withStatusCode(400, res)
+        ->withStatusMessage("Bad Request", res)
+        ->withJSON(res)
+        ->addStringToJson("sucess", "false", res)
+        // ->addObjectToJson("data", data, res)
+        ->addStringToJson("message", "Erro ao atualizar compra. Dados inválidos (Produto não existe)", res);
+      return;
+    }
+    cart[i] = prodCopy;
+    freeAlocatedCString(key);
+  }
+
+  /** Relaciona os itens com a compra */
+  for (int i = 0; i< length; i++) {                             
+    alocatedCString key = intToCString(i);                                  // indice da lista de resposta
+    Product prod = cart[i];                                                 // Produto associado na compra
+    char* prodID = prod->get(prod, "ProdutoID");
+    alocatedCString novoItemID = formatedCString("%s%s", CompraID, prodID); // Chave primária da tabela ItensCompra 
+    double productPrice = *((double*) prod->get(prod, "Preco"));            // preço do produto
+    ItenCompra novoItem = newItensCompra(novoItemID, CompraID, prodID, 1, productPrice);    // cria novo item
+    ItensCompra->setMap(ItensCompra, novoItemID, novoItem);                 // Coloca na tabela itens compra
+
+    // Faz compia do novo item para mandar para o cliente. Não pode ser o novo item, pq o item é destruído apos o envio
+    ItenCompra copia = copyItensCompra(novoItem);
+    copia->setMap(copia, "Produto", prod);                                // prod já é uma cópia, então não tem problema aninhar
+    responseItensCompra->setMap(responseItensCompra, key, copia);
+
+    /** atualiza o valor total */
+    valorTotal += productPrice;
+
+    freeAlocatedCString(novoItemID);
+    freeAlocatedCString(key);
+  }
+
+  // responseData->setMap(responseData, "purchase", copyPurchase(novaCompra));
+  responseData->setNumber(responseData, "valorTotal", valorTotal);
+
+  res
+    ->withStatusCode(200, res)
+    ->withStatusMessage("OK", res)
+    ->withJSON(res)
+    ->addStringToJson("sucess", "true", res)
+    ->addObjectToJson("data", responseData, res)
+    ->addStringToJson("message", "Compra atualizada com sucesso", res);
+  
+  // alocatedCString logMessage = formatedCString("Compra iniciada no caixa: %s", CaixaID);
+  console->info(console, "Checkout atualizado com produtos");
+  console->destroy(&console);
+  // freeAlocatedCString(logMessage);
+}
+
+
+/** Returns a product copy*/
+Product _getProductByID(char* ProductID, void* context) {
+  /** Global state */
+  Map* appState = (Map*) context;
+
+  /** Banco de dados */
+  Map* database = appState->get(appState, "db");
+  Map* Produtos = database->get(database, PRODUCTS_TABLE_NAME);   // tabela de caixas
+  char** keys = Produtos->getKeys(Produtos);
+  int numberOfProdutos = Produtos->length;
+
+  Map* product = NULL;
+  for (int i = 0; i < numberOfProdutos; i++) {
+    product = Produtos->get(Produtos, keys[i]);
+    if (isEquals(ProductID, (char*) product->get(product, "ProdutoID"))) {
+      return copyProduct((Product) product);
+    }
+    product = NULL;
+  }
+
+  return product;
 }
 
 
