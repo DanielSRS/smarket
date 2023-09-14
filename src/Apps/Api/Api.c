@@ -11,6 +11,7 @@ int main(void) {
     server
         ->get("/about", about, server)
         ->get("/cashiers", listCashiers, server)
+        ->get("/cashier/purchases", getAllCashierPurchases, server)
         ->post("/cashiers", createCashier, server)
         ->get("/purchases", getAllPurchases, server)
         ->get("/products", getAllProducts, server)

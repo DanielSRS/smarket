@@ -4,6 +4,7 @@
 #define PRODUCT_H
 
 #define PURCHASE_TABLE_NAME "Purchases"
+#define CASHIER_TABLE_NAME "Cashier"
 
 typedef Map* Product;
 typedef Map* Cashier;

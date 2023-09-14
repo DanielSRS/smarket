@@ -19,3 +19,5 @@ void getAllProducts(Request* req, Response* res, void* context);
 void createProduct(Request* req, Response* res, void* context);
 
 void createPurchase(Request* req, Response* res, void* context);
+
+void getAllCashierPurchases(Request* req, Response* res, void* context);

@@ -16,6 +16,7 @@ void getAllPurchases(Request* req, Response* res, void* context);
 /** Caixas */
 void listCashiers(Request* req, Response* res, void* context);
 void createCashier(Request* req, Response* res, void* context);
+void getAllCashierPurchases(Request* req, Response* res, void* context);
 
 /** Produtos */
 void getAllProducts(Request* req, Response* res, void* context);
@@ -458,6 +459,120 @@ void createPurchase(Request* req, Response* res, void* context) {
   console->destroy(&console);
   freeAlocatedCString(logMessage);
 }
+
+/** retorna a lista de compras realizadas em um caixa */
+void getAllCashierPurchases(Request* req, Response* res, void* context) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "Routes[getAllCashierPurchases]");
+
+  /** Caixa das compras */
+  char* CaixaID = (char*) req->data->get(req->data, "CaixaID");
+
+  boolean isInvalid = CaixaID == NULL;
+
+  /** Se alguem for nulo */
+  if (isInvalid) {
+    console->warn(console, "Tentando buscar registros de compras com dados invalidos");
+    Map* data = newMap();
+    Map* errors = newMap();
+
+    /** Lista os erros */
+    if (CaixaID == NULL)
+      errors->setString(errors, "0", "CaixaID é requerido e deve ser uma string");
+
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
+    res
+      ->withStatusCode(400, res)
+      ->withStatusMessage("Bad Request", res)
+      ->withJSON(res)
+      ->addStringToJson("sucess", "false", res)
+      ->addObjectToJson("data", data, res)
+      ->addStringToJson("message", "Erro ao listar compras neste caixa. Dados inválidos", res);
+    
+    console->destroy(&console);
+    return;
+  }
+
+  console->debug(console, "Dados validados");
+
+  /** Global state */
+  Map* appState = (Map*) context;
+
+  /** Banco de dados */
+  Map* database = appState->get(appState, "db");
+  Map* Purchases = database->get(database, PURCHASE_TABLE_NAME);   // tabela de caixas
+  Map* Caixas = database->get(database, CASHIER_TABLE_NAME);
+
+  if (Purchases == NULL)
+    console->error(console, "Purchases table do not exist!!");
+  if (Caixas == NULL)
+    console->error(console, "Tabela de caixas não existe!!");
+  
+  char** keys = Purchases->getKeys(Purchases);
+  int numberOfPurchases = Purchases->length;
+
+  /** Busca o caixa onde estão sendo feitas as compras */
+  Cashier caixa = (Cashier) Caixas->get(Caixas, CaixaID);
+
+  /** Se o caixa não existe */
+  if (caixa == NULL) {
+    console->error(console, "Caixa não existe!");
+    Map* data = newMap();
+    Map* errors = newMap();
+
+    errors->setString(errors, "0", "CaixaID não pertence a nenhum caixa cadastrado!");
+
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
+
+    res
+      ->withStatusCode(400, res)
+      ->withStatusMessage("Bad Request", res)
+      ->withJSON(res)
+      ->addStringToJson("sucess", "false", res)
+      ->addObjectToJson("data", data, res)
+      ->addStringToJson("message", "Erro ao buscar registros de compra. Dados inválidos", res);
+    
+    console->destroy(&console);
+    return;
+  }
+
+
+  /** Para enviar ao cliente */
+  Map* responseData = newMap();
+  Map* responsePurchases = responseData->nest(responseData, "Purchases");
+
+  int count = 0;
+  for (int i = 0; i < numberOfPurchases; i++) {
+    alocatedCString key = intToCString(i);
+    Map* purchase = Purchases->get(Purchases, keys[i]);
+    if (isEquals(CaixaID, (char*) purchase->get(purchase, "CaixaID"))) {
+      responsePurchases->setMap(responsePurchases, key, copyPurchase(purchase));
+      count++;
+    }
+    freeAlocatedCString(key);
+  }
+
+  responsePurchases->setString(responsePurchases, "length", intToCString(count));
+
+  res
+    ->withStatusCode(200, res)
+    ->withStatusMessage("OK", res)
+    ->withJSON(res)
+    ->addStringToJson("sucess", "true", res)
+    ->addObjectToJson("data", responseData, res)
+    ->addStringToJson("message", "Lista de todas as compras retornadas com sucesso", res);
+
+  console->info(console, "Listado todas as compras");
+  console->destroy(&console);
+}
+
 
 /**
  * Obtem a hora atual
