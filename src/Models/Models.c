@@ -11,6 +11,11 @@ Cashier newCashier(char* CaixaID, char* Nome, char* Descricao);
 Cashier copyCashier(Cashier toBeCopied);
 void initCashierTable(Map* database);
 
+/** Compras */
+Purchase newPurchase(char* CompraID, char* CaixaID, int DataHoraInicio, int DataHoraFim, double TotalCompra);
+Purchase copyPurchase(Purchase toBeCopied);
+void initPurchasesTable(Map* database);
+
 
 Product newProduct(char* ProdutoID, char* NomeProduto, char* Descricao, double Preco, int QuantidadeEmEstoque) {
   Product product = newMap();
@@ -47,6 +52,45 @@ Product copyProduct(Product toBeCopied) {
 void initProductTable(Map* database) {
   /** Produtos */
   Map* Produtos = database->nest(database, "Produtos");
+}
+
+//-----
+
+/** Cria nova compra */
+Purchase newPurchase(char* CompraID, char* CaixaID, int DataHoraInicio, int DataHoraFim, double TotalCompra) {
+  Purchase purchase = newMap();
+
+  purchase
+    ->setString(purchase, "CompraID", CompraID)
+    ->setString(purchase, "CaixaID", CaixaID)
+    ->setNumber(purchase, "DataHoraInicio", DataHoraInicio)
+    ->setNumber(purchase, "DataHoraFim", DataHoraFim)
+    ->setNumber(purchase, "TotalCompra", TotalCompra);
+
+  return purchase;
+}
+
+/** Copia os dados de um caixa */
+Purchase copyPurchase(Purchase toBeCopied) {
+  alocatedCString CompraID = (alocatedCString) toBeCopied->get(toBeCopied, "CompraID");
+  alocatedCString CaixaID = (alocatedCString) toBeCopied->get(toBeCopied, "CaixaID");
+  double DataHoraInicio = *((double*) toBeCopied->get(toBeCopied, "DataHoraInicio"));
+  double DataHoraFim = *((double*) toBeCopied->get(toBeCopied, "DataHoraFim"));
+  double TotalCompra = *((double*) toBeCopied->get(toBeCopied, "TotalCompra"));
+
+  return newPurchase(
+    CompraID,
+    CaixaID,
+    DataHoraInicio,
+    DataHoraFim,
+    TotalCompra
+  );
+}
+
+/** Inicia a tabela de caixa */
+void initPurchasesTable(Map* database) {
+  /** Produtos */
+  Map* Caixas = database->nest(database, "Purchases");
 }
 
 //-----

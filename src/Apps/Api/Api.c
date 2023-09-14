@@ -15,6 +15,7 @@ int main(void) {
         ->get("/purchases/all", getAllPurchases, server)
         ->get("/products", getAllProducts, server)
         ->post("/products", createProduct, server)
+        ->post("/checkout", createPurchase, server)
         ->listen(server);
 
     server->destroy(&server);

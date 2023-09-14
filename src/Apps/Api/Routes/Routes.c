@@ -3,6 +3,9 @@
 #include <stdlib.h> // NULL
 #include "../../../Models/Models.h" // Product, copyProduct
 #include "../../../util/Logger/Logger.h"
+#include <time.h> // time_t, time
+
+double currentTime();
 
 /** Api */
 void about(Request* req, Response* res, void* context);
@@ -17,6 +20,9 @@ void createCashier(Request* req, Response* res, void* context);
 /** Produtos */
 void getAllProducts(Request* req, Response* res, void* context);
 void createProduct(Request* req, Response* res, void* context);
+
+/** Compras */
+void createPurchase(Request* req, Response* res, void* context);
 
 
 
@@ -329,4 +335,125 @@ void createProduct(Request* req, Response* res, void* context) {
   console->destroy(&console);
 
   return;
+}
+
+/** Inicia uma nova compra */
+void createPurchase(Request* req, Response* res, void* context) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "Routes[createPurchase]");
+
+  console->debug(console, "Iniciando nova compra...");
+
+  /** Caixa onde a compra esta sendo feita */
+  char* CaixaID = (char*) req->data->get(req->data, "CaixaID");
+
+  boolean isInvalid = CaixaID == NULL;
+
+  /** Se alguem for nulo */
+  if (isInvalid) {
+    console->warn(console, "Tentando registrar compra com dados invalidos");
+    Map* data = newMap();
+    List* errors = newList();
+
+    /** Lista os erros */
+    if (CaixaID == NULL)
+      errors->pushString(errors, "CaixaID é requerido e deve ser uma string");
+
+    data->setMap(data, "errors", (Map*) errors->_map);
+    errors->_map->setString((Map*) errors->_map, "length", intToCString(errors->length(errors)));
+    errors->_map = newMap();
+    errors->destroy(&errors);
+
+    res
+      ->withStatusCode(400, res)
+      ->withStatusMessage("Bad Request", res)
+      ->withJSON(res)
+      ->addStringToJson("sucess", "false", res)
+      ->addObjectToJson("data", data, res)
+      ->addStringToJson("message", "Erro ao registrar nova compra. Dados inválidos", res);
+    
+    console->destroy(&console);
+    return;
+  }
+
+  console->debug(console, "Dados validados");
+
+  /** Global state */
+  Map* appState = (Map*) context;
+
+  /** Banco de dados */
+  Map* database = appState->get(appState, "db");
+  Map* Compras = database->get(database, "Purchases");   // tabela de caixas
+  Map* Caixas = database->get(database, "Cashier");   // tabela de caixas
+
+  if (Compras == NULL)
+    console->error(console, "Tabela de Compras não existe");
+  if (Caixas == NULL)
+    console->error(console, "Tabela de Caixas não existe");
+
+  int ComprasCount = Compras->length;
+  /** Busca o caixa onde esta sendo feita a compra */
+  Cashier caixa = (Cashier) Caixas->get(Caixas, CaixaID);
+
+  /** Se o caixa não existe */
+  if (caixa == NULL) {
+    console->error(console, "Caixa não existe!");
+    Map* data = newMap();
+    List* errors = newList();
+
+    errors->pushString(errors, "CaixaID não pertence a nenhum caixa cadastrado!");
+
+    data->setMap(data, "errors", (Map*) errors->_map);
+    errors->_map->setString((Map*) errors->_map, "length", intToCString(errors->length(errors)));
+    errors->_map = newMap();
+    errors->destroy(&errors);
+
+    res
+      ->withStatusCode(400, res)
+      ->withStatusMessage("Bad Request", res)
+      ->withJSON(res)
+      ->addStringToJson("sucess", "false", res)
+      ->addObjectToJson("data", data, res)
+      ->addStringToJson("message", "Erro ao registrar nova compra. Dados inválidos", res);
+    
+    console->destroy(&console);
+    return;
+  }
+
+  /** Resposta para o cliente */
+  Map* responseData = newMap();
+
+  /** Se caixa em compra/se caixa já logado? */
+
+  alocatedCString CompraID = intToCString(ComprasCount);
+  
+  Purchase novaCompra = newPurchase(CompraID, CaixaID, currentTime(), 0, -1);
+  Compras->setMap(Compras, CompraID, novaCompra);
+
+  responseData->setMap(responseData, "purchase", copyPurchase(novaCompra));
+
+  res
+    ->withStatusCode(200, res)
+    ->withStatusMessage("OK", res)
+    ->withJSON(res)
+    ->addStringToJson("sucess", "true", res)
+    ->addObjectToJson("data", responseData, res)
+    ->addStringToJson("message", "Compra iniciada com sucesso", res);
+  
+  alocatedCString logMessage = formatedCString("Compra iniciada no caixa: %s", CaixaID);
+  console->info(console, logMessage);
+  console->destroy(&console);
+  freeAlocatedCString(logMessage);
+}
+
+/**
+ * Obtem a hora atual
+*/
+double currentTime(){
+  time_t rawtime;
+  
+  time(&rawtime);
+  
+  return (double) rawtime;
 }
