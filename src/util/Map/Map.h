@@ -63,6 +63,7 @@ typedef struct Map
    */
   struct Map*(*setMap)(struct Map* self, char* key, struct Map* value);
   struct Map*(*setList)(struct Map* self, char* key, void* value);
+  struct Map* (*setNumber)(struct Map* self, char* key, double value);
   /**
    * Adiciona uma nova chave cujo valor é um novo outro Map
    * 

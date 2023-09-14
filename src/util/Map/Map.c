@@ -7,6 +7,7 @@
 #define STRING_OBJECT "__String__"
 #define ANY_OBJECT "__Any__"
 #define LIST_OBJECT "__List__"
+#define NUMBER_OBJECT "__Number__"
 
 
 alocatedCString htttpHeadersCString(Map* self);
@@ -15,6 +16,7 @@ alocatedCString mapToJsonString(Map* self);
 alocatedCString listToJsonString(List* self);
 Map *nestList(Map* self, char* key);
 Map *setList(Map* self, char* key, void* value);
+Map *setNumber(Map* self, char* key, double value);
 int listPushMap(List *self, Map *value);
 
 boolean _hasElementInAMap(Map* self, char* key) {
@@ -42,6 +44,7 @@ boolean _deleteElementInAMap(Map* self, char* key) {
     boolean isItemAnMap = isEquals(itemsInTheMap->type, MAP_OBJECT);
     boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
     boolean isList = isEquals(itemsInTheMap->type, LIST_OBJECT);
+    boolean isNumber = isEquals(itemsInTheMap->type, NUMBER_OBJECT);
 
     /**
      * Se o valor do item for um mapa aninhado, limpa todas
@@ -56,6 +59,11 @@ boolean _deleteElementInAMap(Map* self, char* key) {
     if (isList) {
       List* nestedList = (List*) itemsInTheMap->value;
       nestedList->destroy(&nestedList);
+    }
+    
+    /** Se for uma numero */
+    if (isNumber) {
+      free((void*) itemsInTheMap->value);
     }
 
     /**
@@ -89,6 +97,7 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       boolean isItemAnMap = isEquals(itemToDelete->type, MAP_OBJECT);
       boolean isString = isEquals(itemToDelete->type, STRING_OBJECT);
       boolean isList = isEquals(itemToDelete->type, LIST_OBJECT);
+      boolean isNumber = isEquals(itemToDelete->type, NUMBER_OBJECT);
 
       /**
        * Se o valor do item for um mapa aninhado, limpa todas
@@ -103,6 +112,11 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       if (isList) {
         List* nestedList = (List*) itemToDelete->value;
         nestedList->destroy(&nestedList);
+      }
+
+      /** Se for um numero */
+      if (isNumber) {
+        free((void*) itemToDelete->value);
       }
 
       /**
@@ -154,6 +168,14 @@ char* _mapEntryToString(MapEntry* self) {
     return buffer;
   }
 
+  /** Se o valor guardado for um numero */
+  if (isEquals(self->type, NUMBER_OBJECT)) {
+    alocatedCString buffer = NULL;
+    buffer = formatedCString("%s: %f", self->key, *((double*) self->value));
+
+    return buffer;
+  }
+
   /** Se o valor guardado for um map */
   if (isEquals(self->type, MAP_OBJECT)) {
     char *mapStringfied = ((Map *) self->value)->toString((Map *) self->value);
@@ -201,6 +223,14 @@ alocatedCString mapEntryValueToString(MapEntry* self) {
     int bufferSize = valueLenght + 1;
     char *buffer = malloc(bufferSize);
     snprintf(buffer, bufferSize, "%s", (char*) self->value);
+
+    return buffer;
+  }
+
+  /** Se o valor guardado for um numero */
+  if (isEquals(self->type, NUMBER_OBJECT)) {
+    alocatedCString buffer = NULL;
+    buffer = formatedCString("%f", *((double*) self->value));
 
     return buffer;
   }
@@ -387,6 +417,7 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
     boolean isItemAnMap = isEquals(item->type, MAP_OBJECT);
     boolean isString = isEquals(item->type, STRING_OBJECT);
     boolean isList = isEquals(item->type, LIST_OBJECT);
+    boolean isNumber = isEquals(item->type, NUMBER_OBJECT);
 
     /**
      * Se o valor do item for um mapa aninhado, limpa todas
@@ -401,6 +432,11 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
     if (isList) {
       List *nestedMap = (List*) item->value;
       nestedMap->destroy(&nestedMap);
+    }
+
+    /** Is number */
+    if (isNumber) {
+      free((void*) item->value);
     }
 
     /**
@@ -461,6 +497,7 @@ Map* newMap() {
   map->_items = NULL;
   map->nestList = nestList;
   map->setList = setList;
+  map->setNumber = setNumber;
 
   return map;
 }
@@ -593,6 +630,13 @@ alocatedCString mapEntryToJSONString(MapEntry* self) {
 
     return buffer;
   }
+  
+  /** Se o valor guardado for um numero */
+  if (isEquals(self->type, NUMBER_OBJECT)) {
+    alocatedCString buffer = formatedCString("\"%s\":%f", self->key, *((double*) self->value));
+
+    return buffer;
+  }
 
   /** Se o valor guardado for um map */
   if (isEquals(self->type, MAP_OBJECT)) {
@@ -627,6 +671,13 @@ alocatedCString listEntryToJSONString(MapEntry* self) {
   /** Se o valor guardado for uma string */
   if (isEquals(self->type, STRING_OBJECT)) {
     alocatedCString buffer = formatedCString("\"%s\"", (char*) self->value);
+
+    return buffer;
+  }
+  
+  /** Se o valor guardado for um numero */
+  if (isEquals(self->type, NUMBER_OBJECT)) {
+    alocatedCString buffer = formatedCString("%f", *((double*) self->value));
 
     return buffer;
   }
@@ -749,4 +800,10 @@ int listPushMap(List *self, Map *value) {
   return self->length(self);
 
   freeAlocatedCString(key);
+}
+
+Map* setNumber(Map* self, char* key, double value) {
+  double* valueRef = calloc(1, sizeof(double));
+  *valueRef = value;
+  return _setElementOfAMap(self, key, valueRef, NUMBER_OBJECT);
 }
