@@ -10,8 +10,8 @@ int main(void) {
 
     server
         ->get("/about", about, server)
-        ->get("/cashiers/list", listCashiers, server)
-        ->post("/cashiers/registry", registryCashier, server)
+        ->get("/cashiers", listCashiers, server)
+        ->post("/cashiers", createCashier, server)
         ->get("/purchases/all", getAllPurchases, server)
         ->get("/products", getAllProducts, server)
         ->post("/products", createProduct, server)

@@ -9,7 +9,7 @@ void about(Request* req, Response* res, void* context);
 
 void listCashiers(Request* req, Response* res, void* context);
 
-void registryCashier(Request* req, Response* res, void* context);
+void createCashier(Request* req, Response* res, void* context);
 
 /** retorna a lista de compras realizadas */
 void getAllPurchases(Request* req, Response* res, void* context);

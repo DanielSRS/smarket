@@ -4,6 +4,22 @@
 #include "../../../Models/Models.h" // Product, copyProduct
 #include "../../../util/Logger/Logger.h"
 
+/** Api */
+void about(Request* req, Response* res, void* context);
+
+/** Compras */
+void getAllPurchases(Request* req, Response* res, void* context);
+
+/** Caixas */
+void listCashiers(Request* req, Response* res, void* context);
+void createCashier(Request* req, Response* res, void* context);
+
+/** Produtos */
+void getAllProducts(Request* req, Response* res, void* context);
+void createProduct(Request* req, Response* res, void* context);
+
+
+
 /** Retorna informações sobre a API */
 void about(Request* req, Response* res, void* context) {
   Map* appState = (Map*) context;
@@ -28,68 +44,20 @@ void listCashiers(Request* req, Response* res, void* context) {
 
   /** Banco de dados */
   Map* database = appState->get(appState, "db");
-  Map* caixas = database->get(database, "cashier");   // tabela de caixas
+  Map* caixas = database->get(database, "Cashier");   // tabela de caixas
   int numberOfCashiers = caixas->length;              // quantidade de caixas na tabela
   char** keys = caixas->getKeys(caixas);
 
-  List* listaDeCaixas = newList();
-  for (int i = 0; i < numberOfCashiers; i++) {
-    listaDeCaixas->pushMap(listaDeCaixas, (Map*) caixas->get(caixas, keys[i]));
-  }
-
-  Map* data = newMap();
-  data->setList(data, "cashiers", listaDeCaixas);
-
-  res
-    ->withStatusCode(200, res)
-    ->withStatusMessage("OK", res)
-    ->withJSON(res)
-    ->addStringToJson("sucess", "true", res)
-    ->addObjectToJson("data", data, res)
-    ->addStringToJson("message", "Lista de caixas retornado com sucesso", res);
-}
-
-/** Retorna a lista dos caixas registrados */
-void registryCashier(Request* req, Response* res, void* context) {
-  /** Caixa a ser registrado */
-  char* id = (char*) req->data->get(req->data, "id");
-
-  /** Se id for nulo */
-  if (id == NULL) {
-    Map* data = newMap();
-    List* errors = newList();
-    errors->pushString(errors, "id é requerido");
-    errors->pushString(errors, "id deve ser uma string");
-    data->setList(data, "errors", errors);
-    res
-      ->withStatusCode(400, res)
-      ->withStatusMessage("Bad Request", res)
-      ->withJSON(res)
-      ->addStringToJson("sucess", "false", res)
-      ->addObjectToJson("data", data, res)
-      ->addStringToJson("message", "Erro ao registrar caixa", res);
-    
-    return;
-  }
-
-  /** Global state */
-  Map* appState = (Map*) context;
-
-  /** Banco de dados */
-  Map* database = appState->get(appState, "db");
-  Map* caixas = database->get(database, "cashier");   // tabela de caixas
-
+  /** Resposta para o cliente */
   Map* responseData = newMap();
-  Map* caixa = caixas->get(caixas, id);
+  Map* responseCashiers = responseData->nest(responseData, "Cashiers");
+  responseCashiers->setString(responseCashiers, "length", intToCString(caixas->length));
 
-  /** Se caixa ja existe */
-  if (caixa != NULL) {
-    responseData->setString(responseData, "id", (char*) caixa->get(caixa, "id"));
-  } else {
-    Map* novoCaixa = newMap();
-    novoCaixa->setString(novoCaixa, "id", id);
-    caixas->setMap(caixas, id, novoCaixa);
-    responseData->setString(responseData, "id", id);
+  for (int i = 0; i < numberOfCashiers; i++) {
+    alocatedCString key = intToCString(i);
+    Cashier caixa = (Cashier) caixas->get(caixas, keys[i]);
+    responseCashiers->setMap(responseCashiers, key, copyCashier(caixa));
+    freeAlocatedCString(key);
   }
 
   res
@@ -98,7 +66,103 @@ void registryCashier(Request* req, Response* res, void* context) {
     ->withJSON(res)
     ->addStringToJson("sucess", "true", res)
     ->addObjectToJson("data", responseData, res)
-    ->addStringToJson("message", "Caixa registrado com sucesso", res);
+    ->addStringToJson("message", "Lista de caixas retornado com sucesso", res);
+}
+
+/** Retorna a lista dos caixas registrados */
+void createCashier(Request* req, Response* res, void* context) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "Routes[createCashier]");
+
+  console->debug(console, "Criando novo caixa...");
+
+  /** Caixa a ser registrado */
+  char* CaixaID = (char*) req->data->get(req->data, "CaixaID");
+  char* Nome = (char*) req->data->get(req->data, "Nome");
+  char* Descricao = (char*) req->data->get(req->data, "Descricao");
+
+  boolean isInvalid = CaixaID == NULL
+                    || Nome == NULL
+                    || Descricao == NULL;
+
+  /** Se alguem for nulo */
+  if (isInvalid) {
+    console->warn(console, "Tentando registrar caixa com dados invalidos");
+    Map* data = newMap();
+    List* errors = newList();
+
+    /** Lista os erros */
+    if (CaixaID == NULL)
+      errors->pushString(errors, "CaixaID é requerido e deve ser uma string");
+    if (Nome == NULL)
+      errors->pushString(errors, "Nome é requerido e deve ser uma string");
+    if (Descricao == NULL)
+      errors->pushString(errors, "Descricao é requerido e deve ser uma string");
+
+    data->setMap(data, "errors", (Map*) errors->_map);
+    errors->_map->setString((Map*) errors->_map, "length", intToCString(errors->length(errors)));
+    errors->_map = newMap();
+    errors->destroy(&errors);
+
+    res
+      ->withStatusCode(400, res)
+      ->withStatusMessage("Bad Request", res)
+      ->withJSON(res)
+      ->addStringToJson("sucess", "false", res)
+      ->addObjectToJson("data", data, res)
+      ->addStringToJson("message", "Erro ao registrar caixa. Dados inválidos", res);
+    
+    console->destroy(&console);
+    return;
+  }
+
+  console->debug(console, "Dados validados");
+
+  /** Global state */
+  Map* appState = (Map*) context;
+
+  /** Banco de dados */
+  Map* database = appState->get(appState, "db");
+  Map* Caixas = database->get(database, "Cashier");   // tabela de caixas
+
+  if (Caixas == NULL)
+    console->error(console, "Tabela de caixas não existe");
+
+  Cashier caixa = (Cashier) Caixas->get(Caixas, CaixaID);
+
+  /** Resposta para o cliente */
+  Map* responseData = newMap();
+
+  /** Se caixa ja existe */
+  if (caixa != NULL) {
+    console->warn(console, "Tentando registrar um caixa que já existe");
+    /** Envia de volta */
+    responseData->setMap(responseData, "cashier", (Map*) copyCashier(caixa));
+    res
+    ->withStatusCode(409, res)
+    ->withStatusMessage("Confict", res)
+    ->withJSON(res)
+    ->addStringToJson("sucess", "false", res)
+    ->addObjectToJson("data", responseData, res)
+    ->addStringToJson("message", "Erro! Caixa já existe", res);
+
+    console->destroy(&console);
+    return;
+  }
+  
+  Map* novoCaixa = newCashier(CaixaID, Nome, Descricao);
+  Caixas->setMap(Caixas, CaixaID, novoCaixa);
+
+  responseData->setMap(responseData, "cashier", copyCashier(novoCaixa));
+
+  res
+    ->withStatusCode(200, res)
+    ->withStatusMessage("OK", res)
+    ->withJSON(res)
+    ->addStringToJson("sucess", "true", res)
+    ->addObjectToJson("data", responseData, res)
+    ->addStringToJson("message", "Caixa criado com sucesso", res);
 }
 
 /** retorna a lista de compras realizadas */
@@ -146,6 +210,7 @@ void getAllProducts(Request* req, Response* res, void* context) {
   /** vAI PRO CLIENTE */
   Map* responseData = newMap();
   Map* responseProdutos = responseData->nest(responseData, "Produtos");
+  responseProdutos->setString(responseProdutos, "length", intToCString(responseProdutos->length));
 
   for (int i = 0; i < numberOfProdutos; i++) {
     alocatedCString key = intToCString(i);
@@ -169,7 +234,7 @@ void createProduct(Request* req, Response* res, void* context) {
   Logger* console = createLogger();
   console->extend(console, "Routes[createProduct]");
 
-  /** Caixa a ser registrado */
+  /** Produto a ser registrado */
   char* ProdutoID = (char*) req->data->get(req->data, "ProdutoID");
   char* NomeProduto = (char*) req->data->get(req->data, "NomeProduto");
   char* Descricao = (char*) req->data->get(req->data, "Descricao");

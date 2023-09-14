@@ -113,9 +113,7 @@ Map* initializeDatabase() {
   Map* database = newMap();
 
   /** Caixas */
-  Map* cashier = database->nest(database, "cashier");
-  Map* caixa1 = cashier->nest(cashier, "CAIXA01");
-  caixa1->setString(caixa1, "id", "CAIXA01");
+  initCashierTable(database);
 
   /** Compras */
   Map* purchases = database->nest(database, "purchases");
