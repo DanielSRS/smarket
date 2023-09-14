@@ -51,7 +51,7 @@ void listCashiers(Request* req, Response* res, void* context) {
 
   /** Banco de dados */
   Map* database = appState->get(appState, "db");
-  Map* caixas = database->get(database, "Cashier");   // tabela de caixas
+  Map* caixas = database->get(database, CASHIER_TABLE_NAME);   // tabela de caixas
   int numberOfCashiers = caixas->length;              // quantidade de caixas na tabela
   char** keys = caixas->getKeys(caixas);
 
@@ -97,20 +97,20 @@ void createCashier(Request* req, Response* res, void* context) {
   if (isInvalid) {
     console->warn(console, "Tentando registrar caixa com dados invalidos");
     Map* data = newMap();
-    List* errors = newList();
+    Map* errors = newMap();
 
     /** Lista os erros */
     if (CaixaID == NULL)
-      errors->pushString(errors, "CaixaID é requerido e deve ser uma string");
+      errors->setString(errors, "0", "CaixaID é requerido e deve ser uma string");
     if (Nome == NULL)
-      errors->pushString(errors, "Nome é requerido e deve ser uma string");
+      errors->setString(errors, "1", "Nome é requerido e deve ser uma string");
     if (Descricao == NULL)
-      errors->pushString(errors, "Descricao é requerido e deve ser uma string");
+      errors->setString(errors, "2", "Descricao é requerido e deve ser uma string");
 
-    data->setMap(data, "errors", (Map*) errors->_map);
-    errors->_map->setString((Map*) errors->_map, "length", intToCString(errors->length(errors)));
-    errors->_map = newMap();
-    errors->destroy(&errors);
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
 
     res
       ->withStatusCode(400, res)
@@ -170,6 +170,8 @@ void createCashier(Request* req, Response* res, void* context) {
     ->addStringToJson("sucess", "true", res)
     ->addObjectToJson("data", responseData, res)
     ->addStringToJson("message", "Caixa criado com sucesso", res);
+  
+  console->destroy(&console);
 }
 
 /** retorna a lista de compras realizadas */
@@ -270,24 +272,25 @@ void createProduct(Request* req, Response* res, void* context) {
   if (isInvalid) {
     console->warn(console, "Tentando registrar produtos com dados invalidos");
     Map* data = newMap();
-    List* errors = newList();
+    Map* errors = newMap();
 
     /** Lista os erros */
     if (ProdutoID == NULL)
-      errors->pushString(errors, "ProdutoID é requerido e deve ser uma string");
+      errors->setString(errors, "0", "ProdutoID é requerido e deve ser uma string");
     if (NomeProduto == NULL)
-      errors->pushString(errors, "NomeProduto é requerido e deve ser uma string");
+      errors->setString(errors, "1", "NomeProduto é requerido e deve ser uma string");
     if (Descricao == NULL)
-      errors->pushString(errors, "Descricao é requerido e deve ser uma string");
+      errors->setString(errors, "2", "Descricao é requerido e deve ser uma string");
     if (Preco == NULL)
-      errors->pushString(errors, "Preco é requerido e deve ser uma string");
+      errors->setString(errors, "3", "Preco é requerido e deve ser uma string");
     if (QuantidadeEmEstoque == NULL)
-      errors->pushString(errors, "QuantidadeEmEstoque é requerido e deve ser uma string");
+      errors->setString(errors, "4", "QuantidadeEmEstoque é requerido e deve ser uma string");
 
-    data->setMap(data, "errors", (Map*) errors->_map);
-    errors->_map->setString((Map*) errors->_map, "length", intToCString(errors->length(errors)));
-    errors->_map = newMap();
-    errors->destroy(&errors);
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
+
     res
       ->withStatusCode(400, res)
       ->withStatusMessage("Bad Request", res)
@@ -367,16 +370,16 @@ void createPurchase(Request* req, Response* res, void* context) {
   if (isInvalid) {
     console->warn(console, "Tentando registrar compra com dados invalidos");
     Map* data = newMap();
-    List* errors = newList();
+    Map* errors = newMap();
 
     /** Lista os erros */
     if (CaixaID == NULL)
-      errors->pushString(errors, "CaixaID é requerido e deve ser uma string");
+      errors->setString(errors, "0", "CaixaID é requerido e deve ser uma string");
 
-    data->setMap(data, "errors", (Map*) errors->_map);
-    errors->_map->setString((Map*) errors->_map, "length", intToCString(errors->length(errors)));
-    errors->_map = newMap();
-    errors->destroy(&errors);
+    data->setMap(data, "errors", errors);
+    alocatedCString length = intToCString(errors->length);
+    errors->setString(errors, "length", length);
+    freeAlocatedCString(length);
 
     res
       ->withStatusCode(400, res)
