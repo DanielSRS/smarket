@@ -183,26 +183,31 @@ void dispatchRoutes(HTTPConnection* connection, void* router) {
   /** Seleciona o grupo de acordo com o metodo e encontra o handler com o path */
   switch (connection->request.method){
     case GET:
+      ; // empty statement
       Map* getRoutes = (Map*) routes->get(routes, "GET");
       handler = getRoutes->get(getRoutes, path);
       break;
 
     case POST:
+      ; // empty statement
       Map* postRoutes = (Map*) routes->get(routes, "POST");
       handler = postRoutes->get(postRoutes, path);
       break;
 
     case PUT:
+      ; // empty statement
       Map* putRoutes = (Map*) routes->get(routes, "PUT");
       handler = putRoutes->get(putRoutes, path);
       break;
 
     case DELETE:
+      ; // empty statement
       Map* deleteRoutes = (Map*) routes->get(routes, "DELETE");
       handler = deleteRoutes->get(deleteRoutes, path);
       break;
     
     default:
+      ; // empty statement
       handler = NULL;
       break;
   }
