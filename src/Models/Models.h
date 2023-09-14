@@ -3,6 +3,8 @@
 #ifndef PRODUCT_H
 #define PRODUCT_H
 
+#define PURCHASE_TABLE_NAME "Purchases"
+
 typedef Map* Product;
 typedef Map* Cashier;
 typedef Map* Purchase;

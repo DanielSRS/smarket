@@ -173,23 +173,32 @@ void createCashier(Request* req, Response* res, void* context) {
 
 /** retorna a lista de compras realizadas */
 void getAllPurchases(Request* req, Response* res, void* context) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "Routes[getAllPurchases]");
+
   /** Global state */
   Map* appState = (Map*) context;
 
   /** Banco de dados */
   Map* database = appState->get(appState, "db");
-  Map* purchases = database->get(database, "purchases");   // tabela de caixas
+  Map* Purchases = database->get(database, PURCHASE_TABLE_NAME);   // tabela de caixas
+  
+  if (Purchases == NULL)
+    console->error(console, "Purchases table do not exist!!");
+  
+  char** keys = Purchases->getKeys(Purchases);
+  int numberOfPurchases = Purchases->length;
 
+  /** Para enviar ao cliente */
   Map* responseData = newMap();
-  char** keys = purchases->getKeys(purchases);
-  int numberOfPurchases = purchases->length;
-
-  Map* responsePurchases = responseData->nest(responseData, "purchases");
+  Map* responsePurchases = responseData->nest(responseData, "Purchases");
+  responsePurchases->setString(responsePurchases, "length", intToCString(numberOfPurchases));
 
   for (int i = 0; i < numberOfPurchases; i++) {
     alocatedCString key = intToCString(i);
-    Map* purchase = purchases->get(purchases, keys[i]);
-    responsePurchases->setMap(responsePurchases, key, purchase);
+    Map* purchase = Purchases->get(Purchases, keys[i]);
+    responsePurchases->setMap(responsePurchases, key, copyPurchase(purchase));
     freeAlocatedCString(key);
   }
 
@@ -200,6 +209,9 @@ void getAllPurchases(Request* req, Response* res, void* context) {
     ->addStringToJson("sucess", "true", res)
     ->addObjectToJson("data", responseData, res)
     ->addStringToJson("message", "Lista de todas as compras retornadas com sucesso", res);
+
+  console->info(console, "Listado todas as compras");
+  console->destroy(&console);
 }
 
 /** retorna a lista de compras realizadas */
@@ -384,7 +396,7 @@ void createPurchase(Request* req, Response* res, void* context) {
 
   /** Banco de dados */
   Map* database = appState->get(appState, "db");
-  Map* Compras = database->get(database, "Purchases");   // tabela de caixas
+  Map* Compras = database->get(database, PURCHASE_TABLE_NAME);   // tabela de caixas
   Map* Caixas = database->get(database, "Cashier");   // tabela de caixas
 
   if (Compras == NULL)

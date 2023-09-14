@@ -12,7 +12,7 @@ int main(void) {
         ->get("/about", about, server)
         ->get("/cashiers", listCashiers, server)
         ->post("/cashiers", createCashier, server)
-        ->get("/purchases/all", getAllPurchases, server)
+        ->get("/purchases", getAllPurchases, server)
         ->get("/products", getAllProducts, server)
         ->post("/products", createProduct, server)
         ->post("/checkout", createPurchase, server)
