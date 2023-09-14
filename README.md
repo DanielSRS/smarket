@@ -39,6 +39,41 @@ cd smarket/build
 ./src/Apps/SensorManager/SensorManager
 ```
 
+Executando Testes:
+``` bash
+cd smarket/build
+ctest
+```
+
+## Executando sem a biblioteca MercuryApi
+
+Altere o arquivo src/libs/CMakeLists.txt
+```diff
+- add_subdirectory(MercuryApi)
++
+```
+
+Altere o arquivo src/util/ReadTags/CMakeLists.txt
+```diff
+- target_link_libraries(ReadTags Cstrings Map ReadRFIDTags)
++ target_link_libraries(ReadTags Cstrings Map)
+```
+
+Altere o arquivo src/util/ReadTags/ReadTags.c
+```diff
+Map* readTagsWithArgs(char *tmr, char *antena, Map * result) {
+  char *args[4];
+  args[0] = "readRFID";
+  args[1] = tmr;
+  args[2] = "--ant";
+  args[3] = antena;
+
+- readRFIDTags(4, args, result);
++ mockedRead(4, args, result);
+  return result;
+}
+```
+
 ## API
 
 ### Leitor
