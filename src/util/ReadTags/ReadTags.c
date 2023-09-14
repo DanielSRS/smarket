@@ -11,9 +11,11 @@ int mockedRead(int argc, char **argv,  Map * result) {
     printf("result é null\n");
     return 0;
   }
+
   for (int i = 0; i < 5; i++) {
-    alocatedCString key = intToCString(i);
-    result->setString(result, key, "rfidValue");
+    alocatedCString key = formatedCString("%s%d", "rfidValue", i);
+    result->setString(result, key, key);
+    freeAlocatedCString(key);
   }
 
   return 0;

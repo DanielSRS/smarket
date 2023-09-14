@@ -10,6 +10,14 @@ int main(void) {
 
     server
         ->get("/about", about, server)
+        ->get("/cashiers", listCashiers, server)
+        ->get("/cashier/purchases", getAllCashierPurchases, server)
+        ->post("/cashiers", createCashier, server)
+        ->get("/purchases", getAllPurchases, server)
+        ->get("/products", getAllProducts, server)
+        ->post("/products", createProduct, server)
+        ->post("/checkout", createPurchase, server)
+        ->put("/checkout", addItensToPurchase, server)
         ->listen(server);
 
     server->destroy(&server);

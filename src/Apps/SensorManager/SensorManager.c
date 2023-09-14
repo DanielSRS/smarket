@@ -4,30 +4,52 @@
 #include <stdio.h> // printf
 #include <string.h> // strlen
 
-void sendRequest(TCPClient* tcpClient);
+void readerHandler(HTTPConnection *newConnection, void *context);
+
 
 int main() {
-    TCPClient* tcpClient = newTCPClient("127.0.0.1", 3490);
-    Map *tagsList = readTags();
 
-    printf("\n\nTags lidas: \n%s", tagsList->toString(tagsList));
- 
-    // function for chat
-    sendRequest(tcpClient);
-    tcpClient->close(tcpClient);
+    HTTPServer *server = createHTTPServer();
+
+    server
+        ->setNewConnectionHanddler(server, readerHandler)
+        ->setPort(server, 3497)
+        ->serve(server);
+
+    server->destroy(&server);
 }
 
-void sendRequest(TCPClient* tcpClient) {
-    char *request = "GET /dan/niel?dfg=dsfg HTTP/1.1\
-                    \r\nHost: localhost:3492\
-                    \r\nContent-Type: application/json\
-                    \r\nUser-Agent: SensorManager/0.0.1\
-                    \r\nContent-Length: 17\
-                    \r\n\r\n{\"with\": \"tcpclient\"}";
 
-    int numberOfBytesSent = tcpClient->send(tcpClient, strlen(request), request);
-    if (numberOfBytesSent == -1)
-        perror("send");
+void readerHandler(HTTPConnection *newConnection, void *context) {
+    /** Tags lidas */
+    Map *tagsList = readTags();
+    alocatedCString tags = tagsList->toJsonString(tagsList);
 
-    printf("\nRequest sent\n\n");
+    Map* data = newMap();
+    data->setMap(data, "itens", tagsList);
+    int numberOfItens = tagsList->length;
+    alocatedCString length = intToCString(numberOfItens);
+    char** keys = tagsList->getKeys(tagsList);
+
+    Map* responseData = newMap();
+    for (int i = 0; i < numberOfItens; i++) {
+        alocatedCString key = intToCString(i);
+        responseData->setString(responseData, key, (char*) tagsList->get(tagsList, keys[i]));
+        freeAlocatedCString(key);
+    }
+
+    responseData->setString(responseData, "length", length);
+    freeAlocatedCString(length);
+
+
+    newConnection->response
+        ->withJSON(newConnection->response)
+        ->withStatusCode(200, newConnection->response)
+        ->addStringToJson("success", "true", newConnection->response)
+        ->addObjectToJson("data", responseData, newConnection->response)
+        ->addStringToJson("message", "Tags read with success", newConnection->response);
+
+    newConnection->sendResponse(newConnection);
+    newConnection->close(newConnection);
+    newConnection->destroy(&newConnection);
 }

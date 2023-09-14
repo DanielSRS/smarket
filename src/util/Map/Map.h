@@ -62,10 +62,18 @@ typedef struct Map
    * também vai ser destruído!
    */
   struct Map*(*setMap)(struct Map* self, char* key, struct Map* value);
+  struct Map*(*setList)(struct Map* self, char* key, void* value);
+  struct Map* (*setNumber)(struct Map* self, char* key, double value);
   /**
    * Adiciona uma nova chave cujo valor é um novo outro Map
+   * 
+   * @return A referencia do novo map
    */
   struct Map*(*nest)(struct Map* self, char* key);
+  /**
+   * Adiciona uma nova chave cujo valor é uma lista
+   */
+  struct Map*(*nestList)(struct Map* self, char* key);
   /** 
    * Retorna o tamanho do map. */
   const int length;
@@ -139,11 +147,16 @@ typedef struct List
    * modificar value após a inserção na lista não causa nenhum efeito
    * no dado salvo.
    */
-  int (*pushString)(struct List* self, void *value);
+  int (*pushString)(struct List* self, char *value);
+  int (*pushMap)(struct List* self, Map *value);
   /**
    * Retorna uma string com todos os valores da Lista
    */
   alocatedCString (*toString)(struct List* self);
+  /**
+   * Retorna uma json string com todos os valores da Lista
+   */
+  alocatedCString (*toJsonString)(struct List* self);
   /**
    * Destroi a lista liberando memória. Todos os itens são destruídos junto
    * com a lista, exceto os itens salvos como referencia.

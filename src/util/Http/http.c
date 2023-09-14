@@ -112,6 +112,12 @@ Request parseRequest(const char *requestBuffer, int length) {
       // printf("\nMetodo recebido: %s\n", method);
       if (isEquals("GET", method)){
         request.method = GET;
+      } else if (isEquals("POST", method)) {
+        request.method = POST;
+      } else if (isEquals("PUT", method)) {
+        request.method = PUT;
+      } else if (isEquals("DELETE", method)) {
+        request.method = DELETE;
       } else {
         request.thereWasErrors = True;
         free(method);
@@ -152,6 +158,7 @@ Request parseRequest(const char *requestBuffer, int length) {
   // printf("\nhttp version recebido: %s\n", version);
 
   request.protocolVersion = version;
+  request.destroy = destroyRequest;
 
   request.headers = newMap();
 
@@ -178,6 +185,12 @@ Request parseRequest(const char *requestBuffer, int length) {
     }
   }
 
+  /** Abre e fecha chaves + 4 aspas duplas + 1 dois pontos */
+  if (info.size + 7 >= length) {
+    request.data = newMap();
+    return request;
+  }
+
   // body starts at info.size + 1
   int offset = info.size + 1;
   if (requestBuffer[offset] == '{') {
@@ -186,8 +199,6 @@ Request parseRequest(const char *requestBuffer, int length) {
   } else {
     request.data = newMap();
   }
-
-  request.destroy = destroyRequest;
 
   return request;
 }

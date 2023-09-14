@@ -1,6 +1,7 @@
 #include "App.h"
 #include <stdlib.h> // NULL
 #include "../Router/Router.h" // Router, createRouter
+#include "../../../Models/Models.h" // initProductTable
 
 typedef struct _AppConfig
 {
@@ -17,13 +18,17 @@ App* apppost(const char* path, void (*handler)(Request* req, Response* res, void
 App* appput(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
 App* appdelete(const char* path, void (*handler)(Request* req, Response* res, void* context), struct App* self);
 void applisten(App* self);
+Map* initializeDatabase();
 
 App* createApp() {
   App* app = calloc(1, sizeof(App));
   HTTPServer* server = createHTTPServer();
   Router* router = createRouter();
+
+  /** Criando estado do app */
   Map* appState = newMap();
   appState->setString(appState, "version", "0.0.2");
+  appState->setMap(appState, "db", initializeDatabase());
 
   /** Contexto para propagar para os handlers */
   router->setContext(appState, router);
@@ -102,4 +107,22 @@ App* appdelete(const char* path, void (*handler)(Request* req, Response* res, vo
 /** Inicia servidor */
 void applisten(App* self) {
   self->config->server->serve(self->config->server);
+}
+
+Map* initializeDatabase() {
+  Map* database = newMap();
+
+  /** Caixas */
+  initCashierTable(database);
+
+  /** Compras */
+  initPurchasesTable(database);
+
+  /** Produtos */
+  initProductTable(database);
+
+  /** ItensCompra */
+  initItensCompraTable(database);
+
+  return database;
 }

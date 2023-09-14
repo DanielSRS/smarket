@@ -7,6 +7,7 @@ enable_testing()
 add_subdirectory(util)
 add_subdirectory(Apps)
 add_subdirectory(libs)
+add_subdirectory(Models)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
