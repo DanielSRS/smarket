@@ -1,6 +1,7 @@
 #include "App.h"
 #include <stdlib.h> // NULL
 #include "../Router/Router.h" // Router, createRouter
+#include "../../../Models/Models.h" // initProductTable
 
 typedef struct _AppConfig
 {
@@ -120,6 +121,9 @@ Map* initializeDatabase() {
   Map* purchases = database->nest(database, "purchases");
   Map* Purchase1 = purchases->nest(purchases, "Purchase1");
   Purchase1->setString(Purchase1, "id", "Purchase1");
+
+  /** Produtos */
+  initProductTable(database);
 
   return database;
 }

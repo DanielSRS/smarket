@@ -13,3 +13,7 @@ void registryCashier(Request* req, Response* res, void* context);
 
 /** retorna a lista de compras realizadas */
 void getAllPurchases(Request* req, Response* res, void* context);
+
+void getAllProducts(Request* req, Response* res, void* context);
+
+void createProduct(Request* req, Response* res, void* context);
