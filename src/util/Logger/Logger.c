@@ -4,6 +4,14 @@
 #include "../Cstrings/Cstrings.h" // duplicateString
 #include <time.h> // time_t, tm
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
 typedef struct _loggerOpt {
   alocatedCString namespace;
   void (*destroy)(struct _loggerOpt** self);
@@ -56,7 +64,7 @@ void debug(Logger* self, const char* logMessage) {
 void info(Logger* self, const char* logMessage) {
   logIndicator();
   alocatedCString currentTime = formatTime();
-  printf("%s | %s | INFO : %s\n", currentTime, self->_loggerOptions->namespace, logMessage);
+  printf(ANSI_COLOR_BLUE "%s | %s | INFO : %s\n" ANSI_COLOR_RESET, currentTime, self->_loggerOptions->namespace, logMessage);
   freeAlocatedCString(currentTime);
 }
 
@@ -64,7 +72,7 @@ void info(Logger* self, const char* logMessage) {
 void warn(Logger* self, const char* logMessage) {
   logIndicator();
   alocatedCString currentTime = formatTime();
-  printf("%s | %s | WARN : %s\n", currentTime, self->_loggerOptions->namespace, logMessage);
+  printf(ANSI_COLOR_YELLOW "%s | %s | WARN : %s\n" ANSI_COLOR_RESET, currentTime, self->_loggerOptions->namespace, logMessage);
   freeAlocatedCString(currentTime);
 }
 
