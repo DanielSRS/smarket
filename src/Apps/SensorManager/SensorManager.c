@@ -6,22 +6,8 @@
 
 void readerHandler(HTTPConnection *newConnection, void *context);
 
-// #define ANSI_COLOR_RED     "\x1b[31m"
-// #define ANSI_COLOR_GREEN   "\x1b[32m"
-// #define ANSI_COLOR_YELLOW  "\x1b[33m"
-// #define ANSI_COLOR_BLUE    "\x1b[34m"
-// #define ANSI_COLOR_MAGENTA "\x1b[35m"
-// #define ANSI_COLOR_CYAN    "\x1b[36m"
-// #define ANSI_COLOR_RESET   "\x1b[0m"
 
 int main() {
-
-    // printf(ANSI_COLOR_RED     "This text is RED!"     ANSI_COLOR_RESET "\n");
-    // printf(ANSI_COLOR_GREEN   "This text is GREEN!"   ANSI_COLOR_RESET "\n");
-    // printf(ANSI_COLOR_YELLOW  "This text is YELLOW!"  ANSI_COLOR_RESET "\n");
-    // printf(ANSI_COLOR_BLUE    "This text is BLUE!"    ANSI_COLOR_RESET "\n");
-    // printf(ANSI_COLOR_MAGENTA "This text is MAGENTA!" ANSI_COLOR_RESET "\n");
-    // printf(ANSI_COLOR_CYAN    "This text is CYAN!"    ANSI_COLOR_RESET "\n");
 
     HTTPServer *server = createHTTPServer();
 
@@ -35,17 +21,32 @@ int main() {
 
 
 void readerHandler(HTTPConnection *newConnection, void *context) {
+    /** Tags lidas */
     Map *tagsList = readTags();
     alocatedCString tags = tagsList->toJsonString(tagsList);
 
     Map* data = newMap();
-    data->setMap(data, "tags", tagsList);
+    data->setMap(data, "itens", tagsList);
+    int numberOfItens = tagsList->length;
+    alocatedCString length = intToCString(numberOfItens);
+    char** keys = tagsList->getKeys(tagsList);
+
+    Map* responseData = newMap();
+    for (int i = 0; i < numberOfItens; i++) {
+        alocatedCString key = intToCString(i);
+        responseData->setString(responseData, key, (char*) tagsList->get(tagsList, keys[i]));
+        freeAlocatedCString(key);
+    }
+
+    responseData->setString(responseData, "length", length);
+    freeAlocatedCString(length);
+
 
     newConnection->response
         ->withJSON(newConnection->response)
         ->withStatusCode(200, newConnection->response)
         ->addStringToJson("success", "true", newConnection->response)
-        ->addObjectToJson("data", data, newConnection->response)
+        ->addObjectToJson("data", responseData, newConnection->response)
         ->addStringToJson("message", "Tags read with success", newConnection->response);
 
     newConnection->sendResponse(newConnection);
