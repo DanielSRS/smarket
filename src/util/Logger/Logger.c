@@ -80,7 +80,7 @@ void warn(Logger* self, const char* logMessage) {
 void error(Logger* self, const char* logMessage) {
   logIndicator();
   alocatedCString currentTime = formatTime();
-  printf("%s | %s | ERROR : %s\n", currentTime, self->_loggerOptions->namespace, logMessage);
+  printf(ANSI_COLOR_RED "%s | %s | ERROR : %s\n" ANSI_COLOR_RESET, currentTime, self->_loggerOptions->namespace, logMessage);
   freeAlocatedCString(currentTime);
 }
 
