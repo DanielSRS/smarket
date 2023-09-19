@@ -56,7 +56,7 @@ Product copyProduct(Product toBeCopied) {
 
 void initProductTable(Map* database) {
   /** Produtos */
-  Map* Produtos = database->nest(database, "Produtos");
+  Map* Produtos = database->nest(database, PRODUCTS_TABLE_NAME);
 }
 
 //-----
@@ -95,7 +95,7 @@ Purchase copyPurchase(Purchase toBeCopied) {
 /** Inicia a tabela de caixa */
 void initPurchasesTable(Map* database) {
   /** Produtos */
-  Map* Caixas = database->nest(database, "Purchases");
+  Map* Caixas = database->nest(database, PURCHASE_TABLE_NAME);
 }
 
 //-----
@@ -107,7 +107,8 @@ Cashier newCashier(char* CaixaID, char* Nome, char* Descricao) {
   cashier
     ->setString(cashier, "CaixaID", CaixaID)
     ->setString(cashier, "Nome", Nome)
-    ->setString(cashier, "Descricao", Descricao);
+    ->setString(cashier, "Descricao", Descricao)
+    ->setString(cashier, "CompraAtual", "undefined");
 
   return cashier;
 }
@@ -131,7 +132,7 @@ Cashier copyCashier(Cashier toBeCopied) {
 /** Inicia a tabela de caixa */
 void initCashierTable(Map* database) {
   /** Produtos */
-  Map* Caixas = database->nest(database, "Cashier");
+  Map* Caixas = database->nest(database, CASHIER_TABLE_NAME);
 }
 
 //-----
