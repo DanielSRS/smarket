@@ -220,26 +220,43 @@ void getAllPurchases(Request* req, Response* res, void* context) {
 
 /** retorna a lista de compras realizadas */
 void getAllProducts(Request* req, Response* res, void* context) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "Routes[getAllProducts]");
+
   /** Global state */
   Map* appState = (Map*) context;
 
   /** Banco de dados */
   Map* database = appState->get(appState, "db");
+  if (!database)
+    console->error(console, "Banco de dados não existe");
   Map* Produtos = database->get(database, "Produtos");   // tabela de caixas
+  if (!Produtos)
+    console->error(console, "Tabela Produtos não existe no banco");
   char** keys = Produtos->getKeys(Produtos);
   int numberOfProdutos = Produtos->length;
+  alocatedCString length = intToCString(numberOfProdutos);
+
+  console->debug(console, "Produtos cadastrados: ");
+  console->debug(console, length);
 
   /** vAI PRO CLIENTE */
   Map* responseData = newMap();
   Map* responseProdutos = responseData->nest(responseData, "Produtos");
-  responseProdutos->setString(responseProdutos, "length", intToCString(responseProdutos->length));
+  responseProdutos->setString(responseProdutos, "length", length);
+  freeAlocatedCString(length);
 
   for (int i = 0; i < numberOfProdutos; i++) {
+    console->debug(console, "Copiando produto com a key: ");
+    console->debug(console, keys[i]);
     alocatedCString key = intToCString(i);
     Map* product = Produtos->get(Produtos, keys[i]);
     responseProdutos->setMap(responseProdutos, key, copyProduct((Product) product));
     freeAlocatedCString(key);
   }
+
+  console->debug(console, "Produtos copiados para responseData. Enviando resposta...");
 
   res
     ->withStatusCode(200, res)
@@ -248,6 +265,8 @@ void getAllProducts(Request* req, Response* res, void* context) {
     ->addStringToJson("sucess", "true", res)
     ->addObjectToJson("data", responseData, res)
     ->addStringToJson("message", "Produtos retornadas com sucesso", res);
+  
+  console->destroy(&console);
 }
 
 /** retorna a lista de compras realizadas */
