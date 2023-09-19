@@ -175,6 +175,10 @@ Router* addDeleteRoute(const char* path, void (*handler)(Request* req, Response*
 
 /** Encontra a rota */
 void dispatchRoutes(HTTPConnection* connection, void* router) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "Router[dispatchRoutes]");
+
   char* path = connection->request.path;
   Map* routes = ((Router*) router)->config->routes;
   void* routeContext = ((Router*) router)->config->context;
@@ -184,30 +188,35 @@ void dispatchRoutes(HTTPConnection* connection, void* router) {
   switch (connection->request.method){
     case GET:
       ; // empty statement
+      console->debug(console, "Método GET");
       Map* getRoutes = (Map*) routes->get(routes, "GET");
       handler = getRoutes->get(getRoutes, path);
       break;
 
     case POST:
       ; // empty statement
+      console->debug(console, "Método POST");
       Map* postRoutes = (Map*) routes->get(routes, "POST");
       handler = postRoutes->get(postRoutes, path);
       break;
 
     case PUT:
       ; // empty statement
+      console->debug(console, "Método PUT");
       Map* putRoutes = (Map*) routes->get(routes, "PUT");
       handler = putRoutes->get(putRoutes, path);
       break;
 
     case DELETE:
       ; // empty statement
+      console->debug(console, "Método DELETE");
       Map* deleteRoutes = (Map*) routes->get(routes, "DELETE");
       handler = deleteRoutes->get(deleteRoutes, path);
       break;
     
     default:
       ; // empty statement
+      console->warn(console, "Método desconhecido");
       handler = NULL;
       break;
   }
@@ -217,6 +226,8 @@ void dispatchRoutes(HTTPConnection* connection, void* router) {
 
   /** Não encontrado */
   else {
+    console->warn(console, "Rota desconhecida!");
+
     connection->response
       ->withStatusCode(404, connection->response)
       ->withStatusMessage("Not Found", connection->response)
@@ -227,9 +238,15 @@ void dispatchRoutes(HTTPConnection* connection, void* router) {
   }
 
   /** Envia a resposta e encerra a conexão */
+  console->debug(console, "Enviando resposta");
   connection->sendResponse(connection);
+  console->debug(console, "Fechando a conexão");
   connection->close(connection);
+  console->debug(console, "Destroy a conexão");
   connection->destroy(&connection);
+
+  console->debug(console, "Dispatched");
+  console->destroy(&console);
 }
 
 /** Destroi router */

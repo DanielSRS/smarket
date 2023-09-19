@@ -1,7 +1,14 @@
 #include "JsonParser.h"
 #include <stdio.h>
+#include "../Logger/Logger.h"
 
 alocatedCString parseString(int *offset, int max, const char *buffer) {
+  /** Cria um logger pra esse namespace */
+  Logger* console = createLogger();
+  console->extend(console, "JsonParser[parseString]");
+
+  console->debug(console, "Iniciando parse de string");
+
   int stringStart = *offset; // Inicia já tendo lido as " iniciais, então offset já é o primerio char da string
   alocatedCString string = NULL;
   boolean readingAControl = False;
@@ -23,6 +30,7 @@ alocatedCString parseString(int *offset, int max, const char *buffer) {
         readingAControl = False;
         continue;
       };
+      console->error(console, "Esperando um caractere de controle, mas encontrado valor desconhecido");
       exit(1);                       // Erro!!!
     }
 
@@ -48,6 +56,8 @@ alocatedCString parseString(int *offset, int max, const char *buffer) {
 
   }
 
+  console->debug(console, "string encontrada");
+  console->destroy(&console);
   return string;
 }
 
