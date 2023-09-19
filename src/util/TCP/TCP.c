@@ -115,13 +115,24 @@ int TCPConnectionSend(TCPConnection* self, int numBytes, char* buffer) {
 void TCPConnectionClose(struct TCPConnection* self) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
-  console->extend(console, "TCP");
+  console->extend(console, "TCP[TCPConnectionClose]");
 
   /** Encerrando conexão */
   int connectioSocketFileDescriptor = self->connectionInfo->connectionDescriptor;
-  close(connectioSocketFileDescriptor);
+  if (connectioSocketFileDescriptor == -1) {
+    console->debug(console, "Conexão já fechada");
+    console->destroy(&console);
+    return;
+  }
+  int result = close(connectioSocketFileDescriptor);
 
-  console->debug(console, "Fechando TCPConnection");
+  if (result == 0) {
+    console->debug(console, "Fechado TCPConnection");
+    self->connectionInfo->connectionDescriptor = -1;
+  } else {
+    console->error(console, "Erro ao encerrar TCPConnection");
+  }
+
   console->destroy(&console);
 }
 
@@ -131,7 +142,7 @@ void TCPConnectionClose(struct TCPConnection* self) {
 void destroyTCPConnection(struct TCPConnection** self) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
-  console->extend(console, "TCP");
+  console->extend(console, "TCP[destroyTCPConnection]");
 
   if(!(*self)) {
     console->error(console, "Destruindo refenrencia invalida de TCPConnection");
@@ -139,8 +150,10 @@ void destroyTCPConnection(struct TCPConnection** self) {
     return;
   }
 
+  console->debug(console, "Fechando conexão");
   (*self)->close(*self);
   
+  console->debug(console, "Destruindo connectionInfo");
   (*self)->connectionInfo->destroy(&((*self)->connectionInfo));
   
   free(*self);

@@ -125,6 +125,7 @@ void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdl
     // Loop principal para lidar com as solicitações de conexão 
     while(1) {
         // Aceita uma conexão pendente 
+        console->debug(console, "Aceita uma conexão pendente");
         connectedSocketFileDescriptor = accept(
             socketFileDescriptor,
             (struct sockaddr *)
@@ -147,6 +148,7 @@ void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdl
 
         char ip[100] = "-1.-1.-1.-1";
         char port[100] = "-1";
+        console->debug(console, "Encontrando ip e porta");
         int rc = getnameinfo((struct sockaddr*)&originConnectionAddress,
                             sin_size,
                             ip,
@@ -165,10 +167,10 @@ void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdl
 
         TCPConnection* newConnection = newTCPConnection(connectedSocketFileDescriptor, ip, port);
 
-        
-        console->destroy(&console);
         handdler(newConnection, context);
     }
+
+    console->destroy(&console);
 }
 
 int connectTo(char *host, int port) {

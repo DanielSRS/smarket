@@ -1,5 +1,5 @@
 add_library(JsonParser JsonParser.c)
-target_link_libraries(JsonParser Cstrings Map)
+target_link_libraries(JsonParser Cstrings Map Logger)
 
 
 add_executable(JsonParserTest JsonParser.test.c)

@@ -441,7 +441,7 @@ HTTPServer* setHTTPServerHandler(struct HTTPServer *self, void (*handdler)(HTTPC
 void dispatcher(TCPConnection* newConnection, void* context) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
-  console->extend(console, "HTTP");
+  console->extend(console, "HTTP[dispatcher]");
 
   /** Obtem referencia do servidor */
   HTTPServer* server = (HTTPServer*) context;
@@ -450,26 +450,32 @@ void dispatcher(TCPConnection* newConnection, void* context) {
   char buffer[1000];
 
   /** Lê os dados enviados pelo cliente */
+  console->debug(console, "Lê os dados enviados pelo cliente");
   numberOfBytesWritten = newConnection->receive(newConnection, buffer, 1000);
 
   /** Verifica se houve erro */
   if (numberOfBytesWritten == -1) {
     console->error(console, "Erro ao ler request!!");
+    numberOfBytesWritten = 0;
   }
 
   /** Garante que existe um null terminator na string */
   buffer[numberOfBytesWritten] = '\0';
 
   /** Processa a requisição */
+  console->debug(console, "Processa headers info");
   RequestHeaderInfo info = getHeadersInfo(buffer, numberOfBytesWritten);
   // IOPrintRequestHeaderInfo(info);
+  console->debug(console, "Processa a requisição");
   Request request = parseRequest(buffer, numberOfBytesWritten);
   IOPrintRequest(request);
 
   /** Cria uma nova conexão http */
+  console->debug(console, "Cria uma nova conexão http");
   HTTPConnection* httpcon = newHTTPConnection(newConnection, info, request);
 
   /** Chama o handler para lidar com a solicitação */
+  console->debug(console, "Chama o handler para lidar com a solicitação");
   server->serverConfiguration->handdler(httpcon, server->serverConfiguration->context);
 
   console->destroy(&console);
