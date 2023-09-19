@@ -7,6 +7,7 @@
 #include "../ChildProcess/childProcess.h" // handleChildProcessTermination
 #include "socket.h" //addrinfo
 #include "../Http/http.h" // RequestHeaderInfo, getHeadersInfo
+#include "../Logger/Logger.h" // Logger, createLogger
 
 #define PORT "3492"  // A porta usada para outros usuários se conectarem.
 #define SERVER_PORT 3492  // A porta usada para outros usuários se conectarem.
@@ -101,10 +102,14 @@ void *get_in_addr(struct sockaddr *sa) {
 }
 
 void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdler)(TCPConnection* newConnection, void* context), void* context, void (*onError)()) {
+    /** Cria um logger pra esse namespace */
+    Logger* console = createLogger();
+    console->extend(console, "Socket");
+    
     struct sockaddr_storage originConnectionAddress; // Informações do endereço da conexão de origem
     socklen_t sin_size = sizeof originConnectionAddress;
     int connectedSocketFileDescriptor;
-    char originIpAddress[INET6_ADDRSTRLEN];
+    // char originIpAddress[INET6_ADDRSTRLEN];
 
     handleChildProcessTermination();
 
@@ -113,7 +118,9 @@ void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdl
         onError();
     }
 
-    printf("\n\n✅ server: waiting for connections on port: %d ...\n", port);
+    alocatedCString serverStartMessage = formatedCString("\n\n✅ server: waiting for connections on port: %d ...\n", port);
+    console->info(console, serverStartMessage);
+    freeAlocatedCString(serverStartMessage);
 
     // Loop principal para lidar com as solicitações de conexão 
     while(1) {
@@ -125,22 +132,41 @@ void listenForConnections(uint16_t port, int socketFileDescriptor, void (*handdl
             &sin_size
         );
 
-        if (connectedSocketFileDescriptor == -1) { // Se falha na conexão tenta a próxima 
+        if (connectedSocketFileDescriptor == -1) { // Se falha na conexão tenta a próxima
+            console->warn(console, "Falha ao aceitar conexão pendente."); 
             perror("accept");
             continue;
         }
 
-        TCPConnection* newConnection = newTCPConnection(connectedSocketFileDescriptor);
-
         // Imprime o IP de origem da conexão 
-        inet_ntop(
-            originConnectionAddress.ss_family,
-            get_in_addr((struct sockaddr *)&originConnectionAddress),
-            originIpAddress,
-            sizeof originIpAddress);
+        // inet_ntop(
+        //     originConnectionAddress.ss_family,
+        //     get_in_addr((struct sockaddr *)&originConnectionAddress),
+        //     originIpAddress,
+        //     sizeof originIpAddress);
 
-        printf("\nserver: got connection from %s\n", originIpAddress);
+        char ip[100] = "-1.-1.-1.-1";
+        char port[100] = "-1";
+        int rc = getnameinfo((struct sockaddr*)&originConnectionAddress,
+                            sin_size,
+                            ip,
+                            sizeof(ip),
+                            port,
+                            sizeof(port),
+                            NI_NUMERICHOST | NI_NUMERICSERV);
+        
+        if (rc == -1) {
+            console->error(console, "Erro  ao obter IP e PORTA da conexão aceita!");
+        }
 
+        alocatedCString ipAndPortMessage = formatedCString("Got connection from ip: %s at port: %s\n", ip, port);
+        console->debug(console, ipAndPortMessage);
+        freeAlocatedCString(ipAndPortMessage);
+
+        TCPConnection* newConnection = newTCPConnection(connectedSocketFileDescriptor, ip, port);
+
+        
+        console->destroy(&console);
         handdler(newConnection, context);
     }
 }
