@@ -21,6 +21,10 @@ typedef struct _TCPConnectionInfo
 {
   /** Socket descriptor of the (new) connection */
   int connectionDescriptor;
+  /** Ip da conexão de origem */
+  alocatedCString ip;
+  /** Porta da conexão de origem */
+  alocatedCString port;
   /** Destrói o objeto TCPConnectionInfo */
   void (*destroy)(struct _TCPConnectionInfo** self);
 } TCPConnectionInfo;
@@ -38,6 +42,8 @@ void destroyTCPConnectionInfo(TCPConnectionInfo** self) {
     return;
   }
 
+  freeAlocatedCString((*self)->ip);
+  freeAlocatedCString((*self)->port);
   free(*self);
   *self = NULL;
 
@@ -46,7 +52,7 @@ void destroyTCPConnectionInfo(TCPConnectionInfo** self) {
 }
 
 /** Cria um novo objeto TCPConnectionInfo */
-TCPConnectionInfo* newTCPConnectionInfo(int socketDescriptor) {
+TCPConnectionInfo* newTCPConnectionInfo(int socketDescriptor, char* ip, char* port) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
   console->extend(console, "TCP");
@@ -55,6 +61,8 @@ TCPConnectionInfo* newTCPConnectionInfo(int socketDescriptor) {
 
   newConnectionInfo->connectionDescriptor = socketDescriptor;
   newConnectionInfo->destroy = destroyTCPConnectionInfo;
+  newConnectionInfo->ip = duplicateString(ip);
+  newConnectionInfo->port = duplicateString(port);
 
   console->debug(console, "Criado novo objeto TCPConnectionInfo");
   console->destroy(&console);
@@ -142,7 +150,7 @@ void destroyTCPConnection(struct TCPConnection** self) {
   console->destroy(&console);
 }
 
-TCPConnection* newTCPConnection(int socketDescriptor) {
+TCPConnection* newTCPConnection(int socketDescriptor, char* ip, char* port) {
   /** Cria um logger pra esse namespace */
   Logger* console = createLogger();
   console->extend(console, "TCP");
@@ -150,7 +158,7 @@ TCPConnection* newTCPConnection(int socketDescriptor) {
   TCPConnection* newConnection = calloc(1, sizeof(TCPConnection));
 
   newConnection->close = TCPConnectionClose;
-  newConnection->connectionInfo = newTCPConnectionInfo(socketDescriptor);
+  newConnection->connectionInfo = newTCPConnectionInfo(socketDescriptor, ip, port);
   newConnection->destroy = destroyTCPConnection;
   newConnection->receive = receive;
   newConnection->send = TCPConnectionSend;
@@ -394,5 +402,11 @@ TCPClient* newTCPClient(char *host, uint16_t port) {
   console->debug(console, "Criado TCPClient");
   console->destroy(&console);
 
-  return newTCPConnection(sockeDescriptor);
+  alocatedCString strPort = intToCString((int) port);
+
+  TCPConnection* newConnection = newTCPConnection(sockeDescriptor, "-1.-1.-1.-1", strPort);
+
+  freeAlocatedCString(strPort);
+
+  return newConnection;
 }

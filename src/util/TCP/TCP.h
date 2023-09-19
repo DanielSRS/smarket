@@ -100,7 +100,7 @@ TCPServer *createTCPServer();
  * 
  * @param socketDescriptor socket descriptor da nova conexão
 */
-TCPConnection* newTCPConnection(int socketDescriptor);
+TCPConnection* newTCPConnection(int socketDescriptor,  char* ip, char* port);
 
 /**
  * Cria um cliente TCP
