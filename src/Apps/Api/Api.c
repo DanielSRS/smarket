@@ -18,6 +18,7 @@ int main(void) {
         ->post("/products", createProduct, server)
         ->post("/checkout", createPurchase, server)
         ->put("/checkout", addItensToPurchase, server)
+        ->post("/seed", seed, server)
         ->listen(server);
 
     server->destroy(&server);
