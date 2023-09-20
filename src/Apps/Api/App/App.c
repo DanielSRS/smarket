@@ -124,5 +124,8 @@ Map* initializeDatabase() {
   /** ItensCompra */
   initItensCompraTable(database);
 
+  /** PeymentMethod */
+  initPeymentMethodTable(database);
+
   return database;
 }

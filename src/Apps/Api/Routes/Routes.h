@@ -7,6 +7,7 @@
 #include "../../../util/Http/Response/Response.h" // Response
 #include "../../../util/Http/http.h" // Request
 #include "./Seed/Seed.h"
+#include "./Payment/Payment.h"
 
 /** Retorna informações sobre a API */
 void about(Request* req, Response* res, void* context);
