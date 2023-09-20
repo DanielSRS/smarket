@@ -4,6 +4,7 @@
     "cstrings.h": "c",
     "childprocess.h": "c",
     "socket.h": "c",
-    "logger.h": "c"
+    "logger.h": "c",
+    "payment.h": "c"
   }
 }

@@ -18,6 +18,7 @@ void seed(Request* req, Response* res, void* context) {
   Map* Produtos = database->get(database, PRODUCTS_TABLE_NAME);
   Map* ItensCompra = database->get(database, ITENS_COMPRA_TABLE_NAME);
   Map* Caixas = database->get(database, CASHIER_TABLE_NAME);
+  Map* Pagamento = database->get(database, PAYMENT_METHOD_TABLE_NAME);
 
   /** Adicionando produtos */
   Product p1 = newProduct("E20000172211010118905454", "Vêrrato", "O melhor veneno de rato! É tiro e queda", 5.25, 500);
@@ -50,6 +51,12 @@ void seed(Request* req, Response* res, void* context) {
   Caixas->setMap(Caixas, "CAIXA04", c4);
   Cashier c5 = newCashier("CAIXA05", "05", "Caixa papelaria");
   Caixas->setMap(Caixas, "CAIXA05", c5);
+
+  /** Adicionando metodos de pagamento */
+  PaymentMethod pm1 = newPeymentMethod("PAYM01PIX", "Pix", "Pagamento instantaneo com pix");
+  Pagamento->setMap(Pagamento, "PAYM01PIX", pm1);
+  PaymentMethod pm2 = newPeymentMethod("PAYM02CARD", "Cartão de credito", "Pagamento com cartão de credito");
+  Pagamento->setMap(Pagamento, "PAYM02CARD", pm2);
 
   res
     ->withStatusCode(200, res)

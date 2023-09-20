@@ -21,6 +21,11 @@ ItenCompra newItensCompra(char* ItemCompraID, char* CompraID, char* ProdutoID, i
 ItenCompra copyItensCompra(ItenCompra toBeCopied);
 void initItensCompraTable(Map* database);
 
+/** PeymentMethod */
+PaymentMethod newPeymentMethod(char* metodoDePagementoID, char* nome, char* descricao);
+PaymentMethod copyPeymentMethod(PaymentMethod toBeCopied);
+void initPeymentMethodTable(Map* database);
+
 
 Product newProduct(char* ProdutoID, char* NomeProduto, char* Descricao, double Preco, int QuantidadeEmEstoque) {
   Product product = newMap();
@@ -70,6 +75,7 @@ Purchase newPurchase(char* CompraID, char* CaixaID, int DataHoraInicio, int Data
     ->setString(purchase, "CaixaID", CaixaID)
     ->setNumber(purchase, "DataHoraInicio", DataHoraInicio)
     ->setNumber(purchase, "DataHoraFim", DataHoraFim)
+    ->setString(purchase, "MTPagamentoID", "NULL")
     ->setNumber(purchase, "TotalCompra", TotalCompra);
 
   return purchase;
@@ -83,13 +89,17 @@ Purchase copyPurchase(Purchase toBeCopied) {
   double DataHoraFim = *((double*) toBeCopied->get(toBeCopied, "DataHoraFim"));
   double TotalCompra = *((double*) toBeCopied->get(toBeCopied, "TotalCompra"));
 
-  return newPurchase(
+  Purchase compra = newPurchase(
     CompraID,
     CaixaID,
     DataHoraInicio,
     DataHoraFim,
     TotalCompra
   );
+
+  compra->setString(compra, "MTPagamentoID", (char*) toBeCopied->get(toBeCopied, "MTPagamentoID"));
+
+  return compra;
 }
 
 /** Inicia a tabela de caixa */
@@ -174,5 +184,40 @@ ItenCompra copyItensCompra(ItenCompra toBeCopied) {
 void initItensCompraTable(Map* database) {
   /** ItenCompra */
   Map* itensCompra = database->nest(database, ITENS_COMPRA_TABLE_NAME);
+}
+
+//-----
+
+/** Cria novo Metodo de pagametno */
+PaymentMethod newPeymentMethod(char* metodoDePagementoID, char* nome, char* descricao) {
+  PaymentMethod metodoDePagemento = newMap();
+
+  metodoDePagemento
+    ->setString(metodoDePagemento, "metodoDePagementoID", metodoDePagementoID)
+    ->setString(metodoDePagemento, "nome", nome)
+    ->setString(metodoDePagemento, "descricao", descricao);
+
+  return metodoDePagemento;
+}
+
+/** Copia os dados de um PaymentMethod */
+PaymentMethod copyPeymentMethod(PaymentMethod toBeCopied) {
+  alocatedCString metodoDePagementoID = (alocatedCString) toBeCopied->get(toBeCopied, "metodoDePagementoID");
+  alocatedCString nome = (alocatedCString) toBeCopied->get(toBeCopied, "nome");
+  alocatedCString descricao = (alocatedCString) toBeCopied->get(toBeCopied, "descricao");
+
+  PaymentMethod metodoDePagemento = newPeymentMethod(
+    metodoDePagementoID,
+    nome,
+    descricao
+  );
+
+  return metodoDePagemento;
+}
+
+/** Inicia a tabela de PaymentMethod */
+void initPeymentMethodTable(Map* database) {
+  /** PeymentMethod */
+  Map* metodosDePagamento = database->nest(database, PAYMENT_METHOD_TABLE_NAME);
 }
 

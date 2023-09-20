@@ -775,6 +775,8 @@ void addItensToPurchase(Request* req, Response* res, void* context) {
 
   // responseData->setMap(responseData, "purchase", copyPurchase(novaCompra));
   responseData->setNumber(responseData, "valorTotal", valorTotal);
+  double* ctotalval = (double*) compra->get(compra, "TotalCompra");
+  *ctotalval = valorTotal;
 
   res
     ->withStatusCode(200, res)
