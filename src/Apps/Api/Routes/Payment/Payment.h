@@ -3,5 +3,6 @@
 #include "../Routes.h" // Request, Response, Map?
 
 void getPaymentMethods(Request* req, Response* res, void* context);
+void setPaymentMethods(Request* req, Response* res, void* context);
 
 #endif // PAYMENT_H

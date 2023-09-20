@@ -29,4 +29,6 @@ void getAllCashierPurchases(Request* req, Response* res, void* context);
 
 void addItensToPurchase(Request* req, Response* res, void* context);
 
+double currentTime();
+
 #endif // ROUTES_H

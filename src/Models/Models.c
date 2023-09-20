@@ -75,6 +75,7 @@ Purchase newPurchase(char* CompraID, char* CaixaID, int DataHoraInicio, int Data
     ->setString(purchase, "CaixaID", CaixaID)
     ->setNumber(purchase, "DataHoraInicio", DataHoraInicio)
     ->setNumber(purchase, "DataHoraFim", DataHoraFim)
+    ->setString(purchase, "MTPagamentoID", "NULL")
     ->setNumber(purchase, "TotalCompra", TotalCompra);
 
   return purchase;
@@ -88,13 +89,17 @@ Purchase copyPurchase(Purchase toBeCopied) {
   double DataHoraFim = *((double*) toBeCopied->get(toBeCopied, "DataHoraFim"));
   double TotalCompra = *((double*) toBeCopied->get(toBeCopied, "TotalCompra"));
 
-  return newPurchase(
+  Purchase compra = newPurchase(
     CompraID,
     CaixaID,
     DataHoraInicio,
     DataHoraFim,
     TotalCompra
   );
+
+  compra->setString(compra, "MTPagamentoID", (char*) toBeCopied->get(toBeCopied, "MTPagamentoID"));
+
+  return compra;
 }
 
 /** Inicia a tabela de caixa */
