@@ -1,1 +1,1 @@
-add_subdirectory(MercuryApi)
+#add_subdirectory(MercuryApi)
