@@ -152,3 +152,17 @@ TestResult expectPointersToBeEquals(const void *expected, const void *received) 
 
   return result;
 }
+
+TestResult expectDoublesToBeEquals(double expected, double received) {
+  TestResult result;
+  if (expected == received) {
+    result.errorDescription[0] = '\0';
+    result.pass = True;
+    return result;
+  }
+
+  snprintf(result.errorDescription, 100, "Expected %f but received: %f\n", expected, received);
+  result.pass = False;
+
+  return result;
+}

@@ -50,6 +50,8 @@ TestResult expectToBeTrue(const boolean value);
 
 TestResult expectStringsToBeEquals(const char *expected, const char *received);
 
+TestResult expectDoublesToBeEquals(double expected, double received);
+
 // assertNull
 // assertTrue
 // assertFalse
