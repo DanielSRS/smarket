@@ -1,5 +1,5 @@
 add_library(JsonParser JsonParser.c)
-target_link_libraries(JsonParser Cstrings Map Logger)
+target_link_libraries(JsonParser Cstrings Map Logger NumberParser)
 
 
 add_executable(JsonParserTest JsonParser.test.c)
@@ -14,6 +14,7 @@ add_test(parseBooleanValueFalseType JsonParserTest parseBooleanValueFalseType)
 add_test(parseNullType JsonParserTest parseNullType)
 add_test(parsedObjReturnsNotNull JsonParserTest parsedObjReturnsNotNull)
 add_test(parsedObjCreateCorrectMap JsonParserTest parsedObjCreateCorrectMap)
+add_test(parsedObjWithNumber JsonParserTest parsedObjWithNumber)
 add_test(parsedObjectValue JsonParserTest parsedObjectValue)
 
 add_subdirectory(NumberParser)
