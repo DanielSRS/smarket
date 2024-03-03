@@ -48,7 +48,7 @@ alocatedCString _mapEntryToString(MapEntry* self) {
 
   /** Se o valor guardado for um numero */
   if (self->type == NUMBER_ENTRY_VALUE) {
-    return formatedCString("%s: %f", self->key, *((double*) self->value));
+    return formatedCString("%s: %g", self->key, *((double*) self->value));
   }
 
   /** Se o valor guardado for um map */
@@ -89,7 +89,7 @@ alocatedCString mapEntryToJSONString(MapEntry* self) {
   
   /** Se o valor guardado for um numero */
   if (self->type == NUMBER_ENTRY_VALUE) {
-    alocatedCString buffer = formatedCString("\"%s\":%f", self->key, *((double*) self->value));
+    alocatedCString buffer = formatedCString("\"%s\":%g", self->key, *((double*) self->value));
 
     return buffer;
   }

@@ -150,7 +150,7 @@ alocatedCString mapEntryValueToString(MapEntry* self) {
 
   /** Se o valor guardado for um numero */
   if (self->type == NUMBER_ENTRY_VALUE) {
-    return formatedCString("%f", *((double*) self->value));
+    return formatedCString("%g", *((double*) self->value));
   }
 
   /** Se o valor guardado for um map */
@@ -218,7 +218,6 @@ int _lengthOfAMap(Map* self) {
   return self->length;
 }
 
-
 void destroyMap(struct Map **self) {
   if (!*self) return;
   (*self)->clear(*self);               // Apaga todos os itens
@@ -226,7 +225,6 @@ void destroyMap(struct Map **self) {
   memset(*self, 0, sizeof(Map));
   *self = NULL;
 }
-
 
 Map *_setElementOfAMap(Map* self, char* key, void* value, EntryValueType type) {
   MapEntry *newEntry = newMapEntry(
@@ -397,7 +395,6 @@ int listPushString(List *self, char *value) {
 
   free(key);
 }
-
 
 void destroyList(List **self) {
   if (!*self) return;
@@ -593,7 +590,6 @@ alocatedCString listToJsonString(List* self) {
   return newBuffer;
 }
 
-
 /** Adiciona uma lista como valor de uma chave */
 Map *nestList(Map* self, char* key) {
   List* newlist = newList();
@@ -604,7 +600,6 @@ Map *nestList(Map* self, char* key) {
 Map *setList(Map* self, char* key, void* value) {
   return _setElementOfAMap(self, key, value, LIST_ENTRY_VALUE);
 }
-
 
 int listPushMap(List *self, Map *value) {
   alocatedCString key = intToCString(self->length(self));

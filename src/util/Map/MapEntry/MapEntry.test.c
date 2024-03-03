@@ -91,7 +91,7 @@ TestResult _toJsonWithNumberValues() {
 
   char *stringRepresentation = entry->toJsonString(entry);
 
-  return expectStringsToBeEquals("\"idDaEntrada\":45.456000", stringRepresentation);
+  return expectStringsToBeEquals("\"idDaEntrada\":45.456", stringRepresentation);
 }
 
 TestResult _toStringWithNumberValues() {
@@ -99,7 +99,7 @@ TestResult _toStringWithNumberValues() {
 
   char *stringRepresentation = entry->toString(entry);
 
-  return expectStringsToBeEquals("idDaEntrada: 45.456000", stringRepresentation);
+  return expectStringsToBeEquals("idDaEntrada: 45.456", stringRepresentation);
 }
 
 
