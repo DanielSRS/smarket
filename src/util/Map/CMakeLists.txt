@@ -1,5 +1,5 @@
 add_library(Map Map.c)
-target_link_libraries(Map Cstrings)
+target_link_libraries(Map MapEntry Cstrings)
 
 
 add_executable(ListTest List.test.c)
@@ -18,3 +18,5 @@ add_test(lengthIsTheSameAsPushResult ListTest lengthIsTheSameAsPushResult)
 add_test(lengthShouldChangeAfterMultInsertion ListTest lengthShouldChangeAfterMultInsertion)
 add_test(pushReturnTheNewLengthAfterMultInsertion ListTest pushReturnTheNewLengthAfterMultInsertion)
 add_test(destroyAList ListTest destroyAList)
+
+add_subdirectory(MapEntry)

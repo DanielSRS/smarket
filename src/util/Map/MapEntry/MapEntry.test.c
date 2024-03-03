@@ -1,74 +1,59 @@
-#include "../src/util/TestSuite/TestSuite.h" // strcpy
-#include "../src/util/Map/Map.h"
-#include <stdlib.h> // free
+#include "../../TestSuite/TestSuite.h"      // TestResult, expectToBeNotNull, expectToBeNull, expectPointersToBeEquals
+#include "MapEntry.h"                       // MapEntry
+
+char *key = "idDaEntrada";
+char *value = "Sou um valor qualquer";
+EntryValueType type = UNKNOWN_ENTRY_VALUE;
 
 TestResult _newMapEntryCreatesANonNullReference() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   return expectToBeNotNull(entry);
 }
 
 TestResult _newMapEntrySiblingAttrShouldBeNull() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   return expectToBeNull(entry->sibling);
 }
 
 TestResult _keyShouldBeTheSameAsParam() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   return expectPointersToBeEquals(key, entry->key);
 }
 
 TestResult _valueShouldBeTheSameAsParam() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   return expectPointersToBeEquals(value, entry->value);
 }
 
 TestResult _typeShouldBeTheSameAsParam() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   return expectPointersToBeEquals(value, entry->value);
 }
 
 TestResult _destroyShouldBeNotNull() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   return expectToBeNotNull(entry->destroy);
 }
 
 TestResult _toStringShouldBeNotNull() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   return expectToBeNotNull(entry->toString);
 }
 
+TestResult _toJsonStringShouldBeNotNull() {
+  MapEntry *entry = newMapEntry(key, (void *) value, type);
+
+  return expectToBeNotNull(entry->toJsonString);
+}
+
 TestResult _pointerIsNullAfterDestroy() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   entry->destroy(&entry);
@@ -77,20 +62,28 @@ TestResult _pointerIsNullAfterDestroy() {
 }
 
 TestResult _toStringHasTheExpectedFormat() {
-  char *key = "idDaEntrada";
-  char *value = "Sou um valor qualquer";
-  char *type = "Custom type";
   MapEntry *entry = newMapEntry(key, (void *) value, type);
 
   char *stringRepresentation = entry->toString(entry);
-  int stringLen = strlen(stringRepresentation);
-  char received[stringLen];
-  strcpy(received, stringRepresentation);
 
-  /** toString aloca memória. É preciso liberar antes da asserção */
-  free(stringRepresentation);
+  return expectStringsToBeEquals("idDaEntrada: UNKNOWN_ENTRY_VALUE", stringRepresentation);
+}
 
-  return expectStringsToBeEquals("idDaEntrada: Custom type", received);
+
+TestResult _toStringHasTheExpectedFormatStringVal() {
+  MapEntry *entry = newMapEntry(key, (void *) value, STRING_ENTRY_VALUE);
+
+  alocatedCString stringRepresentation = entry->toString(entry);
+
+  return expectStringsToBeEquals("idDaEntrada: Sou um valor qualquer", stringRepresentation);
+}
+
+TestResult _toJsonStringHasTheExpectedFormat() {
+  MapEntry *entry = newMapEntry(key, (void *) value, type);
+
+  char *stringRepresentation = entry->toJsonString(entry);
+
+  return expectStringsToBeEquals("\"idDaEntrada\":\"UNKNOWN_ENTRY_VALUE\"", stringRepresentation);
 }
 
 
@@ -119,11 +112,20 @@ int main(int argc, char **argv){
     CASE ("_toStringShouldBeNotNull")
       it("Atributo toString tem valor válido (not null)", _toStringShouldBeNotNull);
       break;
+    CASE ("_toJsonStringShouldBeNotNull")
+      it("Atributo toJsonString tem valor válido (not null)", _toJsonStringShouldBeNotNull);
+      break;
     CASE ("_pointerIsNullAfterDestroy")
       it("Destruir o MapEntry define self (ponteiro para si mesmo) como null", _pointerIsNullAfterDestroy);
       break;
     CASE ("_toStringHasTheExpectedFormat")
       it("toString retorna a representação do dado no formato esperado", _toStringHasTheExpectedFormat);
+      break;
+    CASE ("_toJsonStringHasTheExpectedFormat")
+      it("toJsonString retorna a representação do dado no formato esperado", _toJsonStringHasTheExpectedFormat);
+      break;
+    CASE ("_toStringHasTheExpectedFormatStringVal")
+      it("toJsonString retorna a representação do dado no formato esperado", _toStringHasTheExpectedFormatStringVal);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);

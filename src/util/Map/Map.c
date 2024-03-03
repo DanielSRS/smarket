@@ -3,15 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAP_OBJECT "__Map__"
-#define STRING_OBJECT "__String__"
-#define ANY_OBJECT "__Any__"
-#define LIST_OBJECT "__List__"
-#define NUMBER_OBJECT "__Number__"
-
-
 alocatedCString htttpHeadersCString(Map* self);
-alocatedCString mapEntryToJSONString(MapEntry* self);
 alocatedCString mapToJsonString(Map* self);
 alocatedCString listToJsonString(List* self);
 Map *nestList(Map* self, char* key);
@@ -41,10 +33,10 @@ boolean _deleteElementInAMap(Map* self, char* key) {
     self->_items = self->_items->sibling;             // define o proximo item como entrada da lista
     *((int *) &self->length) = self->length - 1;      // reduz a contagem de itens
 
-    boolean isItemAnMap = isEquals(itemsInTheMap->type, MAP_OBJECT);
-    boolean isString = isEquals(itemsInTheMap->type, STRING_OBJECT);
-    boolean isList = isEquals(itemsInTheMap->type, LIST_OBJECT);
-    boolean isNumber = isEquals(itemsInTheMap->type, NUMBER_OBJECT);
+    boolean isItemAnMap = itemsInTheMap->type == MAP_ENTRY_VALUE;
+    boolean isString = itemsInTheMap->type == STRING_ENTRY_VALUE;
+    boolean isList = itemsInTheMap->type == LIST_ENTRY_VALUE;
+    boolean isNumber = itemsInTheMap->type == NUMBER_ENTRY_VALUE;
 
     /**
      * Se o valor do item for um mapa aninhado, limpa todas
@@ -70,11 +62,10 @@ boolean _deleteElementInAMap(Map* self, char* key) {
      * Se for uma string, apaga o conteudo e libera a memoria
     */
     if (isString) {
-      char *stringVal = (char*) itemsInTheMap->value;
-      memset((void*) stringVal, 0, strlen(stringVal));
-      free(stringVal);
+      freeAlocatedCString((char*) itemsInTheMap->value);
     }
 
+    freeAlocatedCString(itemsInTheMap->key);
     itemsInTheMap->destroy(&itemsInTheMap);
 
     return True;
@@ -94,10 +85,10 @@ boolean _deleteElementInAMap(Map* self, char* key) {
       previousItem->sibling = nextItem->sibling;
       *((int *) &self->length) = self->length - 1;      // reduz a contagem de itens
 
-      boolean isItemAnMap = isEquals(itemToDelete->type, MAP_OBJECT);
-      boolean isString = isEquals(itemToDelete->type, STRING_OBJECT);
-      boolean isList = isEquals(itemToDelete->type, LIST_OBJECT);
-      boolean isNumber = isEquals(itemToDelete->type, NUMBER_OBJECT);
+      boolean isItemAnMap = itemToDelete->type == MAP_ENTRY_VALUE;
+      boolean isString = itemToDelete->type == STRING_ENTRY_VALUE;
+      boolean isList = itemToDelete->type == LIST_ENTRY_VALUE;
+      boolean isNumber = itemToDelete->type == NUMBER_ENTRY_VALUE;
 
       /**
        * Se o valor do item for um mapa aninhado, limpa todas
@@ -149,121 +140,31 @@ void* _getItemInAMap(Map* self, char* key) {
   return NULL;
 }
 
-/**
- * Libere a memoria apos o uso!!!!!!
-*/
-char* _mapEntryToString(MapEntry* self) {
-  int keyLenght = strlen(self->key);
-  int typeLenght = strlen(self->type);
-  int separatorLenght = 2;
-  char *separator = ": ";
-
-  /** Se o valor guardado for uma string */
-  if (isEquals(self->type, STRING_OBJECT)) {
-    int valueLenght = strlen((char*) self->value);
-    int bufferSize = keyLenght + separatorLenght + valueLenght + 1;
-    char *buffer = malloc(bufferSize);
-    snprintf(buffer, bufferSize, "%s%s%s", self->key, separator, (char*) self->value);
-
-    return buffer;
-  }
-
-  /** Se o valor guardado for um numero */
-  if (isEquals(self->type, NUMBER_OBJECT)) {
-    alocatedCString buffer = NULL;
-    buffer = formatedCString("%s: %f", self->key, *((double*) self->value));
-
-    return buffer;
-  }
-
-  /** Se o valor guardado for um map */
-  if (isEquals(self->type, MAP_OBJECT)) {
-    char *mapStringfied = ((Map *) self->value)->toString((Map *) self->value);
-    int valueLenght = strlen(mapStringfied);
-    int bufferSize = keyLenght + separatorLenght + valueLenght + 1;
-    char *buffer = malloc(bufferSize);
-    snprintf(buffer, bufferSize, "%s%s%s", self->key, separator, mapStringfied);
-
-    mapStringfied == NULL ? 0 : free(mapStringfied); // map.toString() aloca memoria
-
-    return buffer;
-  }
-
-  /** Se o valor guardado for uma lista */
-  if (isEquals(self->type, LIST_OBJECT)) {
-    alocatedCString listStringfied = ((List *) self->value)->toString((List *) self->value);
-    alocatedCString buffer = formatedCString(
-      "%s: %s",
-      self->key,
-      listStringfied
-    );
-
-    freeAlocatedCString(listStringfied);
-
-    return buffer;
-  }
-
-  /** Se o valor guardado for de outro tipo */
-  int bufferSize = keyLenght + separatorLenght + typeLenght + 1;
-  char *buffer = malloc(bufferSize);
-  snprintf(buffer, bufferSize, "%s%s%s", self->key, separator, self->type);
-
-  return buffer;
-}
-
 alocatedCString mapEntryValueToString(MapEntry* self) {
-  int keyLenght = strlen(self->key);
-  int typeLenght = strlen(self->type);
-  int separatorLenght = 2;
   char *separator = ": ";
 
   /** Se o valor guardado for uma string */
-  if (isEquals(self->type, STRING_OBJECT)) {
-    int valueLenght = strlen((char*) self->value);
-    int bufferSize = valueLenght + 1;
-    char *buffer = malloc(bufferSize);
-    snprintf(buffer, bufferSize, "%s", (char*) self->value);
-
-    return buffer;
+  if (self->type == STRING_ENTRY_VALUE) {
+    return formatedCString("%s", (char*) self->value);
   }
 
   /** Se o valor guardado for um numero */
-  if (isEquals(self->type, NUMBER_OBJECT)) {
-    alocatedCString buffer = NULL;
-    buffer = formatedCString("%f", *((double*) self->value));
-
-    return buffer;
+  if (self->type == NUMBER_ENTRY_VALUE) {
+    return formatedCString("%f", *((double*) self->value));
   }
 
   /** Se o valor guardado for um map */
-  if (isEquals(self->type, MAP_OBJECT)) {
-    char *mapStringfied = ((Map *) self->value)->toString((Map *) self->value);
-    int valueLenght = strlen(mapStringfied);
-    int bufferSize = valueLenght + 1;
-    char *buffer = malloc(bufferSize);
-    snprintf(buffer, bufferSize, "%s", mapStringfied);
-
-    mapStringfied == NULL ? 0 : free(mapStringfied); // map.toString() aloca memoria
-
-    return buffer;
+  if (self->type == MAP_ENTRY_VALUE) {
+    return ((Map *) self->value)->toString((Map *) self->value);
   }
 
   /** Se o valor guardado for uma list */
-  if (isEquals(self->type, LIST_OBJECT)) {
-    alocatedCString stringfied = ((List *) self->value)->toString((List *) self->value);
-    alocatedCString buffer = formatedCString("%s", stringfied);
-
-    freeAlocatedCString(stringfied);
-
-    return buffer;
+  if (self->type = LIST_ENTRY_VALUE) {
+    return ((List *) self->value)->toString((List *) self->value);
   }
 
   /** Se o valor guardado for de outro tipo */
-  int bufferSize = typeLenght + 1;
-  char *buffer = malloc(bufferSize);
-  snprintf(buffer, bufferSize, "%s", self->type);
-
-  return buffer;
+  return formatedCString("UNKNOWN_ENTRY_VALUE");
 }
 
 /**
@@ -317,15 +218,6 @@ int _lengthOfAMap(Map* self) {
   return self->length;
 }
 
-/**
- * Destroi o registro liberando memória
- */
-void destroyMapEntry(struct MapEntry **self) {
-  if (!*self) return;
-  free(*self);
-  memset(*self, 0, sizeof(MapEntry));
-  *self = NULL;
-}
 
 void destroyMap(struct Map **self) {
   if (!*self) return;
@@ -335,26 +227,12 @@ void destroyMap(struct Map **self) {
   *self = NULL;
 }
 
-MapEntry *newMapEntry(char *key, void *value, char *type) {
-  MapEntry *newEntry = (MapEntry*) malloc(sizeof(MapEntry));
-  memset(newEntry, 0, sizeof(MapEntry));
 
-  newEntry->key = key;
-  newEntry->value = value;
-  newEntry->type = type;
-  newEntry->sibling = NULL;
-
-  newEntry->destroy = destroyMapEntry;
-  newEntry->toString = _mapEntryToString;
-  newEntry->toJsonString = mapEntryToJSONString;
-  return newEntry;
-}
-
-Map *_setElementOfAMap(Map* self, char* key, void* value, char *type) {
+Map *_setElementOfAMap(Map* self, char* key, void* value, EntryValueType type) {
   MapEntry *newEntry = newMapEntry(
     duplicateString(key),
     value,
-    duplicateString(type));
+    type);
 
   /** Se vazio */
   if (self->length == 0) self->_items = newEntry;
@@ -365,11 +243,7 @@ Map *_setElementOfAMap(Map* self, char* key, void* value, char *type) {
         item->value = value;
 
         // apaga a chave e o valor escritos na memória
-        memset((void *) newEntry->key, 0, strlen(newEntry->key));
-        memset((void *) newEntry->type, 0, strlen(newEntry->type));
-        // libera pq não vai ser mais usado
-        free((void *) newEntry->key);
-        free((void *) newEntry->type);
+        freeAlocatedCString(newEntry->key);
         newEntry->destroy(&newEntry); // Não foi usado, já que a entrada anterior foi reaproveitada
 
         return self; // retorna antes para que length não seja incrementado
@@ -388,20 +262,20 @@ Map *_setElementOfAMap(Map* self, char* key, void* value, char *type) {
 }
 
 Map *setAny(Map* self, char* key, void* value) {
-  return _setElementOfAMap(self, key, value, ANY_OBJECT);
+  return _setElementOfAMap(self, key, value, UNKNOWN_ENTRY_VALUE);
 }
 
 Map *setString(Map* self, char* key, char* value) {
-  return _setElementOfAMap(self, key, duplicateString(value), STRING_OBJECT);
+  return _setElementOfAMap(self, key, duplicateString(value), STRING_ENTRY_VALUE);
 }
 
 Map *setMap(Map* self, char* key, Map* value) {
-  return _setElementOfAMap(self, key, value, MAP_OBJECT);
+  return _setElementOfAMap(self, key, value, MAP_ENTRY_VALUE);
 }
 
 Map *nest(Map* self, char* key) {
   Map *newmap = newMap();
-  _setElementOfAMap(self, key, newmap, MAP_OBJECT);
+  _setElementOfAMap(self, key, newmap, MAP_ENTRY_VALUE);
   return newmap;
 }
 
@@ -414,10 +288,11 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
    */
   for (MapEntry *item = itemsInTheMap; item != NULL;) {
     MapEntry *nextItem = item->sibling;
-    boolean isItemAnMap = isEquals(item->type, MAP_OBJECT);
-    boolean isString = isEquals(item->type, STRING_OBJECT);
-    boolean isList = isEquals(item->type, LIST_OBJECT);
-    boolean isNumber = isEquals(item->type, NUMBER_OBJECT);
+
+    boolean isItemAnMap = item->type == MAP_ENTRY_VALUE;
+    boolean isString = item->type == STRING_ENTRY_VALUE;
+    boolean isList = item->type == LIST_ENTRY_VALUE;
+    boolean isNumber = item->type == NUMBER_ENTRY_VALUE;
 
     /**
      * Se o valor do item for um mapa aninhado, limpa todas
@@ -443,11 +318,10 @@ void _clearAllKeyValuePairsFromAMap(Map *self) {
      * Se for uma string, apaga o conteudo e libera a memoria
     */
     if (isString) {
-      char *stringVal = (char*) item->value;
-      memset((void*) stringVal, 0, strlen(stringVal));
-      free(stringVal);
+      freeAlocatedCString((char*) item->value);
     }
 
+    freeAlocatedCString(item->key);
     item->destroy(&item);
 
     if(item != NULL) exit(1);
@@ -623,91 +497,30 @@ alocatedCString htttpHeadersCString(Map* self) {
   return newBuffer;
 }
 
-alocatedCString mapEntryToJSONString(MapEntry* self) {
-  /** Se o valor guardado for uma string */
-  if (isEquals(self->type, STRING_OBJECT)) {
-    alocatedCString buffer = formatedCString("\"%s\":\"%s\"", self->key, (char*) self->value);
-
-    return buffer;
-  }
-  
-  /** Se o valor guardado for um numero */
-  if (isEquals(self->type, NUMBER_OBJECT)) {
-    alocatedCString buffer = formatedCString("\"%s\":%f", self->key, *((double*) self->value));
-
-    return buffer;
-  }
-
-  /** Se o valor guardado for um map */
-  if (isEquals(self->type, MAP_OBJECT)) {
-    alocatedCString mapJsonString = ((Map *) self->value)->toJsonString((Map *) self->value);
-    
-    alocatedCString buffer = formatedCString("\"%s\":%s", self->key, mapJsonString);
-
-    mapJsonString == NULL ? 0 : free(mapJsonString); // map.toString() aloca memoria
-
-    return buffer;
-  }
-
-  /** Se o valor guardado for uma list */
-  if (isEquals(self->type, LIST_OBJECT)) {
-    alocatedCString mapJsonString = ((List *) self->value)->toJsonString((List *) self->value);
-    
-    alocatedCString buffer = formatedCString("\"%s\":%s", self->key, mapJsonString);
-
-    freeAlocatedCString(mapJsonString);
-
-    return buffer;
-  }
-
-  /** Se o valor guardado for de outro tipo */
-  alocatedCString buffer = formatedCString("\"%s\":\"type -> %s\"", self->key, self->type);
-
-  return buffer;
-}
-
 /** Se dentro de uma lista não tem key */
 alocatedCString listEntryToJSONString(MapEntry* self) {
   /** Se o valor guardado for uma string */
-  if (isEquals(self->type, STRING_OBJECT)) {
-    alocatedCString buffer = formatedCString("\"%s\"", (char*) self->value);
-
-    return buffer;
+  if (self->type == STRING_ENTRY_VALUE) {
+    return formatedCString("\"%s\"", (char*) self->value);
   }
   
   /** Se o valor guardado for um numero */
-  if (isEquals(self->type, NUMBER_OBJECT)) {
-    alocatedCString buffer = formatedCString("%f", *((double*) self->value));
-
-    return buffer;
+  if (self->type == NUMBER_ENTRY_VALUE) {
+    return formatedCString("%f", *((double*) self->value));
   }
 
   /** Se o valor guardado for um map */
-  if (isEquals(self->type, MAP_OBJECT)) {
-    alocatedCString mapJsonString = ((Map *) self->value)->toJsonString((Map *) self->value);
-    
-    alocatedCString buffer = formatedCString("%s", mapJsonString);
-
-    freeAlocatedCString(mapJsonString);
-
-    return buffer;
+  if (self->type == MAP_ENTRY_VALUE) {
+    return ((Map *) self->value)->toJsonString((Map *) self->value);
   }
 
   /** Se o valor guardado for uma list */
-  if (isEquals(self->type, LIST_OBJECT)) {
-    alocatedCString mapJsonString = ((List *) self->value)->toJsonString((List *) self->value);
-    
-    alocatedCString buffer = formatedCString("%s", mapJsonString);
-
-    freeAlocatedCString(mapJsonString);
-
-    return buffer;
+  if (self->type == LIST_ENTRY_VALUE) {
+    return ((List *) self->value)->toJsonString((List *) self->value);
   }
 
   /** Se o valor guardado for de outro tipo */
-  alocatedCString buffer = formatedCString("\"type -> %s\"", self->type);
-
-  return buffer;
+  return formatedCString("\"type -> UNKNOWN_ENTRY_VALUE\"");
 }
 
 alocatedCString mapToJsonString(Map* self) {
@@ -784,12 +597,12 @@ alocatedCString listToJsonString(List* self) {
 /** Adiciona uma lista como valor de uma chave */
 Map *nestList(Map* self, char* key) {
   List* newlist = newList();
-  _setElementOfAMap(self, key, newlist, LIST_OBJECT);
+  _setElementOfAMap(self, key, newlist, LIST_ENTRY_VALUE);
   return self;
 }
 
 Map *setList(Map* self, char* key, void* value) {
-  return _setElementOfAMap(self, key, value, LIST_OBJECT);
+  return _setElementOfAMap(self, key, value, LIST_ENTRY_VALUE);
 }
 
 
@@ -805,5 +618,5 @@ int listPushMap(List *self, Map *value) {
 Map* setNumber(Map* self, char* key, double value) {
   double* valueRef = calloc(1, sizeof(double));
   *valueRef = value;
-  return _setElementOfAMap(self, key, valueRef, NUMBER_OBJECT);
+  return _setElementOfAMap(self, key, valueRef, NUMBER_ENTRY_VALUE);
 }

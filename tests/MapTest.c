@@ -303,7 +303,7 @@ TestResult _toStringOnNonEmptyMap() {
        *value6 = "value6",
        *value7 = "value7";
 
-  char *type = "__Any__";
+  char *type = "UNKNOWN_ENTRY_VALUE";
   
   map->setAny(map, key1, value1);
   map->setAny(map, key2, value2);
@@ -736,7 +736,7 @@ TestResult toJsonStringOnNonEmptyMap() {
        *value6 = "value6",
        *value7 = "value7";
 
-  char *type = "__Any__";
+  char *type = "UNKNOWN_ENTRY_VALUE";
   
   map->setString(map, key1, value1);
   map->setString(map, key2, value2);
