@@ -3,6 +3,7 @@
 
 char *key = "idDaEntrada";
 char *value = "Sou um valor qualquer";
+double numberValue = 45.456;
 EntryValueType type = UNKNOWN_ENTRY_VALUE;
 
 TestResult _newMapEntryCreatesANonNullReference() {
@@ -69,7 +70,6 @@ TestResult _toStringHasTheExpectedFormat() {
   return expectStringsToBeEquals("idDaEntrada: UNKNOWN_ENTRY_VALUE", stringRepresentation);
 }
 
-
 TestResult _toStringHasTheExpectedFormatStringVal() {
   MapEntry *entry = newMapEntry(key, (void *) value, STRING_ENTRY_VALUE);
 
@@ -84,6 +84,22 @@ TestResult _toJsonStringHasTheExpectedFormat() {
   char *stringRepresentation = entry->toJsonString(entry);
 
   return expectStringsToBeEquals("\"idDaEntrada\":\"UNKNOWN_ENTRY_VALUE\"", stringRepresentation);
+}
+
+TestResult _toJsonWithNumberValues() {
+  MapEntry *entry = newMapEntry(key, (void *) &numberValue, NUMBER_ENTRY_VALUE);
+
+  char *stringRepresentation = entry->toJsonString(entry);
+
+  return expectStringsToBeEquals("\"idDaEntrada\":45.456000", stringRepresentation);
+}
+
+TestResult _toStringWithNumberValues() {
+  MapEntry *entry = newMapEntry(key, (void *) &numberValue, NUMBER_ENTRY_VALUE);
+
+  char *stringRepresentation = entry->toString(entry);
+
+  return expectStringsToBeEquals("idDaEntrada: 45.456000", stringRepresentation);
 }
 
 
@@ -126,6 +142,12 @@ int main(int argc, char **argv){
       break;
     CASE ("_toStringHasTheExpectedFormatStringVal")
       it("toJsonString retorna a representação do dado no formato esperado", _toStringHasTheExpectedFormatStringVal);
+      break;
+    CASE ("_toJsonWithNumberValues")
+      it("toJsonString com um numero", _toJsonWithNumberValues);
+      break;
+    CASE ("_toStringWithNumberValues")
+      it("toJsonString com um numero", _toStringWithNumberValues);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);
