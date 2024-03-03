@@ -59,7 +59,7 @@ void listCashiers(Request* req, Response* res, void* context) {
   /** Resposta para o cliente */
   Map* responseData = newMap();
   Map* responseCashiers = responseData->nest(responseData, "Cashiers");
-  responseCashiers->setString(responseCashiers, "length", intToCString(caixas->length));
+  responseCashiers->setNumber(responseCashiers, "length", (double) caixas->length);
 
   for (int i = 0; i < numberOfCashiers; i++) {
     alocatedCString key = intToCString(i);
