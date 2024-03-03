@@ -303,7 +303,7 @@ TestResult _toStringOnNonEmptyMap() {
        *value6 = "value6",
        *value7 = "value7";
 
-  char *type = "__Any__";
+  char *type = "UNKNOWN_ENTRY_VALUE";
   
   map->setAny(map, key1, value1);
   map->setAny(map, key2, value2);
@@ -613,29 +613,30 @@ TestResult _nestedMapToString() {
        *value6 = "value6",
        *value7 = "value7";
   
-  map->setAny(map, key1, value1);
-  map->setAny(map, key2, value2);
-  map->setAny(map, key3, value3);
-  map->setAny(map, key4, value4);
-  map->setAny(map, key5, value5);
-  map->setAny(map, key6, value6);
-  map->setAny(map, key7, value7);
+  map->setString(map, key1, value1);
+  map->setString(map, key2, value2);
+  map->setString(map, key3, value3);
+  map->setString(map, key4, value4);
+  map->setString(map, key5, value5);
+  map->setString(map, key6, value6);
+  map->setString(map, key7, value7);
 
   char *nestedKey = "nested";
   Map *nestedMap = map->nest(map, nestedKey);
 
   /** Insere elementos no map aninhado */
-  nestedMap->setAny(nestedMap, "first key", value1);
-  nestedMap->setAny(nestedMap, "something", value2);
-  nestedMap->setAny(nestedMap, "likeThis", value3);
-  nestedMap->setAny(nestedMap, "CONST", value4);
-  nestedMap->setAny(nestedMap, "let", value5);
-  nestedMap->setAny(nestedMap, "var", value6);
-  nestedMap->setAny(nestedMap, "enciclopedia", value7);
+  nestedMap->setString(nestedMap, "first key", value1);
+  nestedMap->setString(nestedMap, "something", value2);
+  nestedMap->setString(nestedMap, "likeThis", value3);
+  nestedMap->setString(nestedMap, "CONST", value4);
+  nestedMap->setString(nestedMap, "let", value5);
+  nestedMap->setString(nestedMap, "var", value6);
+  nestedMap->setString(nestedMap, "enciclopedia", value7);
 
   char *stringfied = map->toString(map);
+  char *expected = "{\n\tkey1: value1,\n\tkey2: value2,\n\tkey3: value3,\n\tkey4: value4,\n\tkey5: value5,\n\tkey6: value6,\n\tkey7: value7,\n\tnested: {\n\tfirst key: value1,\n\tsomething: value2,\n\tlikeThis: value3,\n\tCONST: value4,\n\tlet: value5,\n\tvar: value6,\n\tenciclopedia: value7,\n},\n}";
 
-  return expectStringsToBeEquals("expected", stringfied);
+  return expectStringsToBeEquals(expected, stringfied);
 }
 
 TestResult _getMapKeys() {
@@ -736,7 +737,7 @@ TestResult toJsonStringOnNonEmptyMap() {
        *value6 = "value6",
        *value7 = "value7";
 
-  char *type = "__Any__";
+  char *type = "UNKNOWN_ENTRY_VALUE";
   
   map->setString(map, key1, value1);
   map->setString(map, key2, value2);

@@ -31,7 +31,7 @@ TestResult expectStringsToBeEquals(const char *expected, const char *received) {
     return result;
   }
 
-  snprintf(result.errorDescription, 1000, "Expected \"%s\" but received: \"%s\"\n", expected, received);
+  snprintf(result.errorDescription, 1000, "Expected:\n\n\t\"%s\"\nbut received:\n\n\t\"%s\"\n", expected, received);
   result.pass = False;
 
   return result;
@@ -148,6 +148,20 @@ TestResult expectPointersToBeEquals(const void *expected, const void *received) 
   }
 
   snprintf(result.errorDescription, 100, "Expected %p but received: %p\n", expected, received);
+  result.pass = False;
+
+  return result;
+}
+
+TestResult expectDoublesToBeEquals(double expected, double received) {
+  TestResult result;
+  if (expected == received) {
+    result.errorDescription[0] = '\0';
+    result.pass = True;
+    return result;
+  }
+
+  snprintf(result.errorDescription, 100, "Expected %f but received: %f\n", expected, received);
   result.pass = False;
 
   return result;

@@ -7,7 +7,7 @@
 #define JSON_PARSER_H
 
 
-typedef enum ValueType { Obj, String, Array, Boolean, null, unknow } ValueType;
+typedef enum ValueType { Obj, String, Array, Boolean, null, unknow, number } ValueType;
 
 typedef struct ParsedValue
 {
@@ -16,6 +16,7 @@ typedef struct ParsedValue
   char *stringVAlue;
   // list value
   boolean boolValue;
+  double numberValue;
 } ParsedValue;
 
 /**

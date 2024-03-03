@@ -28,7 +28,8 @@ Map* readTagsWithArgs(char *tmr, char *antena, Map * result) {
   args[2] = "--ant";
   args[3] = antena;
 
-  readRFIDTags(4, args, result);
+  // readRFIDTags(4, args, result);
+  mockedRead(4, args, result);
   return result;
 }
 

@@ -1,0 +1,18 @@
+add_library(NumberParser NumberParser.c)
+target_link_libraries(NumberParser Cstrings Logger)
+
+
+add_executable(NumberParserTest NumberParser.test.c)
+target_link_libraries(NumberParserTest TestSuite NumberParser)
+add_test(parseCorrectNumber NumberParserTest parseCorrectNumber)
+add_test(zeroValue NumberParserTest zeroValue)
+add_test(zeroErr NumberParserTest zeroErr)
+add_test(zeroNegativeIsZero NumberParserTest zeroNegativeIsZero)
+add_test(zeroNegativeIsValid NumberParserTest zeroNegativeIsValid)
+add_test(negativeNumber NumberParserTest negativeNumber)
+add_test(positiveNumber NumberParserTest positiveNumber)
+add_test(fractionNumber NumberParserTest fractionNumber)
+add_test(leadingZeroIsInvalid NumberParserTest leadingZeroIsInvalid)
+add_test(leadingNegZeroIsInvalid NumberParserTest leadingNegZeroIsInvalid)
+add_test(positiveSignIsInvalid NumberParserTest positiveSignIsInvalid)
+add_test(commaNotAllowed NumberParserTest commaNotAllowed)

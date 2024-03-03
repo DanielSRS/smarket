@@ -128,6 +128,21 @@ TestResult parsedObjectValue() {
   return expectToBeTrue(value);
 }
 
+TestResult parsedObjWithNumber() {
+  char *stringToBeParsed = "{ \"Dan\": -0.12E4 }";
+  int offset = 1;
+  int max = cStringLenght(stringToBeParsed);
+  Map* map = NULL;
+  map = parseObject(&offset, max, stringToBeParsed);
+
+  boolean hasTheKey = map->has(map, "Dan");
+  boolean correctValue = *((double*) map->get(map, "Dan")) == -1200;
+  boolean correctSize = map->length == 1;
+
+  return expectToBeTrue(hasTheKey && correctValue && correctSize);
+}
+
+
 int main(int argc, char **argv){
   TestArgs args = parseTestArgs(argc, argv);
 
@@ -164,6 +179,9 @@ int main(int argc, char **argv){
       break;
     CASE ("parsedObjectValue")
       it("Reconhece objeto onde um valor é outro objeto", parsedObjectValue);
+      break;
+    CASE ("parsedObjWithNumber")
+      it("Reconhece objeto onde um valor é outro objeto contendo um numero", parsedObjWithNumber);
       break;
     DEFAULT
       noTestFoundWithGiven(args.testName);

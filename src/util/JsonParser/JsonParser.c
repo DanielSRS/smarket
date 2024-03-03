@@ -1,6 +1,7 @@
 #include "JsonParser.h"
-#include <stdio.h>
+#include "NumberParser/NumberParser.h"
 #include "../Logger/Logger.h"
+#include <stdio.h>
 
 alocatedCString parseString(int *offset, int max, const char *buffer) {
   /** Cria um logger pra esse namespace */
@@ -89,6 +90,22 @@ ParsedValue parseValue(int *offset, int max, const char *buffer) {
       FoundValue = True;
       value.stringVAlue = parseString(offset, max, buffer);
       value.type = String;
+      continue;
+    }
+
+    /** Value is a number */
+    if (input == '-' || (input >= '0' && input <= '9')) {
+      if (FoundValue) {
+        printf("as-Econtrado valor mais de uma vez\n");
+        exit(1);        // valor ja encontrado!! erro
+      }
+      FoundValue = True;
+      ParsedNumber parsed = parseNumber(offset, max, buffer);
+      value.numberValue = parsed.value;
+      value.type = number;
+      if (parsed.withErrors) {
+        exit(1);
+      }
       continue;
     }
 
@@ -227,6 +244,13 @@ Map* parseObject(int *offset, int max, const char *buffer) {
         key = NULL;
         value.type = unknow;
       }
+
+      if (value.type == number) { // insere nested object
+        obj->setNumber(obj, key, value.numberValue);
+        key != NULL ? free(key) : 0; // libera a memria da chave
+        key = NULL;
+        value.type = unknow;
+      }
     }
 
     // tem proximo
@@ -244,6 +268,13 @@ Map* parseObject(int *offset, int max, const char *buffer) {
 
       if (value.type == Obj) { // insere nested object
         obj->setMap(obj, key, value.objValue);
+        key != NULL ? free(key) : 0; // libera a memria da chave
+        key = NULL;
+        value.type = unknow;
+      }
+      
+      if (value.type == number) { // insere nested object
+        obj->setNumber(obj, key, value.numberValue);
         key != NULL ? free(key) : 0; // libera a memria da chave
         key = NULL;
         value.type = unknow;

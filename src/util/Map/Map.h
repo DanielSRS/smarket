@@ -1,34 +1,9 @@
 #include "../Boolean/Boolean.h"
 #include "../Cstrings/Cstrings.h" // isEquals alocated cstrings
+#include "MapEntry/MapEntry.h"
 
 #ifndef MAP_H
 #define MAP_H
-
-typedef struct MapEntry
-{
-  const char *key;
-  const void *value;
-  /**
-   * Indica o tipo do dado guardado
-   * 
-   * pode ser: __Map__, __String__, __Any__
-   */
-  const char *type;
-  /**
-   * Retorna uma string com a chave e o valor
-   */
-  char*(*toString)(struct MapEntry* self);
-  /**
-   * Retorna uma string com a chave e o valor no formato json
-   */
-  char*(*toJsonString)(struct MapEntry* self);
-  /**
-   * Destroi o registro liberando memória
-   */
-  const void(*destroy)(struct MapEntry** self);
-
-  struct MapEntry *sibling;
-} MapEntry;
 
 typedef struct Map
 {
@@ -111,14 +86,6 @@ typedef struct Map
  * Cria um novo map
 */
 Map* newMap();
-
-/**
- * MapEntry não aloca memoria para seus atributos.
- * 
- * antes do Destroy deve liberar a memória das referencias
- * manualmente
-*/
-MapEntry *newMapEntry(char *key, void *value, char *type);
 
 /**
  * Uma lista
