@@ -106,6 +106,10 @@ ParsedValue parseValue(int *offset, int max, const char *buffer) {
       if (parsed.withErrors) {
         exit(1);
       }
+      input = buffer[*offset];
+       if (input == ',' || input == ']' || input == '}') {
+        *offset -= 1;
+      }
       continue;
     }
 
