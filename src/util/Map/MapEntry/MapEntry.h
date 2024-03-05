@@ -12,6 +12,7 @@ typedef enum EntryValueType {
   UNKNOWN_ENTRY_VALUE,
   NUMBER_ENTRY_VALUE,
   LIST_ENTRY_VALUE,
+  NULL_ENTRY_VALUE,
 } EntryValueType;
 
 /**

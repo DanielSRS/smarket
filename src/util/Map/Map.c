@@ -153,6 +153,10 @@ alocatedCString mapEntryValueToString(MapEntry* self) {
     return formatedCString("%g", *((double*) self->value));
   }
 
+  if (self->type == NULL_ENTRY_VALUE) {
+    return formatedCString("%s", "null");
+  }
+
   /** Se o valor guardado for um map */
   if (self->type == MAP_ENTRY_VALUE) {
     return ((Map *) self->value)->toString((Map *) self->value);
@@ -271,6 +275,10 @@ Map *setMap(Map* self, char* key, Map* value) {
   return _setElementOfAMap(self, key, value, MAP_ENTRY_VALUE);
 }
 
+Map *setNull(Map* self, char* key) {
+  return _setElementOfAMap(self, key, NULL, NULL_ENTRY_VALUE);
+}
+
 Map *nest(Map* self, char* key) {
   Map *newmap = newMap();
   _setElementOfAMap(self, key, newmap, MAP_ENTRY_VALUE);
@@ -370,6 +378,7 @@ Map* newMap() {
   map->nestList = nestList;
   map->setList = setList;
   map->setNumber = setNumber;
+  map->setNull = setNull;
 
   return map;
 }

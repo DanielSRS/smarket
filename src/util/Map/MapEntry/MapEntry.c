@@ -51,6 +51,10 @@ alocatedCString _mapEntryToString(MapEntry* self) {
     return formatedCString("%s: %g", self->key, *((double*) self->value));
   }
 
+  if (self->type == NULL_ENTRY_VALUE) {
+    return formatedCString("%s: %s", self->key, "null");
+  }
+
   /** Se o valor guardado for um map */
   if (self->type == MAP_ENTRY_VALUE) {
     alocatedCString mapStringfied = ((Map *) self->value)->toString((Map *) self->value);
@@ -114,6 +118,10 @@ alocatedCString mapEntryToJSONString(MapEntry* self) {
     freeAlocatedCString(mapJsonString);
 
     return buffer;
+  }
+
+  if (self->type == NULL_ENTRY_VALUE) {
+    return formatedCString("\"%s\":%s", self->key, "null");
   }
 
   /** Se o valor guardado for de outro tipo */

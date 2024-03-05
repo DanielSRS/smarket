@@ -8,7 +8,7 @@ alocatedCString parseString(int *offset, int max, const char *buffer) {
   Logger* console = createLogger();
   console->extend(console, "JsonParser[parseString]");
 
-  console->debug(console, "Iniciando parse de string");
+  // console->debug(console, "Iniciando parse de string");
 
   int stringStart = *offset; // Inicia já tendo lido as " iniciais, então offset já é o primerio char da string
   alocatedCString string = NULL;
@@ -57,7 +57,7 @@ alocatedCString parseString(int *offset, int max, const char *buffer) {
 
   }
 
-  console->debug(console, "string encontrada");
+  // console->debug(console, "string encontrada");
   console->destroy(&console);
   return string;
 }
@@ -96,7 +96,7 @@ ParsedValue parseValue(int *offset, int max, const char *buffer) {
     /** Value is a number */
     if (input == '-' || (input >= '0' && input <= '9')) {
       if (FoundValue) {
-        printf("as-Econtrado valor mais de uma vez\n");
+        printf("id-Econtrado valor mais de uma vez\n");
         exit(1);        // valor ja encontrado!! erro
       }
       FoundValue = True;
@@ -105,6 +105,10 @@ ParsedValue parseValue(int *offset, int max, const char *buffer) {
       value.type = number;
       if (parsed.withErrors) {
         exit(1);
+      }
+      input = buffer[*offset];
+       if (input == ',' || input == ']' || input == '}') {
+        *offset -= 1;
       }
       continue;
     }
@@ -251,6 +255,13 @@ Map* parseObject(int *offset, int max, const char *buffer) {
         key = NULL;
         value.type = unknow;
       }
+
+      if (value.type == null) {
+        obj->setNull(obj, key);
+        key != NULL ? free(key) : 0; // libera a memria da chave
+        key = NULL;
+        value.type = unknow;
+      }
     }
 
     // tem proximo
@@ -275,6 +286,13 @@ Map* parseObject(int *offset, int max, const char *buffer) {
       
       if (value.type == number) { // insere nested object
         obj->setNumber(obj, key, value.numberValue);
+        key != NULL ? free(key) : 0; // libera a memria da chave
+        key = NULL;
+        value.type = unknow;
+      }
+
+      if (value.type == null) {
+        obj->setNull(obj, key);
         key != NULL ? free(key) : 0; // libera a memria da chave
         key = NULL;
         value.type = unknow;
