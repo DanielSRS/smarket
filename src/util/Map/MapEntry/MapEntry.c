@@ -55,6 +55,11 @@ alocatedCString _mapEntryToString(MapEntry* self) {
     return formatedCString("%s: %s", self->key, "null");
   }
 
+  if (self->type == BOOLEAN_ENTRY_VALUE) {
+    boolean val = *((boolean*) self->value);
+    return val ? formatedCString("%s: %s", self->key, "true") : formatedCString("%s: %s", self->key, "false");
+  }
+
   /** Se o valor guardado for um map */
   if (self->type == MAP_ENTRY_VALUE) {
     alocatedCString mapStringfied = ((Map *) self->value)->toString((Map *) self->value);
@@ -122,6 +127,11 @@ alocatedCString mapEntryToJSONString(MapEntry* self) {
 
   if (self->type == NULL_ENTRY_VALUE) {
     return formatedCString("\"%s\":%s", self->key, "null");
+  }
+
+  if (self->type == BOOLEAN_ENTRY_VALUE) {
+    boolean val = *((boolean*) self->value);
+    return val ? formatedCString("\"%s\":%s", self->key, "true") : formatedCString("\"%s\":%s", self->key, "false");
   }
 
   /** Se o valor guardado for de outro tipo */

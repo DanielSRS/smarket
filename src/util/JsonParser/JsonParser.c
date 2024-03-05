@@ -262,6 +262,13 @@ Map* parseObject(int *offset, int max, const char *buffer) {
         key = NULL;
         value.type = unknow;
       }
+
+      if (value.type == Boolean) {
+        obj->setBoolean(obj, key, value.boolValue);
+        key != NULL ? free(key) : 0; // libera a memria da chave
+        key = NULL;
+        value.type = unknow;
+      }
     }
 
     // tem proximo
@@ -293,6 +300,13 @@ Map* parseObject(int *offset, int max, const char *buffer) {
 
       if (value.type == null) {
         obj->setNull(obj, key);
+        key != NULL ? free(key) : 0; // libera a memria da chave
+        key = NULL;
+        value.type = unknow;
+      }
+
+      if (value.type == Boolean) {
+        obj->setBoolean(obj, key, value.boolValue);
         key != NULL ? free(key) : 0; // libera a memria da chave
         key = NULL;
         value.type = unknow;

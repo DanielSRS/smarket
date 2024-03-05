@@ -16,5 +16,6 @@ add_test(parsedObjReturnsNotNull JsonParserTest parsedObjReturnsNotNull)
 add_test(parsedObjCreateCorrectMap JsonParserTest parsedObjCreateCorrectMap)
 add_test(parsedObjWithNumber JsonParserTest parsedObjWithNumber)
 add_test(parsedObjectValue JsonParserTest parsedObjectValue)
+add_test(parsedObjWithBoolean JsonParserTest parsedObjWithBoolean)
 
 add_subdirectory(NumberParser)

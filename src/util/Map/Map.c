@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+boolean BOOLEAN_TRUE_VALUE = 1;
+boolean BOOLEAN_FALSE_VALUE = 0;
+
 alocatedCString htttpHeadersCString(Map* self);
 alocatedCString mapToJsonString(Map* self);
 alocatedCString listToJsonString(List* self);
@@ -157,6 +160,11 @@ alocatedCString mapEntryValueToString(MapEntry* self) {
     return formatedCString("%s", "null");
   }
 
+  if (self->type == BOOLEAN_ENTRY_VALUE) {
+    boolean val = *((boolean*) self->value);
+    return val ? formatedCString("%s", "true") : formatedCString("%s", "false");
+  }
+
   /** Se o valor guardado for um map */
   if (self->type == MAP_ENTRY_VALUE) {
     return ((Map *) self->value)->toString((Map *) self->value);
@@ -275,6 +283,11 @@ Map *setMap(Map* self, char* key, Map* value) {
   return _setElementOfAMap(self, key, value, MAP_ENTRY_VALUE);
 }
 
+Map *setBoolean(Map* self, char* key, boolean value) {
+  boolean *valueptr = value ? &BOOLEAN_TRUE_VALUE : &BOOLEAN_FALSE_VALUE;
+  return _setElementOfAMap(self, key, valueptr, BOOLEAN_ENTRY_VALUE);
+}
+
 Map *setNull(Map* self, char* key) {
   return _setElementOfAMap(self, key, NULL, NULL_ENTRY_VALUE);
 }
@@ -379,6 +392,7 @@ Map* newMap() {
   map->setList = setList;
   map->setNumber = setNumber;
   map->setNull = setNull;
+  map->setBoolean = setBoolean;
 
   return map;
 }
