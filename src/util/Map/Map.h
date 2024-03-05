@@ -40,6 +40,7 @@ typedef struct Map
   struct Map*(*setList)(struct Map* self, char* key, void* value);
   struct Map* (*setNumber)(struct Map* self, char* key, double value);
   struct Map* (*setNull)(struct Map* self, char* key);
+  struct Map* (*setBoolean)(struct Map* self, char* key, boolean value);
   /**
    * Adiciona uma nova chave cujo valor é um novo outro Map
    * 
